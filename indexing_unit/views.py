@@ -1,0 +1,478 @@
+from django.shortcuts import render, get_object_or_404, redirect
+from django.views import View
+from django.views.generic import (
+     CreateView,
+     DetailView,
+     ListView,
+     UpdateView,
+     DeleteView,
+     TemplateView
+)
+
+import random
+from accounts.forms import SignupForm
+from .forms import *
+from .models import *
+from institutions.models import *
+from django.db import transaction
+from django.db.models import F
+from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.shortcuts import get_object_or_404
+from django.urls import reverse, reverse_lazy
+from django.utils.translation import gettext as _
+from django.views import static
+from django.views.generic import (
+    CreateView,
+    DeleteView,
+    DetailView,
+    TemplateView,
+)
+from django.views.generic.detail import (
+    SingleObjectMixin,
+    SingleObjectTemplateResponseMixin,
+)
+from django.views.generic.edit import FormMixin, ProcessFormView
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.utils.decorators import method_decorator
+
+
+
+
+from django.contrib.auth import get_user_model
+User = get_user_model()
+
+from dal import autocomplete
+
+
+
+
+class InstitutionAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        # Don't forget to filter out results depending on the visitor !
+        if not self.request.user.is_authenticated:
+            return InstitutionProfile.objects.none()
+
+        qs = InstitutionProfile.objects.all()
+
+        if self.q:
+            qs = qs.filter(name__istartswith=self.q)
+
+        return qs
+
+
+class DashboardView(ListView):
+	#queryset = InstitutionProfile.objects.all()
+	template_name = "indexing_unit/dashboard1.html"
+
+	def get_queryset(self):
+		request = self.request
+		qs = InstitutionProfile.objects.all()
+		query = request.GET.get('q')
+		if query:
+			qs = qs.filter(name__icontains=query)
+		return qs
+
+	# def get_context_data(self, *args, **kwargs):
+	# 	context = super(DashboardView, self).get_context_data(*args, **kwargs)
+	# 	context['random_number'] = random.randint(100, 10000)
+	# 	print(context)
+	# 	return context
+
+
+class InstitutionCreateView(CreateView):
+    model = InstitutionProfile
+    template_name = "indexing_unit/register_institution.html"
+    form_class = InstitutionProfileForm
+
+# class InstitutionCreateView(CreateView):
+# 	user_form = SignupForm
+# 	indexing_officer_form = IndexingOfficerProfileForm
+# 	institution_form = InstitutionProfileForm
+# 	template_name = 'indexing_unit/register_institution.html'
+	
+
+
+class IndexingOfficerCreateView1(CreateView):
+    model = IndexingOfficerProfileForm
+    template_name = "indexing_unit/create_indexing_officer1.html"
+    form_class = IndexingOfficerProfileForm
+
+
+
+class IndexingOfficerCreateView2(CreateView):
+	model = User
+	form_class = SignupForm
+	# indexing_officer_form = IndexingOfficerProfileForm
+	template_name = 'indexing_unit/create_indexing_officer.html'
+	success_url = "/"
+	template_name1 = 'indexing_unit/indexing_officer_details.html'
+
+
+
+class IndexingOfficerCreateView(CreateView):
+	model = User
+	user_form = SignupForm
+	form = IndexingOfficerProfileForm
+	template_name = 'indexing_unit/create_indexing_officer.html'
+	template_name1 = 'indexing_unit/indexing_officer_details.html'
+
+	def get(self, request, *args, **kwargs):
+		user_form = self.user_form()
+		form  = self.form()
+		return render(request, self.template_name, {'user_form':user_form, 'form':form})
+
+	def post(self, request, *args, **kwargs):
+		user_form = self.user_form(request.POST)
+		form  = self.form (request.POST)
+		
+		if user_form.is_valid() and form.is_valid():
+			user = user_form.save(commit=False)
+			user.is_active = True
+			user.save()
+			indexing_officer = form.save(commit=False)
+			IndexingOfficerProfile.objects.create(
+                indexing_officer = user,
+                institution = indexing_officer.institution,
+                )
+			indexing_officer = IndexingOfficerProfile.objects.filter(indexing_officer=user).first()
+			return redirect(indexing_officer.get_absolute_url())
+
+	   	# 	return redirect('index')  	
+	   	
+		print(request.POST)
+		return render(request, self.template_name, {'user_form':user_form, 'form':form})
+    
+
+
+class IndexingOfficerDetailView(DetailView):
+	queryset = IndexingOfficerProfile.objects.all()
+	template_name = "indexing_unit/indexing_officer_details.html"
+
+
+
+class InstitutionListView(ListView):
+	template_name = "indexing_unit/institutions_list1.html"
+	def get_queryset(self):
+		request = self.request
+		qs = InstitutionProfile.objects.all()
+		query = request.GET.get('q')
+		if query:
+			qs = qs.filter(name__icontains=query)
+		return qs  #.filter(title__icontains='vid') 
+
+
+
+class InstitutionCreateView1(CreateView):
+	user_form = SignupForm
+	indexing_officer_form = IndexingOfficerProfileForm
+	institution_form = InstitutionProfileForm
+	template_name = 'indexing_unit/create_institution_profile.html'
+	
+	
+	
+	def get(self, request, *args, **kwargs):
+		user_form = self.user_form()
+		indexing_officer_form  = self.indexing_officer_form()
+		institution_form  = self.institution_form()
+		return render(request, self.template_name, {'user_form':user_form, 'institution_form':institution_form, 'indexing_officer_form':indexing_officer_form})
+
+	def post(self, request, *args, **kwargs):
+		user_form = self.user_form(request.POST)
+		indexing_officer_form  = self.indexing_officer_form (request.POST)
+		institution_form  = self.institution_form (request.POST)
+
+
+		if user_form.is_valid() and institution_form.is_valid() and indexing_officer_form.is_valid():
+	   		user = user_form.save(commit=False)
+	   		user.is_active = True
+	   		user.save()
+	   		institution = institution_form.save()
+	   		indexing_officer = indexing_officer_form.save(commit=False)
+	   		IndexingOfficerProfile.objects.create(
+                indexing_officer = user,
+                institution = institution,
+                )
+	   		return redirect('index')
+	   	
+	   	
+		print(request.POST)
+		return render(request, self.template_name, {'user_form':user_form, 'institution_form':institution_form, 'indexing_officer_form':indexing_officer_form})
+
+
+
+
+class InstitutionDetailView(DetailView):
+	queryset = InstitutionProfile.objects.all()
+	template_name = "indexing_unit/institution_details.html"
+
+
+
+
+    
+
+
+class AdmissionQuotaCreateView(CreateView):
+    model = AdmissionQuota
+    template_name = "indexing_unit/assign_admission_quota.html"
+    form_class = AdmissionQuotaForm
+
+
+
+class AdmissionQuotaDetailView(DetailView):
+	queryset = AdmissionQuota.objects.all()
+	template_name = "indexing_unit/admission_quota_details.html"
+
+
+
+class AdmissionQuotaListView(ListView):
+	template_name = "indexing_unit/admission_quota_list.html"
+	def get_queryset(self):
+		request = self.request
+		qs = AdmissionQuota.objects.all()
+		query = request.GET.get('q')
+		if query:
+			qs = qs.filter(name__icontains=query)
+		return qs  #.filter(title__icontains='v
+
+
+class IndexingApplicationsListView(ListView):
+	template_name = "indexing_unit/students_indexing_applications_list.html"
+	def get_queryset(self):
+		request = self.request
+		qs = StudentIndexing.objects.all()
+		query = request.GET.get('q')
+		if query:
+			qs = qs.filter(name__icontains=query)
+		return qs.filter(indexing_status=2) 
+
+
+class IndexingVerificationsDetailView(DetailView):
+	queryset = StudentIndexing.objects.all()
+	template_name = "indexing_unit/student_indexing_verification_details.html"
+
+
+def verify(request, id):
+  if request.method == 'POST':
+     object = get_object_or_404(StudentIndexing, pk=id)
+     object.indexing_status = 3
+     object.save()
+     context = {}
+     context['object'] = object
+     # messages.success(request, ('Indexing Application Verified'))
+     return render(request, 'indexing_unit/verifications_successful.html',context)
+
+
+def reject(request, id):
+  if request.method == 'POST':
+     object = get_object_or_404(StudentIndexing, pk=id)
+     object.indexing_status = 4
+     object.save()
+     context = {}
+     context['object'] = object
+     # messages.error(request, ('Indexing Application Rejected'))
+     return render(request, 'indexing_unit/verification_failed.html',context)
+
+
+class IndexNumberIssuanceList(ListView):
+	template_name = "indexing_unit/index_number_issuance_list.html"
+	def get_queryset(self):
+		request = self.request
+		qs = InstitutionPayment.objects.all()
+		query = request.GET.get('q')
+		if query:
+			qs = qs.filter(name__icontains=query)
+		return qs.filter(payment_status=2) 
+
+
+
+
+class InstitutionsIndexingListView(ListView):
+	template_name = "indexing_unit/issued_indexing_list.html"
+	def get_queryset(self):
+		request = self.request
+		qs = InstitutionProfile.objects.all()
+		query = request.GET.get('q')
+		if query:
+			qs = qs.filter(name__icontains=query)
+		return qs 
+
+
+class InstitutionsIndexingStudentsListView(ListView):
+	template_name = "indexing_unit/institutions_indexing_students_list.html"
+	def get_queryset(self):
+		request = self.request
+		qs = IssueIndexing.objects.all()
+		query = request.GET.get('q')
+		if query:
+			qs = qs.filter(name__icontains=query)
+		return qs 
+
+	def get_context_data(self, **kwargs):
+	    context = super(InstitutionsIndexingStudentsListView, self).get_context_data(**kwargs)
+	    institutions = InstitutionProfile.objects.all()
+	    students = IssueIndexing.objects.filter(institution__in=institutions)
+	    context = {
+	    'institutions':institutions,
+	    'students':students,
+	    }
+	    print ("context:", context)
+	    return context
+	    print ("context:", context)
+
+    	
+    	
+
+class IssueIndexNumberDetails(DetailView):
+	queryset = StudentIndexing.objects.all()
+	template_name = "indexing_unit/assign_index_number_detail.html"
+
+class IndexObjectMixin(object):
+    model = StudentIndexing
+    def get_object(self):
+        slug = self.kwargs.get('slug')
+        obj = None
+        if slug is not None:
+            obj = get_object_or_404(self.model, slug=slug)
+        return obj 
+
+
+class IssueIndexNumber1(CreateView):
+    model = IssueIndexing
+    template_name = "indexing_unit/issue_indexing_number.html"
+    form_class = IssueIndexingForm
+
+    def form_valid(self, form):
+        payment = form.save(commit=False)
+        user = self.request.user
+        institution = InstitutionProfile.objects.get(name=user.get_indexing_officer_profile.institution)
+        payment.institution = institution
+        payment.save()
+        return super(InstitutionPaymentCreateView, self).form_valid(form)
+
+
+
+class IssueIndexNumber(CreateView, IndexObjectMixin):
+    model = IssueIndexing
+    template_name = "indexing_unit/issue_index_number.html"
+    form_class = IssueIndexingForm
+
+    def get_initial(self):
+        # You could even get the Book model using Book.objects.get here!
+        return {
+            'student_indexing': self.kwargs["slug"],
+            #'license_type': self.kwargs["pk"]
+        }
+
+    def get_form_kwargs(self):
+        self.student_indexing = StudentIndexing.objects.get(slug=self.kwargs['slug'])
+        kwargs = super().get_form_kwargs()
+        kwargs['initial']['student_profile'] = self.student_indexing.student_profile
+        kwargs['initial']['student_indexing'] = self.student_indexing
+        kwargs['initial']['reg_no'] = self.student_indexing.student_profile.student.reg_no
+        kwargs['initial']['institution'] = self.student_indexing.institution
+        kwargs['initial']['academic_session'] = self.student_indexing.academic_session
+        #kwargs['initial']['hospital'] = self.payment.hospital
+        
+        return kwargs
+      
+
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data())
+
+
+class IssuedIndexingApplications(ListView):
+	template_name = "indexing_unit/issued_indexing_applications_list.html"
+	def get_queryset(self):
+		request = self.request
+		qs = IssueIndexing.objects.all()
+		query = request.GET.get('q')
+		if query:
+			qs = qs.filter(name__icontains=query)
+		return qs
+
+class InstitutionsPaymentsListView(LoginRequiredMixin, ListView):
+	template_name = "indexing_unit/institutions_payments_list.html"
+	def get_queryset(self):
+		request = self.request
+		qs = InstitutionPayment.objects.all()
+		query = request.GET.get('q')
+		if query:
+			qs = qs.filter(name__icontains=query)
+		return qs
+
+
+class InstitutionsIndexingPaymentDetailView(LoginRequiredMixin, DetailView):
+	queryset = InstitutionPayment.objects.all()
+	template_name = "indexing_unit/institutions_payment_details.html"
+
+class InstitutionsIndexingPreIssueDetailView(LoginRequiredMixin, DetailView):
+	queryset = InstitutionPayment.objects.all()
+	template_name = "indexing_unit/institutions_indexing_pre_issue_details.html"
+
+
+
+def verify_payment(request, id):
+  if request.method == 'POST':
+     object = get_object_or_404(InstitutionPayment, pk=id)
+     object.payment_status = 2
+     object.save()
+     context = {}
+     context['object'] = object
+     # messages.success(request, ('Indexing Application Verified'))
+     return render(request, 'indexing_unit/payment_verification_successful.html',context)
+
+
+def reject_payment(request, id):
+  if request.method == 'POST':
+     object = get_object_or_404(InstitutionPayment, pk=id)
+     object.payment_status = 1
+     object.save()
+     context = {}
+     context['object'] = object
+     # messages.error(request, ('Indexing Application Rejected'))
+     return render(request, 'indexing_unit/payment_verification_failed.html',context)
+
+
+
+class VerifiedPaymentsListView(LoginRequiredMixin, ListView):
+	template_name = "indexing_unit/verified_payments_list.html"
+	
+	def get_queryset(self):
+		user = self.request.user
+		try:
+			obj = InstitutionPayment.objects.filter(payment_status=2)
+			print ("obj:", obj)
+			if obj.exists():
+				return obj
+		except:
+			raise Http404
+
+class InstitutionsPaymentsListView1(LoginRequiredMixin, ListView):
+	template_name = "indexing_unit/institutions_payments_list.html"
+	
+	def get_queryset(self):
+		user = self.request.user
+		try:
+			obj = InstitutionPayment.objects.filter(institution = user.get_indexing_officer_profile.institution, payment_status=1)
+			print ("obj:", obj)
+			if obj.exists():
+				return obj
+		except:
+			raise Http404
+
+class IssuedIndexingApplicationsDetails(DetailView):
+	queryset = IssueIndexing.objects.all()
+	template_name = "indexing_unit/issued_indexing_applications_details.html"
+
+
+
+class StudentIndexingApplicationDetailView(LoginRequiredMixin, DetailView):
+    queryset = StudentIndexing.objects.all()
+    template_name = "indexing_unit/student_indexing_application_details.html"
+
+    
+class StudentIndexingNumberDetailView(LoginRequiredMixin, DetailView):
+    queryset = IssueIndexing.objects.all()
+    template_name = "indexing_unit/students_indexing_number_details.html"
+

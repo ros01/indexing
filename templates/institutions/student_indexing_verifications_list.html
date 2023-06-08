@@ -1,0 +1,51 @@
+{% extends 'institutions/dashboard_base1.html'%}
+
+{% block title %}Institution | {{ block.super }}{% endblock title %}
+
+
+{% block content %}
+<div class="row mx-2">
+<div class="col-md-12 mt-4 mx-1">
+<div class="row">
+<div class="col-md-12">
+<div class="card">   
+ <div class="card-body">
+<h4 class="mt-0 header-title text-primary">Students Indexing Verifications List</h4>
+<div class="d-flex justify-content-end mr-2 mb-2">  
+<h5 class="mb-1"><a href="{% url 'institutions:generate_payment_invoice' %}"> <span class="badge badge-warning">Generate Invoice</span></a>  </h5> 
+</div>
+<p class="text-muted  font-14">Below are the list of verified students indexing applications for the 2022/2023 Academic Session.
+</p>
+    <table id="datatable-buttons" class="table table-striped table-bordered dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+        <thead>
+        <tr>
+            <th>Student Name</th>
+            <th>Institution</th>
+            <th>Academic Session</th>
+            <th>Admission Type</th>
+            <th>Submission Date</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for object in object_list %}
+        <tr>
+            <td>{{object.student_profile.student.last_name}} {{object.student_profile.student.first_name}}</td>
+            <td>{{object.institution}}</td>
+            <td>{{object.academic_session}}</td>
+            <td>{{object.admission_type}}</td>
+            <td>{{object.timestamp}}</td>
+            <td><h6 class="mb-1"><a href="{% url 'institutions:student_indexing_verification_details' object.slug %}"> <i class="fas fa-search text-primary"></i> <span class="badge badge-boxed  badge-primary">View Details </span></a></h6></td> 
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+</div>
+</div> <!-- end col -->
+</div> <!-- end row -->
+</div>
+</div>
+
+{% endblock content %}

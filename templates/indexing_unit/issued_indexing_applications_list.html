@@ -1,0 +1,107 @@
+{% extends 'indexing_unit/dashboard_base.html'%}
+
+{% block title %}Institution | {{ block.super }}{% endblock title %}
+
+
+{% block content %}
+
+<div class="row mx-2">
+
+
+<div class="col-md-12 mt-4 mx-1">
+
+
+  <div class="card">
+            <div class="card-header pb-0 px-3">
+              <h6 class="mb-0 ml-2">Issued Indexing Applications List</h6>
+              
+            </div>
+
+            
+  <div class="table-responsive">
+    <table class="table align-items-center mb-0">
+      <thead>
+        <tr>
+          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Student Name</th>
+          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Academic Session</th>
+          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Admission Type</th>
+          <!-- <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">UTME Grade</th> -->
+          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Submission Date</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+
+        {% for object in object_list %}
+        <tr>
+          <td>
+            <div class="d-flex px-2">
+              <div>
+                <img src="https://demos.creative-tim.com/soft-ui-design-system-pro/assets/img/logos/small-logos/logo-spotify.svg" class="avatar avatar-sm rounded-circle me-2">
+              </div>
+              <div class="my-auto">
+                <h6 class="mb-0 text-xs">{{object.student_profile.student.last_name}} {{object.student_profile.student.first_name}}</h6>
+              </div>
+            </div>
+          </td>
+          <td>
+            <p class="text-xs font-weight-normal mb-0">{{object.academic_session}}</p>
+          </td>
+          <td>
+            <span class="badge badge-dot me-4">
+              <i class="bg-info"></i>
+              <span class="text-dark text-xs">{{object.index_number}}</span>
+            </span>
+          </td>
+          <!-- <td class="align-middle text-center">
+            <div class="d-flex align-items-center">
+              <span class="text-dark text-xs">{{object.utme_grade}}</span>
+            </div>
+          </td> -->
+          <td class="align-middle text-center">
+            <div class="d-flex align-items-center">
+              <span class="me-2 text-xs">{{object.timestamp}}</span>
+            </div>
+          </td>
+
+          <td class="align-middle">
+            <button class="btn btn-link text-secondary mb-0">
+              <span class="material-icons">
+              more_vert
+              </span>
+
+
+              <a href="{% url 'indexing_unit:issued_indexing_application_details' object.slug %}">
+               <span class="material-icons text-info mx-1">
+              visibility
+              </span>
+               </a>
+
+
+
+              <span class="material-icons text-warning mx-1">
+              edit
+              </span>
+               <span class="material-icons text-danger mx-1">
+              delete
+              </span>
+            </button>
+          </td>
+
+          
+
+
+
+
+        </tr>
+
+        {% endfor %}
+
+        
+      </tbody>
+    </table>
+  </div>
+  </div>
+        </div>
+      </div>
+{% endblock content %}

@@ -1,0 +1,94 @@
+{% extends 'indexing_unit/dashboard_base.html'%}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block title%}| Welcome {% endblock %}
+
+{% block styles %}
+
+
+{% endblock %}
+
+
+
+{% block content %}
+
+<div class="row ml-3">
+
+    <div class="col-md-10 mt-4">
+    
+    <div class="card">
+    <div class="card-header pb-0 px-3">
+    <h6 class="mb-0 ml-2">Assign Admission Quota</h6>
+    </div>
+
+   <form method="POST" enctype="multipart/form-data">
+   {% csrf_token %}
+    <div class="row px-4">
+
+      <div class="col-md-6">
+      <div class= "form-control-alternative my-4 py-0">
+      {{ form.course_1|as_crispy_field }}
+
+      </div>
+     </div>
+
+    <div class="col-md-6">
+      <div class="input-group input-group-outline is-valid my-3 pt-5 pb-2">
+        <label class="form-label">Admission Quota</label>
+        <input type="number" name="admission_quota_1" class="form-control">
+      </div>
+        </div>
+     </div>
+
+     <div class="row px-4">
+
+      <div class="col-md-6">
+      <div class= "form-control-alternative my-4 py-0">
+      {{ form.course_2|as_crispy_field }}
+
+      </div>
+     </div>
+
+    <div class="col-md-6">
+      <div class="input-group input-group-outline is-valid my-3 pt-5 pb-2">
+        <label class="form-label">Admission Quota</label>
+        <input type="number" name="admission_quota_2" class="form-control">
+      </div>
+        </div>
+     </div>
+
+
+      <div class="row px-4">
+      <div class="col-md-6">
+      <div class= "form-control-alternative my-0 py-0">
+      {{ form.institution|as_crispy_field }}
+
+      </div>
+     </div>
+
+      <div class="col-md-6">
+      <div class= "form-control-alternative my-0 py-0">
+      {{ form.academic_session|as_crispy_field }}
+
+      </div>
+     </div>
+
+      </div>
+    
+    
+      <div class="d-flex justify-content-end pr-4"> 
+      <button type="submit" class="btn btn-primary ml-4 px-3 py-2 mt-2 mb-4"> Proceed &#x21E8;</button>
+
+      </div>
+
+      </form>
+
+
+      </div>
+      </div>
+        </div>
+
+    </div>
+
+
+{% endblock %}

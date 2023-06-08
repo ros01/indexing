@@ -1,0 +1,272 @@
+{% extends 'indexing_unit/dashboard_base.html'%}
+
+{% block title %}Institution | {{ block.super }}{% endblock title %}
+
+
+{% block content %}
+
+<div class="row mx-2">
+
+
+<div class="col-md-12 mt-4 mx-1">
+
+
+  <div class="card">
+            <div class="card-header pb-0 px-3">
+              <h6 class="mb-0 ml-2">Institutions Admission Quota List</h6>
+            </div>
+  <div class="table-responsive">
+    <table class="table align-items-center mb-0">
+      <thead>
+        <tr>
+          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Institution</th>
+          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Academic Session</th>
+          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Course</th>
+          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Admission Quota</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+
+        {% for object in object_list %}
+        <tr>
+          <td>
+            <div class="d-flex px-2">
+              <div>
+                <img src="https://demos.creative-tim.com/soft-ui-design-system-pro/assets/img/logos/small-logos/logo-spotify.svg" class="avatar avatar-sm rounded-circle me-2">
+              </div>
+              <div class="my-auto">
+                <h6 class="mb-0 text-xs">{{object.institution}}</h6>
+              </div>
+            </div>
+          </td>
+          <td>
+            <p class="text-xs font-weight-normal mb-0">{{object.academic_session}}</p>
+          </td>
+          <td>
+            <span class="badge badge-dot me-4">
+              <i class="bg-info"></i>
+              <span class="text-dark text-xs">{{object.course_1}}</span>
+            </span>
+          </td>
+          <td class="align-middle text-center">
+            <div class="d-flex align-items-center">
+              <span class="me-2 text-xs">{{object.admission_quota_1}}</span>
+            </div>
+          </td>
+
+          <td class="align-middle">
+            <button class="btn btn-link text-secondary mb-0">
+              <span class="material-icons">
+              more_vert
+              </span>
+
+              
+              <a href="{% url 'indexing_unit:institution_detail' object.slug %}">
+               <span class="material-icons text-info mx-1">
+              visibility
+              </span>
+               </a>
+
+
+
+              <span class="material-icons text-warning mx-1">
+              edit
+              </span>
+               <span class="material-icons text-danger mx-1">
+              delete
+              </span>
+            </button>
+          </td>
+
+          
+
+
+
+
+        </tr>
+
+        {% endfor %}
+
+        <!-- <tr>
+          <td>
+            <div class="d-flex px-2">
+              <div>
+                <img src="https://demos.creative-tim.com/soft-ui-design-system-pro/assets/img/logos/small-logos/logo-invision.svg" class="avatar avatar-sm rounded-circle me-2">
+              </div>
+              <div class="my-auto">
+                <h6 class="mb-0 text-xs">Invision</h6>
+              </div>
+            </div>
+          </td>
+          <td>
+            <p class="text-xs font-weight-normal mb-0">$5,000</p>
+          </td>
+          <td>
+            <span class="badge badge-dot me-4">
+              <i class="bg-success"></i>
+              <span class="text-dark text-xs">done</span>
+            </span>
+          </td>
+          <td class="align-middle text-center">
+            <div class="d-flex align-items-center">
+              <span class="me-2 text-xs">100%</span>
+            </div>
+          </td>
+
+          <td class="align-middle">
+            <button class="btn btn-link text-secondary mb-0" aria-haspopup="true" aria-expanded="false">
+              <span class="material-icons">
+              more_vert
+              </span>
+            </button>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <div class="d-flex px-2">
+              <div>
+                <img src="https://demos.creative-tim.com/soft-ui-design-system-pro/assets/img/logos/small-logos/logo-jira.svg" class="avatar avatar-sm rounded-circle me-2">
+              </div>
+              <div class="my-auto">
+                <h6 class="mb-0 text-xs">Jira</h6>
+              </div>
+            </div>
+          </td>
+          <td>
+            <p class="text-xs font-weight-normal mb-0">$3,400</p>
+          </td>
+          <td>
+            <span class="badge badge-dot me-4">
+              <i class="bg-danger"></i>
+              <span class="text-dark text-xs">canceled</span>
+            </span>
+          </td>
+          <td class="align-middle text-center">
+            <div class="d-flex align-items-center">
+              <span class="me-2 text-xs">30%</span>
+            </div>
+          </td>
+
+          <td class="align-middle">
+            <button class="btn btn-link text-secondary mb-0" aria-haspopup="true" aria-expanded="false">
+              <span class="material-icons">
+              more_vert
+              </span>
+            </button>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <div class="d-flex px-2">
+              <div>
+                <img src="https://demos.creative-tim.com/soft-ui-design-system-pro/assets/img/logos/small-logos/logo-slack.svg" class="avatar avatar-sm rounded-circle me-2">
+              </div>
+              <div class="my-auto">
+                <h6 class="mb-0 text-xs">Slack</h6>
+              </div>
+            </div>
+          </td>
+          <td>
+            <p class="text-xs font-weight-normal mb-0">$1,000</p>
+          </td>
+          <td>
+            <span class="badge badge-dot me-4">
+              <i class="bg-danger"></i>
+              <span class="text-dark text-xs">canceled</span>
+            </span>
+          </td>
+          <td class="align-middle text-center">
+            <div class="d-flex align-items-center">
+              <span class="me-2 text-xs">0%</span>
+            </div>
+          </td>
+
+          <td class="align-middle">
+            <button class="btn btn-link text-secondary mb-0" aria-haspopup="true" aria-expanded="false">
+              <span class="material-icons">
+              more_vert
+              </span>
+            </button>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <div class="d-flex px-2">
+              <div>
+                <img src="https://demos.creative-tim.com/soft-ui-design-system-pro/assets/img/logos/small-logos/logo-webdev.svg" class="avatar avatar-sm rounded-circle me-2">
+              </div>
+              <div class="my-auto">
+                <h6 class="mb-0 text-xs">Webdev</h6>
+              </div>
+            </div>
+          </td>
+          <td>
+            <p class="text-xs font-weight-normal mb-0">$14,000</p>
+          </td>
+          <td>
+            <span class="badge badge-dot me-4">
+              <i class="bg-info"></i>
+              <span class="text-dark text-xs">working</span>
+            </span>
+          </td>
+          <td class="align-middle text-center">
+            <div class="d-flex align-items-center">
+              <span class="me-2 text-xs">80%</span>
+            </div>
+          </td>
+
+          <td class="align-middle">
+            <button class="btn btn-link text-secondary mb-0" aria-haspopup="true" aria-expanded="false">
+              <span class="material-icons">
+              more_vert
+              </span>
+            </button>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <div class="d-flex px-2">
+              <div>
+                <img src="https://demos.creative-tim.com/soft-ui-design-system-pro/assets/img/logos/small-logos/logo-xd.svg" class="avatar avatar-sm rounded-circle me-2">
+              </div>
+              <div class="my-auto">
+                <h6 class="mb-0 text-xs">Adobe XD</h6>
+              </div>
+            </div>
+          </td>
+          <td>
+            <p class="text-xs font-weight-normal mb-0">$2,300</p>
+          </td>
+          <td>
+            <span class="badge badge-dot me-4">
+              <i class="bg-success"></i>
+              <span class="text-dark text-xs">done</span>
+            </span>
+          </td>
+          <td class="align-middle text-center">
+            <div class="d-flex align-items-center">
+              <span class="me-2 text-xs">100%</span>
+            </div>
+          </td>
+
+          <td class="align-middle">
+            <button class="btn btn-link text-secondary mb-0" aria-haspopup="true" aria-expanded="false">
+              <span class="material-icons">
+              more_vert
+              </span>
+            </button>
+          </td>
+        </tr> -->
+
+      </tbody>
+    </table>
+  </div>
+  </div>
+        </div>
+      </div>
+{% endblock content %}

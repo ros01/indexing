@@ -1,0 +1,109 @@
+{% extends 'students/dashboard_base2.html'%}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block title%}| Welcome {% endblock %}
+
+{% block styles %}
+
+
+{% endblock %}
+
+
+
+{% block content %}
+
+
+
+
+
+<div class="row ml-3">
+
+<div class="col-md-10 mt-4">
+
+<div class="card m-b-30">
+<div class="card-body bootstrap-select-1">
+<h4 class="header-title mt-0 text-primary">Update Profile</h4>
+<p class="text-muted font-14">Please fill all relevant fields to update your profile in order to proceed with your indexing application.</p>  
+
+<form method="POST" enctype="multipart/form-data">
+{% csrf_token %}  
+
+<div class="row form-material">
+<div class="col-md-6">
+<div class="form-control-alternative mt-3" style="width: 100%; height:36px;">
+{{ form.sex|as_crispy_field }}
+</div>
+</div>
+<div class="col-md-6">
+<label class="text-muted mt-3">Date of Birth</label>
+<input type="text" class="form-control" name="dob" placeholder="2017-06-04" id="mdate">
+</div>
+</div> 
+
+<div class="row form-material mt-3">
+<div class="col-md-6">
+<div class= "form-control-alternative my-0 py-0">
+{{ form.marital_status|as_crispy_field }}
+</div>
+</div>
+
+<div class="col-md-6">
+<div class="form-control-alternative" style="width: 100%; height:36px;">
+{{ form.nationality|as_crispy_field }}
+</div>
+</div>
+</div> 
+
+<div class="row form-material">
+<div class="col-md-6">
+<div class= "form-control-alternative my-0 py-0">
+{{ form.state_of_origin|as_crispy_field }}
+</div>
+</div>
+
+
+<div class="col-md-6">
+<div class= "form-control-alternative my-0 py-0">
+{{ form.lga|as_crispy_field }}
+</div>
+</div>
+</div> 
+
+<div class="row form-material">
+<div class="col-md-6">
+<div class= "form-control-alternative my-0 py-0">
+    {{ form.contact_address|as_crispy_field }}
+    </div>
+</div>
+<div class="col-md-6">
+<div class="form-control-alternative mt-3 py-0" style="width: 100%; height:36px;">
+
+</div>
+</div>
+</div> 
+<div class="d-flex justify-content-end pr-4"> 
+<!-- <button type="submit" class="btn btn-primary ml-4 px-3 py-2 mt-2 mb-4"> Save&#x21E8;</button> -->
+<button type="submit" class="btn btn-outline-primary waves-effect waves-light btn-sm px-3">Save</button>
+
+
+</div>
+
+</form>
+
+
+
+</div>
+</div> 
+</div>
+</div> 
+
+{% endblock %}
+
+
+<<!-- div class="form-group">
+
+<button class="btn btn-primary btn-sm text-light px-4 mt-2 float-right">Upload Admission Details</button>
+</div>
+</form> -->
+
+

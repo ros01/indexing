@@ -1,0 +1,148 @@
+{% extends 'indexing_unit/dashboard_base1.html'%}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block title%}| Welcome {% endblock %}
+
+{% block styles %}
+
+
+{% endblock %}
+
+
+
+{% block content %}
+
+
+
+
+
+<div class="row ml-4">
+
+    <div class="col-md-10 mt-4">
+    
+    <div class="card">
+    <div class="card-header pb-3 px-3">
+    <h6 class="mb-0 ml-2">Create Institution Profile</h6>
+    </div>
+
+   <form method="POST" enctype="multipart/form-data">
+   {% csrf_token %}
+
+   {% if form.errors %}
+    {% for field in form %}
+        {% for error in field.errors %}
+            <p> {{ error }} </p>
+        {% endfor %}
+    {% endfor %}
+    {% endif %}
+
+
+  
+   <div class="row px-4">
+      <div class="col-md-6">
+      <div class= "form-control-alternative my-0 py-0">
+      {{ form.name|as_crispy_field }}
+      </div>
+      </div>
+
+      <div class="col-md-6">
+      <div class= "form-control-alternative my-0 py-0">
+      {{ form.email|as_crispy_field }}
+      </div>
+      </div>
+
+    </div>
+
+    <div class="row px-4">
+      <div class="col-md-6">
+      <div class= "form-control-alternative my-0 py-0">
+      {{ form.phone_no|as_crispy_field }}
+      </div>
+      </div>
+
+      <div class="col-md-6">
+      <div class= "form-control-alternative my-0 py-0">
+      {{ form.address|as_crispy_field }}
+      </div>
+      </div>
+    </div>
+
+    <div class="row px-4">
+    <div class="col-md-6">
+    <div class= "form-control-alternative my-0 py-0">
+    {{ form.institution_type|as_crispy_field }}
+    </div>
+    </div>
+    
+    <div class="col-md-6">
+   <div class= "form-control-alternative my-0 py-0">
+    {{ form.accreditation_type|as_crispy_field }}
+    </div>
+    </div>
+
+
+    </div>
+
+
+    <div class="row px-4">
+      
+
+
+      <div class="col-md-6">
+      <!-- <div class= "form-control-alternative my-0 py-0">
+      {{ form.accreditation_date|as_crispy_field }}
+      </div>
+      </div> -->
+
+       
+
+
+      <div class="form-group row">
+      <label class="pl-3">Accreditation Date</label>
+      <div class="col-sm-12">
+      <input class="form-control" type="datetime-local" name="accreditation_date">
+      </div>
+      </div>
+
+
+      </div>
+
+
+
+
+
+      <div class="col-md-6">
+      <div class= "form-control-alternative my-0 py-0">
+      {{ form.accreditation_score|as_crispy_field }}
+      </div>
+      </div>
+    </div>
+
+    
+
+      
+      <div class="d-flex justify-content-end pr-4 pb-4"> 
+      <button type="submit" class="btn btn-primary ml-4 px-3 py-2 mt-2 mb-4"> Proceed &#x21E8;</button>
+
+      </div>
+
+      </form>
+
+
+      </div>
+      </div>
+        </div>
+
+  
+
+
+{% endblock %}
+
+
+
+
+
+       
+
+
+
