@@ -82,8 +82,8 @@
                     <th>Course</th>
                     <th>Academic Session</th>
                     <th>Reg No</th>
-                    <th>Admission Type</th>
-                    <th>Actions</th>
+                    <th>Index Number</th>
+                    <!-- <th>Actions</th> -->
                 </tr>
                 </thead>
                 <tbody>
@@ -91,10 +91,11 @@
                     <td>{{object.student_profile.student.last_name}} {{object.student_profile.student.first_name}}</td>
                     <td>{{object.institution.course_type}}</td>
                      <td>{{object.academic_session}}</td>
-                    <td>{{object.student_profile.student.reg_no}}</td>
-                    <td>{{object.reg_no}}</td>
+                      <td>{{object.reg_no}}</td>
+                    <td>{{object.index_number}}</td>
                    
-                    <td><a href="{% url 'indexing_unit:student_indexing_application_details' object.slug %}"> <i class="fas fa-search text-primary"></i> <span class="badge badge-boxed  badge-primary">View Student Details </span></a></td> 
+                   
+                    <!-- <td><a href="{% url 'indexing_unit:student_indexing_application_details' object.slug %}"> <i class="fas fa-search text-primary"></i> <span class="badge badge-boxed  badge-primary">View Student Details </span></a></td>  -->
                 </tr>
                
                 </tbody>

@@ -48,11 +48,11 @@
 <i class="mdi mdi-cube-outline"></i>
 </div>
 <div class="p-4">
-<h6 class="text-uppercase mb-3">Statistics</h6>
+<h6 class="text-uppercase mb-3">Students</h6>
 <div class="float-right">
-<p class="mb-0"><b>Last:</b> 30.4k</p>
+<p class="mb-0"><b>Week:</b> 15</p>
 </div>
-<h4 class="mb-0">34578<small class="ml-2"><i class="mdi mdi-arrow-up text-primary"></i></small></h4>
+<h4 class="mb-0">340<small class="ml-2"><i class="mdi mdi-arrow-up text-primary"></i></small></h4>
 </div>
 </div>
 </div>
@@ -63,11 +63,11 @@
 <i class="mdi mdi-buffer"></i>
 </div>
 <div class="p-4">
-<h6 class="text-uppercase mb-3">User Today</h6>
+<h6 class="text-uppercase mb-3">Payments</h6>
 <div class="float-right">
-<p class="mb-0"><b>Last:</b> 1250</p>
+<p class="mb-0"><b>Week:</b> 12</p>
 </div>
-<h4 class="mb-0">895<small class="ml-2"><i class="mdi mdi-arrow-down text-danger"></i></small></h4>
+<h4 class="mb-0">95<small class="ml-2"><i class="mdi mdi-arrow-down text-danger"></i></small></h4>
 </div>
 </div>
 </div>
@@ -78,11 +78,11 @@
 <i class="mdi mdi-tag-text-outline"></i>
 </div>
 <div class="p-4">
-<h6 class="text-uppercase mb-3">User This Month</h6>
+<h6 class="text-uppercase mb-3">Verifications</h6>
 <div class="float-right">
-<p class="mb-0"><b>Last:</b> 40.33k</p>
+<p class="mb-0"><b>Week:</b> 4</p>
 </div>
-<h4 class="mb-0">52410<small class="ml-2"><i class="mdi mdi-arrow-up text-primary"></i></small></h4>
+<h4 class="mb-0">10<small class="ml-2"><i class="mdi mdi-arrow-up text-primary"></i></small></h4>
 </div>
 </div>
 </div>
@@ -92,11 +92,11 @@
 <i class="mdi mdi-briefcase-check"></i>
 </div>
 <div class="p-4">
-<h6 class="text-uppercase mb-3">Request Per Minute</h6>
+<h6 class="text-uppercase mb-3">Indexing</h6>
 <div class="float-right">
-<p class="mb-0"><b>Last:</b> 956</p>
+<p class="mb-0"><b>Week:</b> 56</p>
 </div>
-<h4 class="mb-0">652<small class="ml-2"><i class="mdi mdi-arrow-down text-danger"></i></small></h4>
+<h4 class="mb-0">152<small class="ml-2"><i class="mdi mdi-arrow-down text-danger"></i></small></h4>
 </div>
 </div>
 
@@ -204,8 +204,8 @@
 <h4 class="card-header mt-0 text-primary">Student Profile Creation</h4>
 <div class="card-body">
 <!-- <h4 class="card-title font-20 mt-0">Post Accreditation Institution Creation</h4> -->
-<p class="card-text"><strong class="text-primary"> Note: </strong>This is for Institutions that have undergone successful accreditation with the Board </p>
-<a href="{% url 'institutions:create_student_profile' %}" class="btn btn-primary">Create Student Profile</a>
+<p class="card-text"><strong class="text-primary"> Note: </strong>Bulk Create Student Profiles from Excel Sheet </p>
+<a href="{% url 'institutions:create_student_profile' %}" class="btn btn-primary">Create Student Profiles</a>
 </div>
 </div>
 </div>
@@ -219,7 +219,7 @@
 <h4 class="card-header mt-0 text-primary">Institution Indexing Fee Payment</h4>
 <div class="card-body">
 <!-- <h4 class="card-title font-20 mt-0">Post Accreditation Institution Creation</h4> -->
-<p class="card-text"><strong class="text-primary"> Note: </strong>This is for Institutions that have undergone successful accreditation with the Board </p>
+<p class="card-text"><strong class="text-primary"> Note: </strong>Submit Students Indexing Fees to the Board </p>
 <a href="{% url 'institutions:institutions_indexing_payment' %}" class="btn btn-primary">Pay Students Indexing Fee</a>
 </div>
 </div>
@@ -231,8 +231,8 @@
 <h5 class="card-header mt-0 text-primary">Yearly Admmission Quota</h5>
 <div class="card-body">
 <!-- <h4 class="card-title font-20 mt-0">Post Accreditation Institution Creation</h4> -->
-<p class="card-text"><strong class="text-primary"> Note: </strong>This is for Institutions that have undergone successful accreditation with the Board </p>
-<a href="{% url 'indexing_unit:create_indexing_officer' %}" class="btn btn-primary">Assign Admission Quota</a>
+<p class="card-text"><strong class="text-primary"> Note: </strong>View Assigned Annual Admission Quota from the Board </p>
+<a href="" class="btn btn-primary">Assign Admission Quota</a>
 </div>
 </div>
 </div>
@@ -242,8 +242,8 @@
 <h4 class="card-header mt-0 text-primary">Institutions Student Indexing</h4>
 <div class="card-body">
 <!-- <h4 class="card-title font-20 mt-0">Post Accreditation Institution Creation</h4> -->
-<p class="card-text"><strong class="text-primary"> Note: </strong>This is for Institutions that have undergone successful accreditation with the Board </p>
-<a href="{% url 'indexing_unit:create_indexing_officer' %}" class="btn btn-primary">Assign Index Numbers</a>
+<p class="card-text"><strong class="text-primary"> Note: </strong>List of Indexed Students for current Academic Session </p>
+<a href="" class="btn btn-primary">View Students</a>
 </div>
 </div>
 </div>
@@ -282,7 +282,7 @@
 </div>
 </div>
 </div>
-<div class="table-responsive">
+<!-- <div class="table-responsive">
 <table class="table">
 <thead>
 <tr>
@@ -365,7 +365,7 @@
 </tr>                                                      
 </tbody>
 </table>
-</div>
+</div> -->
 
 </div>
 </div>                                    

@@ -29,9 +29,9 @@ admin.site.register(InstitutionProfile, InstitutionProfileAdmin)
 
 class AdmissionQuotaAdmin(admin.ModelAdmin):
     list_filter = ['updated', 'timestamp']
-    list_display = ['institution', 'academic_session', 'slug', 'course_1', 'admission_quota_1', 'course_2', 'admission_quota_2']
+    list_display = ['institution', 'academic_session', 'slug', 'admission_quota']
     readonly_fields = ['updated', 'timestamp']
-    search_fields = ['institution', 'academic_session', 'slug', 'course_1', 'admission_quota_1', 'course_2', 'admission_quota_2']
+    search_fields = ['institution', 'academic_session', 'slug', 'admission_quota']
     
     class Meta:
         model = AdmissionQuota

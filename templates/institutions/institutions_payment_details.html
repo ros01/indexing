@@ -135,32 +135,22 @@
 </div>
 
 
-
-{% if object.payment_status == 1 %}
+{% if object.payment_status ==  %}
 <div class="d-flex justify-content-end mr-2 mb-2">   
 <a href="javascript:{document.getElementById('verify_payment{{object.id }}').submit()}"><button class="btn btn-success py-0 mr-2 mt-1 mb-1"> Verify Payment<i class="fa fa-check" aria-hidden="true"></i></button> </a>
 <a href="javascript:{document.getElementById('reject_payment{{object.id }}').submit()}"><button class="btn btn-danger py-0 mr-2 mt-1 mb-1"> Reject Payment<i class="fa fa-reply" aria-hidden="true"></i></button></a> 
-<a href="{% url 'institutions:submitted_payments_list' %}" class="btn btn-outline-success text-success py-0 mr-2 mt-1 mb-1"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Payments List</a>  
+<a href="{% url 'indexing_unit:institutions_payments_list' %}" class="btn btn-outline-success text-success py-0 mr-2 mt-1 mb-1"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Payments List</a>  
 </div>
-{% elif  object.payment_status == 2 %}
-<div class="d-flex justify-content-end mr-2 mb-2">
-<a href="{% url 'institutions:verified_payments_list' %}" class="btn btn-outline-success text-success py-0 mr-2 mt-1 mb-1"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Payments List</a> 
-</div> 
-{% else %} 
-<div class="d-flex justify-content-end mr-2 mb-2">
-<a href="{% url 'institutions:verified_payments_list' %}" class="btn btn-outline-success text-success py-0 mr-2 mt-1 mb-1"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Payments List</a> 
-</div> 
-{% endif %} 
 
 </div>
 
 
-<form id="verify_payment{{object.id }}" method="POST" action="{% url 'institutions:verify_payment' object.id %}">
+<form id="verify_payment{{object.id }}" method="POST" action="{% url 'indexing_unit:verify_payment' object.id %}">
 {% csrf_token%}
 <input type="hidden">
 </form>
 
-<form id="reject_payment{{object.id }}" method="POST" action="{% url 'institutions:reject_payment' object.id %}">
+<form id="reject_payment{{object.id }}" method="POST" action="{% url 'indexing_unit:reject_payment' object.id %}">
 {% csrf_token%}
 <input type="hidden">
 </form>

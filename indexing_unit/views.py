@@ -161,6 +161,15 @@ class InstitutionListView(ListView):
 			qs = qs.filter(name__icontains=query)
 		return qs  #.filter(title__icontains='vid') 
 
+class AdmissionQuotaListView(ListView):
+	template_name = "indexing_unit/admission_quota_list.html"
+	def get_queryset(self):
+		request = self.request
+		qs = AdmissionQuota.objects.all()
+		query = request.GET.get('q')
+		if query:
+			qs = qs.filter(name__icontains=query)
+		return qs 
 
 
 class InstitutionCreateView1(CreateView):
@@ -225,15 +234,7 @@ class AdmissionQuotaDetailView(DetailView):
 
 
 
-class AdmissionQuotaListView(ListView):
-	template_name = "indexing_unit/admission_quota_list.html"
-	def get_queryset(self):
-		request = self.request
-		qs = AdmissionQuota.objects.all()
-		query = request.GET.get('q')
-		if query:
-			qs = qs.filter(name__icontains=query)
-		return qs  #.filter(title__icontains='v
+
 
 
 class IndexingApplicationsListView(ListView):

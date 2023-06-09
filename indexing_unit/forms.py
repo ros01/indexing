@@ -80,10 +80,8 @@ class AdmissionQuotaForm(forms.ModelForm):
         fields = [
             'institution',
             'academic_session',
-            'course_1',
-            'admission_quota_1',
-            'course_2',
-            'admission_quota_2',
+            'admission_quota',
+            
             
                 ]
         widgets = {

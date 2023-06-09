@@ -96,10 +96,7 @@ class AcademicSession(models.Model):
 class AdmissionQuota(models.Model):
     institution  = models.ForeignKey(InstitutionProfile, on_delete=models.SET_NULL, null=True)
     academic_session = models.CharField(max_length=100, choices = ACADEMIC_SESSION, blank=True)
-    course_1 = models.CharField(max_length=100, choices = COURSE_TYPE, blank=True, null=True)
-    admission_quota_1   = models.IntegerField(blank=True, null=True)
-    course_2 = models.CharField(max_length=100, choices = COURSE_TYPE, blank=True, null=True)
-    admission_quota_2   = models.IntegerField(blank=True, null=True)
+    admission_quota  = models.IntegerField(blank=True, null=True)
     slug      = models.SlugField(blank=True)
     updated = models.DateTimeField(auto_now=True)
     timestamp       = models.DateTimeField(auto_now_add=True)
