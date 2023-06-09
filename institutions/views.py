@@ -206,7 +206,7 @@ class StudentIndexingApplicationsListView(LoginRequiredMixin, ListView):
 			qs = qs.filter(name__icontains=query)
 		# return qs  
 		#.filter(title__icontains='vid') 
-		return qs.filter(indexing_status=2) 
+		return qs.filter #(indexing_status=2) 
 
 
 class StudentIndexingApplicationDetailView(LoginRequiredMixin, DetailView):
@@ -274,7 +274,7 @@ class IndexingVerificationsListView(LoginRequiredMixin, ListView):
 		query = request.GET.get('q')
 		if query:
 			qs = qs.filter(name__icontains=query)
-		return qs.filter(indexing_status=2) 
+		return qs.filter(indexing_status=5) 
 
 
 
