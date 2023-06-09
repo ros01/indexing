@@ -23,11 +23,11 @@ class IndexingOfficerProfileForm(forms.ModelForm):
         #     'institution',
         #         ]
        
-        widgets = {
+        # widgets = {
 
-        'institution': autocomplete.ModelSelect2(url='indexing_unit:institution_autocomplete')
+        # 'institution': autocomplete.ModelSelect2(url='indexing_unit:institution_autocomplete')
         
-        }
+        # }
 
 
     # def __init__(self, *args, **kwargs):
