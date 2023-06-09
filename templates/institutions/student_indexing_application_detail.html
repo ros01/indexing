@@ -169,12 +169,12 @@
 
 
 <div class="d-flex justify-content-end mr-2 mb-2">   
-<a href="javascript:{document.getElementById('approve{{object.id }}').submit()}"><button class="btn btn-success py-1 mr-2 mt-1 mb-1"> Approve Application<i class="fa fa-check" aria-hidden="true"></i></button> </a>
-<a href="javascript:{document.getElementById('reject{{object.id }}').submit()}"><button class="btn btn-danger py-1 mr-2 mt-1 mb-1"> Reject Application <i class="fa fa-reply" aria-hidden="true"></i></button></a> 
+<!-- <a href="javascript:{document.getElementById('approve{{object.id }}').submit()}"><button class="btn btn-success py-1 mr-2 mt-1 mb-1"> Approve Application<i class="fa fa-check" aria-hidden="true"></i></button> </a>
+<a href="javascript:{document.getElementById('reject{{object.id }}').submit()}"><button class="btn btn-danger py-1 mr-2 mt-1 mb-1"> Reject Application <i class="fa fa-reply" aria-hidden="true"></i></button></a>  -->
 <a href="{% url 'institutions:dashboard' %}" class="btn btn-warning text-white py-1 px-1 mt-1 mb-1"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Return to Dashboard</a>  
 </div>
 
-<form id="approve{{object.id }}" method="POST" action="{% url 'institutions:verify' object.id %}">
+<!-- <form id="approve{{object.id }}" method="POST" action="{% url 'institutions:verify' object.id %}">
 {% csrf_token%}
 <input type="hidden">
 </form>
@@ -182,7 +182,7 @@
 <form id="reject{{object.id }}" method="POST" action="{% url 'institutions:reject' object.id %}">
 {% csrf_token%}
 <input type="hidden">
-</form>
+</form> -->
 
 </div>
 
