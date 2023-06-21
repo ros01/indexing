@@ -41,7 +41,7 @@
 <ul class="list-unstyled">                        
 <li>Student Name: <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.student.last_name}} {{object.student_profile.student.first_name}} {{object.student_profile.student.middle_name}}</span></li>
 <li>Institution: <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.institution}}</span></li>
-<li>Course of Study:  <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.course}}</span></li>
+<li>Course of Study:  <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.institution.course_type}}</span></li>
 <li>Registration No: <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.student.reg_no}}</span></li>
 
 </ul> 
@@ -174,7 +174,8 @@
 
 <div class="d-flex justify-content-end mr-2 mb-2">   
 
-<a href="{% url 'institutions:student_indexing_verifications_list' %}" class="btn btn-warning text-white py-1 px-1 mb-1"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Return to Verifications List</a>  
+<a href="{% url 'institutions:student_indexing_verifications_list' %}" class="btn btn-outline-success py-0 mr-3 mt-1 mb-3"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Verifications List</a>  
+
 </div>
 
 </div>

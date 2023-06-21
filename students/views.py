@@ -23,6 +23,8 @@ from django.utils.translation import gettext as _
 from django.views import static
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib import messages
+from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic import (
     CreateView,
     DeleteView,
@@ -56,12 +58,12 @@ def status(request):
         return MyStudentProfileListView.as_view()(request)
     elif StudentProfile.objects.filter(student = user, indexing_status=2):
         return ApplicationList.as_view()(request)
-    elif StudentIndexing.objects.filter(student_profile__student = user, indexing_status=2):
+    elif StudentIndexing.objects.filter(student_profile__student = user, indexing_status=1):
         return IndexingPaymentCreateListView.as_view()(request)
-    elif StudentIndexing.objects.filter(student_profile__student = user, indexing_status=3):
+    elif StudentIndexing.objects.filter(student_profile__student = user, indexing_status=2):
         return MyIndexingApplicationListView.as_view()(request)
     else:
-        return HttpResponseNotFound('404 Page not found')
+         return MyIndexingApplicationListView.as_view()(request)
 
 
 class MyIndexingApplicationListView(LoginRequiredMixin, ListView):
@@ -128,18 +130,29 @@ class MyStudentProfileDetailView(LoginRequiredMixin, DetailView):
 
 
 
-class UpdateProfile(LoginRequiredMixin, UpdateView):
+class UpdateProfile(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     model = StudentProfile
     form_class = StudentProfileModelForm
     template_name = "students/update_profile.html"
+    # success_message = "Student Profile Update Successful"
+
+    success_message = "%(student)s Student Profile Update Successful"
+
+    def get_success_message(self, cleaned_data):
+      return self.success_message % dict(
+            cleaned_data,
+            student=self.object.student.get_full_name,
+        )
 
 
+    
     def form_valid(self, form):
         instance = form.save(commit=False)
         if instance.indexing_status >2:
             pass
         else:
             instance.indexing_status = 2
+        
         return super(UpdateProfile, self).form_valid(form)
 
     def get_success_url(self):
@@ -147,10 +160,25 @@ class UpdateProfile(LoginRequiredMixin, UpdateView):
 
 
 
-class IndexingApplicationCreateView(LoginRequiredMixin, CreateView):
+class IndexingApplicationCreateView(LoginRequiredMixin, SuccessMessageMixin,  CreateView):
     template_name = "students/start_indexing_application.html"
     utme_form = UtmeGradeModelForm
     student_indexing_form = StudentIndexingModelForm
+    success_message = "%(student_profile)s Indexing Application Submission Successful"
+
+    def get_form_kwargs(self):
+        """ Passes the request object to the form class.
+         This is necessary to only display members that belong to a given user"""
+
+        kwargs = super(IndexingApplicationCreateView, self).get_form_kwargs()
+        kwargs['request'] = self.request
+        return kwargs
+
+    def get_success_message(self, cleaned_data):
+      return self.success_message % dict(
+            cleaned_data,
+            student_profile=self.object.student_profile.student.get_full_name,
+        )
 
     def get(self, request, *args, **kwargs):
         utme_form = self.utme_form()
@@ -159,7 +187,7 @@ class IndexingApplicationCreateView(LoginRequiredMixin, CreateView):
 
     
     def post(self, request, *args, **kwargs):
-        student_indexing_form = self.student_indexing_form(request.POST)
+        student_indexing_form = self.student_indexing_form(request.POST, request.FILES)
         utme_form = self.utme_form(request.POST)
 
         if utme_form.is_valid() and student_indexing_form.is_valid():
@@ -178,14 +206,17 @@ class IndexingApplicationCreateView(LoginRequiredMixin, CreateView):
                 institution = institution,
                 reg_no = reg_no,
                 )
-            
-
+            messages.success(request, "Indexing Application Submission Successful!")
             return redirect(indexing.get_absolute_url())
-      
+            
         print(request.POST)  
+        messages.error(request, 'Form already submitted')
         return render(request, self.template_name, {'utme_form':utme_form, 'student_indexing_form':student_indexing_form})
 
-class IndexingPaymentCreateView(LoginRequiredMixin, CreateView):
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data())
+
+class IndexingPaymentCreateView(LoginRequiredMixin, SuccessMessageMixin,  CreateView):
     model = IndexingPayment
     template_name = "students/indexing_payment.html"
     form_class = IndexingPaymentModelForm

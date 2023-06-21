@@ -58,6 +58,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         ('Indexing Officer', 'Indexing Officer'),
         ('Indexing Unit', 'Indexing Unit'),
         ('Registrar', 'Registrar'),
+        ('Registration', 'Registration'),
         )
 
     email = models.EmailField(unique=True)
@@ -93,6 +94,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.email
 
+
     @property
     def get_indexing_officer_profile(self):
         indexingOfficerProfile = self.indexingofficerprofile_set.first()
@@ -124,6 +126,10 @@ class IndexingOfficerProfile(models.Model):
 
     def get_absolute_url(self):
         return reverse("indexing_unit:indexing_officer_detail", kwargs={"slug": self.slug})
+
+
+    def get_reg_absolute_url(self):
+        return reverse("registration:indexing_officer_detail", kwargs={"slug": self.slug})
 
 def post_save_indexing_officer_receiver(sender, instance, *args, **kwargs):
     if not instance.slug:

@@ -23,6 +23,7 @@ class SignupForm(UserCreationForm):
        super(SignupForm, self).__init__(*args, **kwargs)
        self.fields['first_name'].label = "First Name"
        self.fields['first_name'].widget.attrs['placeholder'] = "Enter First Name"
+       self.fields['middle_name'].label = "Middle Name"
        self.fields['last_name'].label = "Last Name"
        self.fields['last_name'].widget.attrs['placeholder'] = "Enter Last Name"
        self.fields['phone_no'].label = "Phone Number"

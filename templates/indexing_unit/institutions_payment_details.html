@@ -16,6 +16,9 @@
 <li class="nav-item">
 <a class="nav-link active" href="#about" data-toggle="tab" aria-expanded="false"><i class="ti-user mr-2"></i>Institution Indexing Payment Details</a>
 </li>
+<li class="nav-item">
+<a class="nav-link" href="#settings" data-toggle="tab" aria-expanded="false"><i class="ti-settings mr-2"></i>Uploads</a>
+</li> 
 </ul>
 </div>
 <div class="card-body mb-0 pb-0">
@@ -23,7 +26,7 @@
 <div class="tab-content">
 <div class="tab-pane active" id="about">
 <div class="row justify-content-center">
-
+{% include 'partials/_alerts.html' %} 
 <div class="col-md-12  profile-detail">
 <div class="d-flex justify-content-between align-items-center">
  <div class="w-50">
@@ -32,10 +35,8 @@
 </div> 
 {% if object.payment_status == 1 %}
  <h5 class="mb-1"> <span class="badge badge-warning">Pending Verification</span></h5> 
-{% elif  object.payment_status == 2 %}
-<h5 class="mb-1"> <span class="badge badge-primary">PAID</span></h5>
-{% else %} 
-<h5 class="mb-1"> <span class="badge badge-primary"></span></h5>
+{% else %}
+<h5 class="mb-1"> <span class="badge badge-primary">Payment Verified</span></h5>
 {% endif %}
 
 </div> 
@@ -54,17 +55,17 @@
 </ul> 
 </div>
 </div>
+<!-- </div>
 </div>
 </div>
 </div>
-</div>
-</div>
+</div> -->
 
-<div class="card mb-3">
+<!-- <div class="card mb-3">
 <div class="card-body mb-0 pb-0">
 <div class="">
 <div class="tab-content">
-<div class="tab-pane active">
+<div class="tab-pane active"> -->
 <div class="row justify-content-center">
 <div class="col-md-12  profile-detail">
 <div class="">
@@ -82,18 +83,18 @@
 </ul>
 </div>
 </div>
+<!-- </div>
 </div>
 </div>
 </div>
-</div>
-</div>
+</div> -->
 
 
-<div class="card mb-3">
+<!-- <div class="card mb-3">
 <div class="card-body mb-0 pb-0">
 <div class="">
 <div class="tab-content">
-<div class="tab-pane active">
+<div class="tab-pane active"> -->
 <div class="row justify-content-center">
 <div class="col-md-12  profile-detail">
 <div class="">
@@ -122,25 +123,81 @@
                     <td>{{student.student_profile.student.reg_no}}</td>
                     <td>{{student.student_indexing.admission_type}}</td>
                    
-                    <td><a href="{{ student.get_absolute_url }}"> <i class="fas fa-search text-primary"></i> <span class="badge badge-boxed  badge-primary">View Details </span></a></td> 
+                    <td><a href="{{ student.student_indexing.get_indexing_url }}"> <i class="fas fa-search text-primary"></i> <span class="badge badge-boxed  badge-primary">View Details </span></a></td> 
                 </tr>
                 {% endfor %}
                 </tbody>
             </table>
 </div>
 </div>
+<!-- </div>
 </div>
 </div>
-</div>
-</div>
+</div> -->
 
 <div class="d-flex justify-content-end mr-2 mb-2">   
-<a href="javascript:{document.getElementById('verify_payment{{object.id }}').submit()}"><button class="btn btn-success py-0 mr-2 mt-1 mb-1"> Verify Payment<i class="fa fa-check" aria-hidden="true"></i></button> </a>
-<a href="javascript:{document.getElementById('reject_payment{{object.id }}').submit()}"><button class="btn btn-danger py-0 mr-2 mt-1 mb-1"> Reject Payment<i class="fa fa-reply" aria-hidden="true"></i></button></a> 
-<a href="{% url 'indexing_unit:institutions_payments_list' %}" class="btn btn-outline-success text-success py-0 mr-2 mt-1 mb-1"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Payments List</a>  
+<a href="{% url 'indexing_unit:institutions_payments_list' %}" class="btn btn-outline-success py-0 mr-2 mt-1 mb-1"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Payments List</a>  
+</div>
 </div>
 
+<div class="tab-pane" id="settings">
+
+
+<div class="row justify-content-center">
+<div class="col-md-12  profile-detail">
+<div class="">
+<h5 class="mb-1"> <i class="mdi mdi-book-open-page-variant text-primary"></i> Institutions Indexing Payment Documents Uploads</h5>
 </div>
+
+<p class="text-dark font-weight-bold">Please verify individual student application first before proceeding to verify institution payment. Click link below to View Uploaded Documents before approving or rejecting institution payment</p>
+</div>
+
+
+
+<div class="row py-0">
+<table class="table table-hover">
+<thead>
+<tr>
+<th scope="col lead" style="color: #05567b;">Parameter</th>
+<th scope="col lead" style="color: #05567b;">Value</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% if object.payment_receipt %}
+<tr> <td width="40%" scope="col">Payment Receipt:</td> 
+<td width="60%" scope="col"><i class="fa fa-eye text-dark"></i>
+<a class="text-danger" href="{{object.payment_receipt.url}}" target="_blank">&nbsp; View Payment Receipt</a></td>  
+</tr>
+{% endif %}
+
+
+                       
+</tbody>
+</table>
+</div>  
+</div>
+
+
+
+
+{% if object.payment_status == 1 %}
+<div class="d-flex justify-content-end mr-2 mb-2">   
+<a href="javascript:{document.getElementById('verify_payment{{object.id }}').submit()}">
+<!-- <button class="btn btn-success py-0 mr-2 mt-1 mb-1"> Verify Payment<i class="fa fa-check" aria-hidden="true"></i></button>  -->
+<input type="submit" class="btn btn-success py-0 mr-3 mt-1 mb-1" value="Verify Payment" onclick="return confirm('Are you sure you want to verify this payment?')" >
+</a>
+<a href="javascript:{document.getElementById('reject_payment{{object.id }}').submit()}"><button class="btn btn-danger py-0 mr-2 mt-1 mb-1"> Reject Payment<i class="fa fa-reply" aria-hidden="true"></i></button></a> 
+<a href="{% url 'indexing_unit:institutions_payments_list' %}" class="btn btn-outline-success py-0 mr-2 mt-1 mb-1"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Payments List</a>  
+</div>
+{% else %}
+<div class="d-flex justify-content-end mr-2 mb-2">   
+<a href="{% url 'indexing_unit:institutions_payments_list' %}" class="btn btn-outline-success py-0 mr-2 mt-1 mb-1"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Payments List</a>  
+</div>
+{% endif %}
+
+<!-- </div> -->
 
 
 <form id="verify_payment{{object.id }}" method="POST" action="{% url 'indexing_unit:verify_payment' object.id %}">
@@ -152,16 +209,16 @@
 {% csrf_token%}
 <input type="hidden">
 </form>
-
-
-
-
-
-
 </div>
 </div>
 </div>
 
+</div>
+</div>
+
+</div>
+</div>
+</div>
 
 
 

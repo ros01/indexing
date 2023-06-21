@@ -12,25 +12,6 @@
 
 {% block content %}
 
-<!-- <div class="row ml-3">
-
-<div class="col-md-10 mt-4">
-
-<div class="card">
-<div class="card-header pb-0 px-3">
-<h6 class="mb-0">Create Student Profile</h6>
-
-
-<h4>Import Student</h4>
-<form method="post" enctype="multipart/form-data">
-{% csrf_token %}
-<input type="file" name="employeefile">
-<button type="submit">Upload</button>
-</form>
-</div>
-</div>
-</div> -->
-
 
 <div class="row ml-3 mb-3">
 <div class="col-lg-12 col-xl-9">
@@ -44,9 +25,9 @@
                     <a class="nav-link" href="#photo" data-toggle="tab" aria-expanded="false"><i class="ti-image mr-2"></i>Photos</a>
                 </li> -->
 
-               <!--  <li class="nav-item">
+                <li class="nav-item">
                     <a class="nav-link" href="#settings" data-toggle="tab" aria-expanded="false"><i class="ti-settings mr-2"></i>Settings</a>
-                </li> -->
+                </li>
             </ul>
         </div>
         <div class="card-body">
@@ -86,8 +67,9 @@
                                         </div>
                                         
                                         <div class="form-group">
+                                            <input type="submit" class="btn btn-primary btn-sm text-light px-4 mt-2 float-right" value="Upload Student Profiles" onclick="return confirm('Are you sure you want to submit this form?')">
                                              
-                                            <button class="btn btn-primary btn-sm text-light px-4 mt-2 float-right">Upload Student Profiles</button>
+                                            <!-- <button class="btn btn-primary btn-sm text-light px-4 mt-2 float-right">Upload Student Profiles</button> -->
                                         </div>
                                     </form>
                                 </div>
@@ -182,7 +164,7 @@
                         </div>
                         <div class="text-right mt-3"> <a href="#" class="primary">View all 10+ post</a></div>
                     </div> -->
-                 <!--    <div class="tab-pane" id="settings">
+                 <div class="tab-pane" id="settings">
                         <div class="row">
                             <div class="col-lg-12">
                                 
@@ -226,7 +208,12 @@
                                 </div>
                             </div>
                         </div>
-                    </div> -->
+                    </div>
+
+
+
+
+
                 </div>
             </div>
         </div>

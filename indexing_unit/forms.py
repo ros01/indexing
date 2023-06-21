@@ -4,11 +4,10 @@ from django.forms import MultipleChoiceField
 from django.forms.models import ModelMultipleChoiceField
 from django.contrib.admin.widgets import ForeignKeyRawIdWidget 
 from accounts.models import *
-
 from .models import *
 from institutions.models import *
 from dal import autocomplete
-
+from bootstrap_datepicker_plus.widgets import DatePickerInput
 
 class IndexingOfficerProfileForm(forms.ModelForm):
     # order   = forms.IntegerField(widget=forms.TextInput())
@@ -41,7 +40,8 @@ class IndexingOfficerProfileForm(forms.ModelForm):
 
 
 class InstitutionProfileForm(forms.ModelForm):
-    # order   = forms.IntegerField(widget=forms.TextInput())
+    
+    
     class Meta:
         model = InstitutionProfile
         fields = [
@@ -56,8 +56,12 @@ class InstitutionProfileForm(forms.ModelForm):
                 ]
         widgets = {
         'address': forms.Textarea(attrs={'rows':1, 'cols':12}),
+        "accreditation_date": DatePickerInput(),
+  
+        
         }
 
+       
 
     def __init__(self, *args, **kwargs):
        super(InstitutionProfileForm, self).__init__(*args, **kwargs)
@@ -70,6 +74,7 @@ class InstitutionProfileForm(forms.ModelForm):
        self.fields['accreditation_score'].label = "Accreditation Score"
        self.fields['accreditation_date'].label = "Accreditation Date"
        self.fields['institution_type'].label = "Institution Type"
+       # self.fields['accreditation_date'].widget.attrs['placeholder'] = "Click Calendar button to enter Accreditation Date"
        
 
  

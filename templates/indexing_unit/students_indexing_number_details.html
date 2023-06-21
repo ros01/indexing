@@ -83,7 +83,7 @@
                     <th>Academic Session</th>
                     <th>Reg No</th>
                     <th>Index Number</th>
-                    <!-- <th>Actions</th> -->
+                    <th>Actions</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -95,7 +95,7 @@
                     <td>{{object.index_number}}</td>
                    
                    
-                    <!-- <td><a href="{% url 'indexing_unit:student_indexing_application_details' object.slug %}"> <i class="fas fa-search text-primary"></i> <span class="badge badge-boxed  badge-primary">View Student Details </span></a></td>  -->
+                    <td><a href="{{ object.student_indexing.get_indexing_url }}"> <i class="fas fa-search text-primary"></i> <span class="badge badge-boxed  badge-primary">View Details </span></a></td> 
                 </tr>
                
                 </tbody>

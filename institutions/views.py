@@ -36,6 +36,7 @@ from django.views.generic.detail import (
 )
 from django.views.generic.edit import FormMixin, ProcessFormView
 from django.contrib import messages
+from django.contrib.messages.views import SuccessMessageMixin
 import io, csv
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.decorators import login_required
@@ -45,13 +46,6 @@ from indexing_unit.utils import *
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
-
-
-# class LoginRequiredMixin(object):
-   
-#     @method_decorator(login_required)
-#     def dispatch(self, request, *args, **kwargs):
-#         return super(LoginRequiredMixin, self).dispatch(request, *args, **kwargs)
 
 class DashboardView(LoginRequiredMixin, ListView):
     template_name = "institutions/dashboard1.html"
@@ -104,7 +98,7 @@ class StudentProfilesListView(LoginRequiredMixin, ListView):
 		try:
 			qs1 = InstitutionProfile.objects.filter(name=user.get_indexing_officer_profile.institution)
 			obj = qs1.first().studentprofile_set.all()
-			print ("obj:", obj)
+			# print ("obj:", obj)
 			if obj.exists():
 				return obj
 		except:
@@ -119,6 +113,20 @@ class StudentProfilesListView(LoginRequiredMixin, ListView):
 	    context['obj'] = obj
 	    return context
 		
+class AdmissionQuotaListView(ListView):
+	template_name = "institutions/admission_quota_list.html"
+	def get_queryset(self):
+		request = self.request
+		user = request.user
+		qs = AdmissionQuota.objects.filter(institution = user.get_indexing_officer_profile.institution)
+		query = request.GET.get('q')
+		if query:
+			qs = qs.filter(name__icontains=query)
+		return qs 
+
+class AdmissionQuotaDetailView(DetailView):
+	queryset = AdmissionQuota.objects.all()
+	template_name = "institutions/admission_quota_details.html"
 
     
 def slug_router(request, slug):
@@ -136,7 +144,15 @@ class CreateAcademicSession(LoginRequiredMixin, CreateView):
     success_message = 'Academic Session created Successfully.'
 
 
-class StudentProfileCreateView(LoginRequiredMixin, CreateView):
+class StudentProfileCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+	# success_message = "Bulk Create of %(student)s Students successful"
+
+	# def get_success_message(self, cleaned_data):
+	# 	return self.success_message % dict(
+    #         cleaned_data,
+    #         student=self.object.student,
+    #     )
+
 	def get(self, request, *args, **kwargs):
 		template_name = 'institutions/bulk_create_students.html'
 		return render(request, template_name)
@@ -169,6 +185,7 @@ class StudentProfileCreateView(LoginRequiredMixin, CreateView):
 			for obj in objs:
 				obj.slug = create_slug3(instance=obj)
 			nmsg = StudentProfile.objects.bulk_create(objs)
+			messages.success(request, "Bulk Create of Students successful!")
 			return redirect(institution.first().get_student_profiles_list()) 
 			returnmsg = {"status_code": 200}
 			print('imported successfully')
@@ -194,13 +211,12 @@ class StudentProfileDetailView(LoginRequiredMixin, DetailView):
 		obj = get_object_or_404(StudentProfile, institution__slug = institutionprofile_slug, slug = studentprofile_slug)
 		return obj
 
-
-
 class StudentIndexingApplicationsListView(LoginRequiredMixin, ListView):
 	template_name = "institutions/student_indexing_applications_list.html"
 	def get_queryset(self):
 		request = self.request
-		qs = StudentIndexing.objects.all()
+		user = request.user
+		qs = StudentIndexing.objects.filter(institution=user.get_indexing_officer_profile.institution, verification_status=1)
 		query = request.GET.get('q')
 		if query:
 			qs = qs.filter(name__icontains=query)
@@ -210,26 +226,43 @@ class StudentIndexingApplicationsListView(LoginRequiredMixin, ListView):
 
 
 class StudentIndexingApplicationDetailView(LoginRequiredMixin, DetailView):
-	queryset = StudentIndexing.objects.all()
+	# queryset = StudentIndexing.objects.all()
 	template_name = "institutions/student_indexing_application_detail.html"
+
+	def get_object(self):
+		institutionprofile_slug = self.kwargs.get("islug")
+		studentindexing_slug = self.kwargs.get("sslug")
+		obj = get_object_or_404(StudentIndexing, institution__slug = institutionprofile_slug, slug = studentindexing_slug)
+		return obj
+
+
+class StudentIndexingApplicationDetails(LoginRequiredMixin, DetailView):
+	# queryset = StudentIndexing.objects.all()
+	template_name = "institutions/student_indexing_post_application_details.html"
+
+	def get_object(self):
+		institutionprofile_slug = self.kwargs.get("islug")
+		studentindexing_slug = self.kwargs.get("sslug")
+		obj = get_object_or_404(StudentIndexing, institution__slug = institutionprofile_slug, slug = studentindexing_slug)
+		return obj
 
 
 
 def verify(request, id):
   if request.method == 'POST':
      object = get_object_or_404(StudentIndexing, pk=id)
-     object.indexing_status = 2
+     object.verification_status = 2
      object.save()
      context = {}
      context['object'] = object
-     # messages.success(request, ('Indexing Application Verified'))
+     messages.success(request, ('Indexing Application Verified'))
      return render(request, 'institutions/verification_successful.html',context)
 
 
 def reject(request, id):
   if request.method == 'POST':
      object = get_object_or_404(StudentIndexing, pk=id)
-     object.indexing_status = 1
+     object.verification_status = 1
      object.save()
      context = {}
      context['object'] = object
@@ -244,7 +277,7 @@ def verify_payment(request, id):
      object.save()
      context = {}
      context['object'] = object
-     # messages.success(request, ('Indexing Application Verified'))
+     messages.success(request, ('Indexing Application Payment Verified'))
      return render(request, 'institutions/submitted_payment_details.html',context)
 
 
@@ -270,11 +303,12 @@ class IndexingVerificationsListView(LoginRequiredMixin, ListView):
 	template_name = "institutions/student_indexing_verifications_list.html"
 	def get_queryset(self):
 		request = self.request
-		qs = StudentIndexing.objects.all()
+		user = request.user
+		qs = StudentIndexing.objects.filter(institution=user.get_indexing_officer_profile.institution)
 		query = request.GET.get('q')
 		if query:
 			qs = qs.filter(name__icontains=query)
-		return qs.filter(indexing_status=5) 
+		return qs.filter(verification_status=2) 
 
 
 
@@ -332,16 +366,23 @@ class SubmittedPaymentsListView(LoginRequiredMixin, ListView):
 class VerifiedPaymentsListView(LoginRequiredMixin, ListView):
 	template_name = "institutions/verified_payments_list.html"
 	
+	# def get_queryset(self):
+	# 	user = self.request.user
+	# 	try:
+	# 		obj = IndexingPayment.objects.filter(institution = user.get_indexing_officer_profile.institution, payment_status=2)
+	# 		print ("obj:", obj)
+	# 		if obj.exists():
+	# 			return obj
+	# 	except:
+	# 		raise Http404
 	def get_queryset(self):
-		user = self.request.user
-		try:
-			obj = IndexingPayment.objects.filter(institution = user.get_indexing_officer_profile.institution, payment_status=2)
-			print ("obj:", obj)
-			if obj.exists():
-				return obj
-		except:
-			raise Http404
-
+		request = self.request
+		user = request.user
+		qs = IndexingPayment.objects.filter(institution=user.get_indexing_officer_profile.institution, payment_status=2)
+		query = request.GET.get('q')
+		if query:
+			qs = qs.filter(name__icontains=query)
+		return qs
 
 
 class InstitutionsPaymentsListView(LoginRequiredMixin, ListView):
@@ -350,7 +391,7 @@ class InstitutionsPaymentsListView(LoginRequiredMixin, ListView):
 	def get_queryset(self):
 		user = self.request.user
 		try:
-			obj = InstitutionPayment.objects.filter(institution = user.get_indexing_officer_profile.institution, payment_status=1)
+			obj = InstitutionPayment.objects.filter(institution = user.get_indexing_officer_profile.institution)
 			print ("obj:", obj)
 			if obj.exists():
 				return obj
@@ -374,10 +415,17 @@ class IndexingPaymentsDetails(TemplateView):
         context['obj'] = InstitutionProfile.objects.filter(indexing_status=1)
         return context
 
-class InstitutionPaymentCreateView(LoginRequiredMixin, CreateView):
+class InstitutionPaymentCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = InstitutionPayment
     template_name = "institutions/institutions_indexing_payment.html"
     form_class = InstitutionPaymentModelForm
+    success_message = "%(institution)s Institution Indexing Payment Submission Successful"
+
+    def get_success_message(self, cleaned_data):
+      return self.success_message % dict(
+            cleaned_data,
+            institution=self.object.institution.name,
+        )
 
     def get_form_kwargs(self):
         """ Passes the request object to the form class.
@@ -391,11 +439,24 @@ class InstitutionPaymentCreateView(LoginRequiredMixin, CreateView):
         payment = form.save(commit=False)
         user = self.request.user
         institution = InstitutionProfile.objects.get(name=user.get_indexing_officer_profile.institution)
+        # form.instance.institution = institution
         payment.institution = institution
         payment.save()
         return super(InstitutionPaymentCreateView, self).form_valid(form)
 
+	    
+    # def form_valid(self, form):
+    #     user = self.request.user
+    #     institution = InstitutionProfile.objects.get(name=user.get_indexing_officer_profile.institution)
+    #     form.instance.institution = institution
+    #     form.save()
+    #     return super(InstitutionPaymentCreateView, self).form_valid(form)    
+        
 
+
+class InstitutionsIndexingPaymentDetailView(LoginRequiredMixin, DetailView):
+	queryset = InstitutionPayment.objects.all()
+	template_name = "institutions/institutions_payment_details.html"
 
     # def get(self, request, *args, **kwargs):
     # 	form = InstitutionPaymentModelForm
@@ -467,9 +528,7 @@ class InstitutionPaymentCreateView(LoginRequiredMixin, CreateView):
     #     return super(InstitutionPaymentCreateView, self).form_valid(form)
 
 
-class InstitutionsIndexingPaymentDetailView(LoginRequiredMixin, DetailView):
-	queryset = InstitutionPayment.objects.all()
-	template_name = "institutions/institutions_payment_details.html"
+
 
 
 

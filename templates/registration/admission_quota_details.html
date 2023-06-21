@@ -1,0 +1,62 @@
+{% extends 'registration/dashboard_base.html'%}
+{% load static %}
+{% block title %}Registration | {{ block.super }}{% endblock title %}
+
+{% block content %}
+
+<div class="container-fluid py-2">
+<div class="row ml-3 mb-3">
+<div class="col-lg-8 mx-auto">
+
+<div class="card mb-3">
+<div class="card-header profile-tabs pb-0">
+<ul class="nav nav-tabs">
+<li class="nav-item">
+<a class="nav-link active" href="#about" data-toggle="tab" aria-expanded="false"><i class="ti-user mr-2"></i>Institution Annual Admission Quota Details</a>
+</li>
+</ul>
+</div>
+<div class="card mb-3">
+<div class="card-body mb-0 pb-0">
+<div class="">
+<div class="tab-content">
+<div class="tab-pane active" id="about">
+<div class="row justify-content-center">
+
+<div class="col-md-12  profile-detail">
+<div class="d-flex justify-content-between align-items-center">
+ <div class="w-50">
+
+<h5 class="mb-1"> <i class="fa fa-graduation-cap text-primary"></i> Annual Admission Details</h5> 
+</div> 
+ <!-- <h5 class="mb-1"> <span class="badge badge-info">Submitted</span></h5>  -->
+</div> 
+</div>
+
+<div>  
+<p class="text-sm mb-0">
+                      
+<ul class="list-unstyled">                        
+<li>Name of Institution: <span class="text-dark font-weight-bold ms-sm-2">{{object.institution.name}}</span></li>
+<li>Academic Session: <span class="text-dark font-weight-bold ms-sm-2">{{object.academic_session}}</span></li>
+<li>Admission Quota:  <span class="text-dark font-weight-bold ms-sm-2">{{object.admission_quota}}</span></li>
+
+</ul> 
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="d-flex justify-content-end mr-2 mb-2">   
+<a href="{% url 'registration:admission_quota_list' %}" class="btn btn-outline-primary py-0 mr-2 mt-1 mb-3"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Admission Quota List</a>  
+</div>
+
+</div>
+</div>
+</div>
+
+</div>
+</div>
+{% endblock content %}

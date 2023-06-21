@@ -146,7 +146,7 @@ a.text-primary:hover {
 
 #wrapper {
   height: 100%;
-  overflow: hidden;
+  overflow: scroll;
   width: 100%;
 }
 

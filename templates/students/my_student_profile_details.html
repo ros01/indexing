@@ -9,7 +9,7 @@
 <div class="row ml-3 mb-3">
 <div class="col-lg-12 col-xl-9">
 
-<div class="card m-b-30">
+<div class="card mb-3">
 <div class="card-header profile-tabs pb-0">
 <ul class="nav nav-tabs">
 <li class="nav-item">
@@ -17,7 +17,8 @@
 </li>
 </ul>
 </div>
-<div class="card-body">
+<div class="card-body mb-0 pb-0">
+{% include 'partials/_alerts.html' %} 
 <div class="">
 <div class="tab-content">
 <div class="tab-pane active" id="about">
@@ -25,7 +26,7 @@
 
 <div class="col-md-12  profile-detail">
 <div class="">
-<h5 class="mb-3"> <i class="fa fa-graduation-cap text-primary"></i> Basic Details</h5>
+<h5 class="mb-1"> <i class="fa fa-graduation-cap text-primary"></i> Basic Details</h5>
 </div>
 </div>
 
@@ -50,15 +51,15 @@
 </div>
 
 
-<div class="card m-b-30">
-<div class="card-body">
+<div class="card mb-3">
+<div class="card-body mb-0 pb-0">
 <div class="">
 <div class="tab-content">
 <div class="tab-pane active" id="about">
 <div class="row justify-content-center">
 <div class="col-md-12  profile-detail">
 <div class="">
-<h5 class="mb-3"> <i class="fab fa-accusoft text-primary"></i> Personal Details</h5>
+<h5 class="mb-1"> <i class="fab fa-accusoft text-primary"></i> Personal Details</h5>
 </div>
 </div>
 <div>  
@@ -76,15 +77,15 @@
 </div>
 </div>
 
-<div class="card m-b-30">
-<div class="card-body">
+<div class="card mb-3">
+<div class="card-body mb-0 pb-0">
 <div class="">
 <div class="tab-content">
 <div class="tab-pane active" id="about">
 <div class="row justify-content-center">
 <div class="col-md-12  profile-detail">
 <div class="">
-<h5 class="mb-3"> <i class="fab fa-asymmetrik text-primary"></i> Contact Details</h5>
+<h5 class="mb-1"> <i class="fab fa-asymmetrik text-primary"></i> Contact Details</h5>
 </div>
 </div>
 <div>  
@@ -107,7 +108,7 @@
 <div class="d-flex justify-content-end mr-2 mb-2">  
 <h5 class="mb-1 mr-3"><a href="{% url 'students:my_student_profile_list' %}" class="badge badge-success text-light px-3 py-2">My Profile List</a></h5>  
 
-<h5 class="mb-1"><a href="{% url 'students:update_profile' object.slug %}" class="badge badge-warning text-light px-3 py-2">Update Profile</a></h5> 
+<h5 class="mb-1"><a href="{% url 'students:update_profile' object.slug %}" class="badge badge-warning text-light px-3 py-2 mr-3 mb-3">Update Profile</a></h5> 
 
 
 

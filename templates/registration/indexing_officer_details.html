@@ -1,0 +1,94 @@
+{% extends 'registration/dashboard_base.html'%}
+
+{% block title %}Institution | {{ block.super }}{% endblock title %}
+
+
+{% block content %}
+
+<div class="container-fluid py-4">
+<div class="row ml-3 mb-3">
+<div class="col-lg-1 col-xl-8">
+
+<div class="card mb-3">
+<div class="card-header profile-tabs pb-0">
+<ul class="nav nav-tabs">
+<li class="nav-item">
+<a class="nav-link active" href="#about" data-toggle="tab" aria-expanded="false"><i class="ti-user mr-2"></i>Indexing Officer Profile Details</a>
+</li>
+</ul>
+</div>
+<div class="card-body mb-0 pb-0">
+{% include 'partials/_alerts.html' %} 
+
+<div class="">
+<div class="tab-content">
+<div class="tab-pane active" id="about">
+<div class="row justify-content-center">
+
+<div class="col-md-12  profile-detail">
+
+<div class="">
+<h5 class="mb-1"> <i class="fa fa-graduation-cap text-primary"></i> Personal Details</h5>
+</div>
+</div>
+
+<div>  
+                  
+<ul class="list-unstyled">                        
+<li>Name: <span class="text-dark font-weight-bold ms-sm-2">{{object.indexing_officer.first_name}} {{object.indexing_officer.last_name}}</span></li>
+<li>Address: <span class="text-dark font-weight-bold ms-sm-2">{{object.institution.address}}</span></li>
+<li>Phone No: <span class="text-dark font-weight-bold ms-sm-2">{{object.institution.phone_no}}</span></li>
+<li>Email: <span class="text-dark font-weight-bold ms-sm-2">{{object.indexing_officer.email}}</span></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+<div class="card mb-3">
+<div class="card-body mb-0 pb-0">
+<div class="">
+<div class="tab-content">
+<div class="tab-pane active" id="about">
+<div class="row justify-content-center">
+<div class="col-md-12  profile-detail">
+<div class="">
+<h5 class="mb-1"> <i class="fab fa-accusoft text-primary"></i> Instiution Details</h5>
+</div>
+</div>
+<div>  
+<p class="text-sm mb-0">
+<ul class="list-unstyled">                           
+<li>Name of Institution: <span class="text-dark font-weight-bold ms-sm-2">{{object.institution.name}}</span></li>
+<li>Address: <span class="text-dark font-weight-bold ms-sm-2">{{object.institution.address}}</span></li>
+<li>Phone No: <span class="text-dark font-weight-bold ms-sm-2">{{object.institution.phone_no}}</span></li>
+<li>Email: <span class="text-dark font-weight-bold ms-sm-2">{{object.institution.email}}</span></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="d-flex justify-content-end mr-2 mb-2">   
+<a href="{% url 'registration:indexing_officers_list' %}" class="btn btn-outline-primary py-0 mr-2 mt-1 mb-3"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Indexing Officers List</a>  
+</div>
+
+
+</div>
+
+
+
+
+
+</div>
+
+</div>
+</div>
+
+{% endblock content %}

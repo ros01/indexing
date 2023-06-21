@@ -7,7 +7,7 @@ from accounts.models import *
 from .models import *
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Field
-
+from bootstrap_datepicker_plus.widgets import DatePickerInput
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
@@ -38,6 +38,7 @@ class StudentProfileModelForm(forms.ModelForm):
 
          widgets = {
             'contact_address': forms.Textarea(attrs={'rows':2, 'cols':3}),
+            'dob': DatePickerInput(),
             
          }
 
@@ -60,11 +61,11 @@ class IndexingPaymentModelForm(forms.ModelForm):
        super(IndexingPaymentModelForm, self).__init__(*args, **kwargs)
        self.fields['academic_session'].label = "Academic Session"
        self.fields['rrr_number'].label = "RRR Number"
+       self.fields['rrr_number'].widget.attrs['placeholder'] = "Optional (Enter RRR Number if available)"
        self.fields['receipt_number'].label = "Receipt Number"
        self.fields['payment_amount'].label = "Payment Amount"
        self.fields['payment_method'].label = "Payment Method"
        self.fields['payment_receipt'].label = "Payment Receipt"
-
 
 
 
@@ -101,10 +102,7 @@ class InstitutionPaymentModelForm(forms.ModelForm):
     
     class Meta:
          model = InstitutionPayment
-         fields = ('students_payments', 'academic_session', 'rrr_number', 'receipt_number', 'payment_amount', 'payment_method', 'payment_receipt')
-
-         
-         
+         fields = ('students_payments', 'academic_session', 'rrr_number', 'receipt_number', 'payment_amount', 'payment_method', 'payment_receipt')  
     
 
     def __init__(self, *args, **kwargs):
@@ -113,7 +111,7 @@ class InstitutionPaymentModelForm(forms.ModelForm):
        self.request = kwargs.pop('request')
        super(InstitutionPaymentModelForm, self).__init__(*args, **kwargs)
        user = self.request.user
-       self.fields['students_payments'].queryset = IndexingPayment.objects.filter(institution = user.get_indexing_officer_profile.institution, payment_status=2)
+       self.fields['students_payments'].queryset = IndexingPayment.objects.filter(institution = user.get_indexing_officer_profile.institution, student_indexing__verification_status = 2, payment_verification_status=1)
        self.fields['academic_session'].label = "Academic Session"
        self.fields['rrr_number'].label = "RRR Number"
        self.fields['receipt_number'].label = "Receipt Number"

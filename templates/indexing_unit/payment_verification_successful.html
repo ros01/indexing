@@ -19,6 +19,7 @@
 </ul>
 </div>
 <div class="card-body mb-0 pb-0">
+{% include 'partials/_alerts.html' %} 
 <div class="">
 <div class="tab-content">
 <div class="tab-pane active" id="about">
@@ -33,7 +34,7 @@
 {% if object.payment_status == 1 %}
  <h5 class="mb-1"> <span class="badge badge-warning">Pending Verification</span></h5> 
 {% elif  object.payment_status == 2 %}
-<h5 class="mb-1"> <span class="badge badge-primary">PAID</span></h5>
+<h5 class="mb-1"> <span class="badge badge-primary">Payment Verified</span></h5>
 {% else %} 
 <h5 class="mb-1"> <span class="badge badge-primary"></span></h5>
 {% endif %}
@@ -122,7 +123,7 @@
                     <td>{{student.student_profile.student.reg_no}}</td>
                     <td>{{student.student_indexing.admission_type}}</td>
                    
-                    <td><a href="{{ student.get_absolute_url }}"> <i class="fas fa-search text-primary"></i> <span class="badge badge-boxed  badge-primary">View Details </span></a></td> 
+                    <td><a href="{{ student.student_indexing.get_indexing_url }}"> <i class="fas fa-search text-primary"></i> <span class="badge badge-boxed  badge-primary">View Details </span></a></td> 
                 </tr>
                 {% endfor %}
                 </tbody>

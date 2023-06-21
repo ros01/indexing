@@ -1,0 +1,285 @@
+{% extends 'registration/dashboard_base.html'%}
+{% load static %}
+
+{% block title %}Institution | {{ block.super }}{% endblock title %}
+
+
+{% block content %}
+
+<div class="container-fluid py-4">
+<div class="row ml-3 mb-3">
+<div class="col-lg-8 mx-auto">
+
+<div class="card mb-3">
+<div class="card-header profile-tabs pb-0">
+<ul class="nav nav-tabs">
+<li class="nav-item">
+<a class="nav-link active" href="#about" data-toggle="tab" aria-expanded="false"><i class="ti-user mr-2"></i>Student Indexing Application Details</a>
+</li>
+
+<li class="nav-item">
+<a class="nav-link" href="#settings" data-toggle="tab" aria-expanded="false"><i class="ti-settings mr-2"></i>Uploads</a>
+</li> 
+
+</ul>
+</div>
+
+<div class="card-body mb-0 pb-0">
+<div class="">
+<div class="tab-content">
+<div class="tab-pane active" id="about">
+<div class="row justify-content-center">
+
+<div class="col-md-12  profile-detail">
+<div class="d-flex justify-content-between align-items-center">
+ <div class="w-50">
+
+<h5 class="mb-1"> <i class="fa fa-graduation-cap text-primary"></i> Basic Details</h5> 
+</div> 
+{% if object.verification_status == 1%}
+ <h5 class="mb-1"> <span class="badge badge-warning">Pending</span></h5> 
+ {% else %}
+ <h5 class="mb-1"> <span class="badge badge-primary">VERFIED BY INSTITUTION</span></h5> 
+ {% endif %}
+</div> 
+</div>
+
+<div>  
+<p class="text-sm mb-0">
+                      
+
+<ul class="list-unstyled">                        
+<li>Student Name: <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.student.last_name}} {{object.student_profile.student.first_name}} {{object.student_profile.student.middle_name}}</span></li>
+<li>Institution: <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.institution}}</span></li>
+<li>Course of Study:  <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.institution.course_type}}</span></li>
+<li>Registration No: <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.student.reg_no}}</span></li>
+
+{% for student in object.issueindexing_set.all %}
+<li>Indexing No: <span class="text-dark font-weight-bold ms-sm-2">{{student.index_number }}</span></li>
+{% endfor %}
+
+</ul> 
+</div>
+</div>
+<!-- </div>
+</div>
+</div>
+</div>
+</div> -->
+
+
+<!-- <div class="card mb-3">
+<div class="card-body mb-0 pb-0">
+<div class="">
+<div class="tab-content">
+<div class="tab-pane active"> -->
+<div class="row justify-content-center">
+<div class="col-md-12  profile-detail">
+<div class="">
+<h5 class="mb-1"> <i class="fab fa-accusoft text-primary"></i> Personal Details</h5>
+</div>
+</div>
+<div>  
+
+<ul class="list-unstyled">                           
+<li>Sex: <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.sex}}</span></li>
+<li>Date of Birth: <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.dob}}</span></li>
+<li>Marital Status: <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.marital_status}}</span></li>
+</ul>
+</div>
+</div>
+<!-- </div>
+</div>
+</div>
+</div>
+</div> -->
+
+
+<!-- <div class="card mb-3">
+<div class="card-body mb-0 pb-0">
+<div class="">
+<div class="tab-content">
+<div class="tab-pane active" id="about"> -->
+<div class="row justify-content-center">
+<div class="col-md-12  profile-detail">
+<div class="">
+<h5 class="mb-1"> <i class="fab fa-asymmetrik text-primary"></i> Contact Details</h5>
+</div>
+</div>
+<div>  
+<p class="text-sm mb-0">
+<ul class="list-unstyled">                           
+<li>Nationality: <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.nationality}}</span></li>
+<li>State of Origin: <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.state_of_origin}}</span></li>
+<li>LGA of Origin:  <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.lga}}</span></li>
+<li>Contact Address:  <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.contact_address}}</span></li>
+</ul>
+</div>
+</div>
+<!-- </div>
+</div>
+</div>
+</div>
+</div> -->
+
+
+
+
+<!-- <div class="card m-b-30"> -->
+<!-- <div class="card mb-3">
+<div class="card-body mb-0 pb-0">
+<div class="">
+<div class="tab-content">
+<div class="tab-pane active" id="about"> -->
+<div class="row justify-content-center">
+<div class="col-md-12  profile-detail">
+<div class="">
+<h5 class="mb-1"> <i class="mdi mdi-book-open-page-variant text-primary"></i> Admission Details</h5>
+</div>
+</div>
+<div>  
+<p class="text-sm mb-0">
+<ul class="list-unstyled">                           
+<li>Academic Session: <span class="text-dark font-weight-bold ms-sm-2">{{object.academic_session}}</span></li>
+<li>Admission Type:  <span class="text-dark font-weight-bold ms-sm-2">{{object.admission_type}}</span></li>
+</ul>
+</div>
+</div>
+<!-- </div>
+</div>
+</div>
+</div>
+</div> -->
+
+
+
+<!-- div class="card m-b-30">
+<div class="card-body mb-0 pb-0">
+<div class="">
+<div class="tab-content">
+<div class="tab-pane active" id="about"> -->
+<div class="row justify-content-center">
+<div class="col-md-12  profile-detail">
+<div class="">
+<h5 class="mb-1"> <i class="fas fa-desktop text-primary"></i> O'level Results</h5>
+</div>
+</div>
+<div>  
+<p class="text-sm mb-0">
+<ul class="list-unstyled">                           
+<li>Examination Body: <span class="text-dark font-weight-bold ms-sm-2">{{object.utme_grade.examination_body}}</span></li>
+<li>O'level Course 1:   <span class="text-dark font-weight-bold ms-sm-2">{{object.utme_grade.course_1}}</span></li>
+<li>O'level Course 1 Grade:    <span class="text-dark font-weight-bold ms-sm-2">{{object.utme_grade.course_1_grade}}</span></li>
+<li>O'level Course 2:   <span class="text-dark font-weight-bold ms-sm-2">{{object.utme_grade.course_2}}</span></li>
+<li>O'level Course 2 Grade:    <span class="text-dark font-weight-bold ms-sm-2">{{object.utme_grade.course_2_grade}}</span></li>
+<li>O'level Course 3:   <span class="text-dark font-weight-bold ms-sm-2">{{object.utme_grade.course_3}}</span></li>
+<li>O'level Course 3 Grade:    <span class="text-dark font-weight-bold ms-sm-2">{{object.utme_grade.course_3_grade}}</span></li>
+<li>O'level Course 4:   <span class="text-dark font-weight-bold ms-sm-2">{{object.utme_grade.course_4}}</span></li>
+<li>O'level Course 4 Grade:    <span class="text-dark font-weight-bold ms-sm-2">{{object.utme_grade.course_4_grade}}</span></li>
+<li>O'level Course 5:   <span class="text-dark font-weight-bold ms-sm-2">{{object.utme_grade.course_5}}</span></li>
+<li>O'level Course 5 Grade:    <span class="text-dark font-weight-bold ms-sm-2">{{object.utme_grade.course_5_grade}}</span></li>
+</ul>
+</div>
+</div>
+
+<div class="d-flex justify-content-end mr-3 mb-3">  
+<a href="{% url 'registration:institutions_indexed_students_list' %}" class="btn btn-outline-success py-0 mr-3 mt-1 mb-3"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Return to Indexed Students List</a>  
+</div>
+
+
+
+
+
+</div>
+<!-- </div>
+</div>
+</div> -->
+
+
+<div class="tab-pane" id="settings">
+
+    <div class="row justify-content-center">
+<div class="col-md-12  profile-detail">
+<div class="">
+<h5 class="mb-1"> <i class="mdi mdi-book-open-page-variant text-primary"></i> Student Indexing Documents Uploads</h5>
+</div>
+
+<p class="text-dark font-weight-bold">Click link below to View Uploaded Documents before approving or rejecting application </p>
+</div>
+
+
+
+<div class="row py-0">
+<table class="table table-hover">
+<thead>
+<tr>
+<th scope="col lead" style="color: #05567b;">Parameter</th>
+<th scope="col lead" style="color: #05567b;">Value</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% if object.utme_grade_result %}
+<tr> <td width="40%" scope="col">UTME Result:</td> 
+<td width="60%" scope="col"><i class="fa fa-eye text-dark"></i>
+<a class="text-danger" href="{{object.utme_grade_result.url}}" target="_blank">&nbsp; View UTME Result</a></td>  
+</tr>
+{% endif %}
+
+
+                       
+</tbody>
+</table>
+</div>  
+</div>
+
+
+
+{% if object.verification_status == 2 %}
+
+<div class="d-flex justify-content-end mr-3 mb-3">  
+<a href="javascript:{document.getElementById('approve{{object.id }}').submit()}">
+<!-- <button class="btn btn-success py-0 mr-3 mt-1 mb-3"> Approve Application<i class="fa fa-check" aria-hidden="true"></i></button>  -->
+<input type="submit" class="btn btn-success py-0 mr-3 mt-1 mb-3" value="Approve Application" onclick="return confirm('Are you sure you want to approve this application?')" >
+</a>
+
+<a href="javascript:{document.getElementById('reject{{object.id }}').submit()}"><button class="btn btn-danger py-0 mr-3 mt-1 mb-3"> Reject Application <i class="fa fa-reply" aria-hidden="true"></i></button></a> 
+ 
+<a href="{% url 'registration:institutions_indexed_students_list' %}" class="btn btn-outline-success py-0 mr-3 mt-1 mb-3"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Return to Indexed Students List</a> 
+</div>
+
+{% else %}
+<div class="d-flex justify-content-end mr-3 mb-3">  
+<a href="{% url 'registration:institutions_indexed_students_list' %}" class="btn btn-outline-success py-0 mr-3 mt-1 mb-3"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Return to Indexed Students List</a>  
+</div>
+
+{% endif %}
+
+<form id="approve{{object.id }}" method="POST" action="{% url 'indexing_unit:verify' object.id %}">
+{% csrf_token%}
+<input type="hidden">
+</form>
+
+<form id="reject{{object.id }}" method="POST" action="{% url 'indexing_unit:reject' object.id %}">
+{% csrf_token%}
+<input type="hidden">
+</form>
+
+
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+
+
+
+{% endblock content %}

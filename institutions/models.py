@@ -1,7 +1,8 @@
 from django.conf import settings
 from django.db import models
 from django.db.models import Prefetch, Q
-from django.db.models.signals import pre_save, post_save
+from django.db.models.signals import pre_save, post_save, m2m_changed
+from django.dispatch import receiver
 from django.urls import reverse
 from django.utils.text import slugify
 from .choices import *
@@ -38,7 +39,7 @@ class InstitutionProfile(models.Model):
     email = models.EmailField(unique=True, null=False, blank=False)
     phone_no = models.CharField(max_length=100, blank=True) 
     accreditation_score = models.DecimalField(blank=True, max_digits=5, decimal_places=2)
-    accreditation_date = models.DateTimeField(default=date.today)
+    accreditation_date = models.DateField(null=True)
     accreditation_type = models.CharField(max_length=100, choices = ACCREDITATION_TYPE, blank=True)
     address = models.TextField(blank=True)
     updated         = models.DateTimeField(auto_now=True)
@@ -65,7 +66,9 @@ class InstitutionProfile(models.Model):
     def get_create_student_profile_url (self):
         return reverse("institutions:create_student_profile", kwargs={"slug": self.slug})
 
-
+    def get_reg_absolute_url(self):
+        #return "/videos/{slug_arg}/".format(slug_arg=self.slug)
+        return reverse("registration:institution_detail", kwargs={"slug": self.slug})
 
     def get_absolute_url(self):
         #return "/videos/{slug_arg}/".format(slug_arg=self.slug)
@@ -109,8 +112,14 @@ class AdmissionQuota(models.Model):
     # class Meta:
     #     unique_together = (('institution', 'academic_session'),)
 
+    def get_admission_quota_url(self):
+        return reverse("institutions:admission_quota_detail", kwargs={"slug": self.slug})
+
     def get_absolute_url(self):
         return reverse("indexing_unit:admission_quota_detail", kwargs={"slug": self.slug})
+
+    def get_reg_absolute_url(self):
+        return reverse("registration:admission_quota_detail", kwargs={"slug": self.slug})
 
 def pre_save_admission_quota_receiver(sender, instance, *args, **kwargs):
     if not instance.slug:
@@ -119,9 +128,6 @@ def pre_save_admission_quota_receiver(sender, instance, *args, **kwargs):
 pre_save.connect(pre_save_admission_quota_receiver, sender=AdmissionQuota)
 
     
-
-
-
 class StudentProfileQuerySet(models.query.QuerySet):
     def active(self):
         return self.filter(active=True)
@@ -142,10 +148,7 @@ class StudentProfileManager(models.Manager):
 class StudentProfile(models.Model):
     student = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.CASCADE)
     institution = models.ForeignKey(InstitutionProfile,  on_delete=models.DO_NOTHING)
-    # indexing_payment = models.ForeignKey('IndexingPayment', null=True, blank=True, on_delete=models.DO_NOTHING)
     slug  = models.SlugField(blank=True)
-
-    # reg_no = models.CharField(max_length=200)
     indexing_status = models.IntegerField(default=1)
     sex = models.CharField(max_length=200, choices = SEX, null=True, blank=True)
     dob = models.DateField(default=date.today, null=True, blank=True)
@@ -270,7 +273,6 @@ class TransferGrade(models.Model):
         return str(self.student)
 
 
-
 class StudentIndexing(models.Model):    
     student_profile = models.ForeignKey(StudentProfile,  null=True, blank=True, on_delete=models.DO_NOTHING)
     institution = models.ForeignKey(InstitutionProfile,  on_delete=models.DO_NOTHING)
@@ -281,7 +283,9 @@ class StudentIndexing(models.Model):
     utme_grade = models.ForeignKey(UtmeGrade, null=True, blank=True, on_delete=models.CASCADE) 
     de_grade = models.ForeignKey(DeGrade, null=True, blank=True, on_delete=models.DO_NOTHING)
     transfer_grade = models.ForeignKey(TransferGrade, null=True, blank=True, on_delete=models.DO_NOTHING) 
-    indexing_status = models.IntegerField(default=2)
+    utme_grade_result = models.FileField(null=True, blank=True, upload_to='%Y/%m/%d/')
+    indexing_status = models.IntegerField(default=1)
+    verification_status = models.IntegerField(default=1)
     updated         = models.DateTimeField(auto_now=True)
     timestamp       = models.DateTimeField(auto_now_add=True)
 
@@ -294,12 +298,68 @@ class StudentIndexing(models.Model):
     def get_absolute_url(self):
         return reverse('students:my_indexing_application_details', kwargs={"slug": self.slug})
 
-    def get_indexing_url(self):
+
+    def get_application_url(self):
+        url_kwargs={
+            'islug': self.institution.slug,
+            'sslug': self.slug,
+        }
+        return reverse('institutions:student_indexing_details', kwargs=url_kwargs)
+
+
+    def get_application_details_url(self):
+        url_kwargs={
+            'islug': self.institution.slug,
+            'sslug': self.slug,
+        }
+        return reverse('institutions:student_indexing_application_details', kwargs=url_kwargs)
+
+    # def get_institution_indexing_url(self):
+    #     return reverse('institutions:student_indexing_application_details', kwargs={"slug": self.slug})
+
+    # def get_application_url(self):
+    #     return reverse('institutions:student_indexing_details', kwargs={"slug": self.slug})
+
+    def get_index_url(self):
         return reverse('indexing_unit:student_indexing_application_details', kwargs={"slug": self.slug})
+
+    def get_indexing_url(self):
+        url_kwargs={
+            'islug': self.institution.slug,
+            'sslug': self.slug,
+        }
+        return reverse('indexing_unit:student_indexing_details', kwargs=url_kwargs)
+
+
+
+    def get_reg_indexing_url(self):
+        url_kwargs={
+            'islug': self.institution.slug,
+            'sslug': self.slug,
+        }
+        return reverse('registration:student_indexing_details', kwargs=url_kwargs)
+
+
+    def get_indexing_number_url(self):
+        url_kwargs={
+            'islug': self.institution.slug,
+            'sslug': self.slug,
+        }
+        return reverse('indexing_unit:students_indexing_details', kwargs=url_kwargs)
+
+
+
+    def get_reg_indexing_number_url(self):
+        url_kwargs={
+            'islug': self.institution.slug,
+            'sslug': self.slug,
+        }
+        return reverse('registration:students_indexing_details', kwargs=url_kwargs)
+
 
     def save(self, *args, **kwargs):
         super(StudentIndexing, self).save(*args, **kwargs)
-        self.indexing_status = 2
+        # self.indexing_status = 2
         self.student_profile.indexing_status = 3
         self.student_profile.save()
 
@@ -324,7 +384,9 @@ class IndexingPayment(models.Model):
     reg_no = models.CharField(max_length=200, unique=True)
     academic_session = models.CharField(max_length=200, choices = ACADEMIC_SESSION,  null=True, blank=True)
     payment_status = models.IntegerField(default=1)
-    rrr_number = models.CharField(max_length=100)
+    indexing_status = models.IntegerField(default=1)
+    payment_verification_status = models.IntegerField(default=1)
+    rrr_number = models.CharField(max_length=100, null=True, blank=True)
     receipt_number = models.CharField(max_length=100)
     payment_amount = models.CharField(max_length=100)
     payment_method = models.CharField(max_length=100, choices = PAYMENT_METHOD)
@@ -337,8 +399,15 @@ class IndexingPayment(models.Model):
     def __str__(self):
         return  str(self.student_profile)
 
+    @property
+    def get_indexing_students_list(self):
+        studentsList = self.institutionpayment_set.all()
+        return studentsList 
+
     def get_absolute_url(self):
         return reverse('students:my_indexing_application_details', kwargs={"slug": self.slug})
+
+
 
     def get_redirect_url(self):
         return reverse('institutions:student_indexing_payment_details', kwargs={"slug": self.slug})
@@ -375,17 +444,38 @@ class InstitutionPayment(models.Model):
     def __str__(self):
         return  str(self.institution)
 
+    
     def get_absolute_url(self):
         return reverse('institutions:institutions_indexing_payment_details', kwargs={"slug": self.slug})
 
     def get_indexing_url(self):
         return reverse('indexing_unit:institutions_indexing_payment_details', kwargs={"slug": self.slug})
 
+    # def save(self, *args, **kwargs):       
+    #     for student in self.students_payments.all():
+    #         student.student_indexing.indexing_status  = 4
+    #         student.save()
+    #     super(InstitutionPayment, self).save(*args, **kwargs)
+
 def pre_save_institution_indexing_payment_receiver(sender, instance, *args, **kwargs):
     if not instance.slug:
         instance.slug = create_slug7(instance)
 
 pre_save.connect(pre_save_institution_indexing_payment_receiver, sender=InstitutionPayment)
+
+def post_save_institution_payment_receiver(sender, instance,  *args, **kwargs):
+    for student in instance.students_payments.all():
+        student.payment_verification_status  = 2
+        student.save()
+
+m2m_changed.connect(post_save_institution_payment_receiver, sender=InstitutionPayment.students_payments.through)
+
+
+# @receiver(post_save, sender=InstitutionPayment)
+# def my_handler(sender, instance, **kwargs):
+#     for student in instance.students_payments.all():
+#         student.student_indexing.indexing_status = 4
+#         student.save()
 
 
 

@@ -1,14 +1,10 @@
 {% extends 'indexing_unit/dashboard_base1.html'%}
 {% load static %}
-
 {% block title %}Institution | {{ block.super }}{% endblock title %}
-
 
 {% block content %}
 
-
-
-<div class="container-fluid py-4">
+<div class="container-fluid py-2">
 <div class="row ml-3 mb-3">
 <div class="col-lg-8 mx-auto">
 
@@ -20,7 +16,7 @@
 </li>
 </ul>
 </div>
-<div class="card m-b-30">
+<div class="card mb-3">
 <div class="card-body mb-0 pb-0">
 <div class="">
 <div class="tab-content">
@@ -40,7 +36,6 @@
 <div>  
 <p class="text-sm mb-0">
                       
-
 <ul class="list-unstyled">                        
 <li>Name of Institution: <span class="text-dark font-weight-bold ms-sm-2">{{object.institution.name}}</span></li>
 <li>Academic Session: <span class="text-dark font-weight-bold ms-sm-2">{{object.academic_session}}</span></li>
@@ -54,16 +49,14 @@
 </div>
 </div>
 
-<div class="d-flex justify-content-end">   
-
-<a href="{% url 'indexing_unit:admission_quota_list' %}" class="btn btn-outline-success text-success py-0 mr-3 mt-1 mb-3"><i class="fa fa-times" aria-hidden="true"></i> Return to Admission Quota List </a>
-
+<div class="d-flex justify-content-end mr-2 mb-2">   
+<a href="{% url 'indexing_unit:admission_quota_list' %}" class="btn btn-outline-primary py-0 mr-2 mt-1 mb-3"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Admission Quota List</a>  
 </div>
-
 
 </div>
 </div>
 </div>
 
+</div>
 </div>
 {% endblock content %}

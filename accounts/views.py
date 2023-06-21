@@ -33,6 +33,8 @@ def login(request):
             return redirect('indexing_unit:dashboard')
         if user.role == 'Student':
             return redirect('students:dashboard')
+        if user.role == 'Registration':
+            return redirect('registration:dashboard')
         else:
             messages.error(request, 'Please enter the correct email and password for your account. Note that both fields may be case-sensitive.')
             return redirect('accounts:signin')

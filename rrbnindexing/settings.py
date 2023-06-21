@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 from pathlib import Path
 import os
 from django.contrib.messages import constants as messages
+from django.contrib.messages import constants as message_constants
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -33,7 +34,11 @@ BOOTSTRAP5 = {
     'include_jquery': True,
 }
 
-
+MESSAGE_TAGS = {message_constants.DEBUG: 'debug',
+                message_constants.INFO: 'info',
+                message_constants.SUCCESS: 'success',
+                message_constants.WARNING: 'warning',
+                message_constants.ERROR: 'danger',}
 
 
 
@@ -43,6 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     'dal',
     'dal_select2',
+    "bootstrap_datepicker_plus",
     # 'grappelli',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -55,6 +61,7 @@ INSTALLED_APPS = [
     'indexing_unit',
     'institutions',
     'students',
+    'registration',
     'pages',
 ]
 
@@ -105,7 +112,7 @@ WSGI_APPLICATION = 'rrbnindexing.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'rrbnindexingdb',
+        'NAME': 'rrbnindexingdb1',
         'USER': 'postgres',
         'PASSWORD': 'blackstone1',
         'HOST': 'localhost',

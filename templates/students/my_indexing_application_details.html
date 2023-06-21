@@ -33,6 +33,7 @@
 </ul>
 </div>
 <div class="card-body mb-0 pb-0">
+{% include 'partials/_alerts.html' %} 
 <div class="">
 <div class="tab-content">
 <div class="tab-pane active" id="about">
@@ -189,7 +190,7 @@
 {% if object.indexing_status == 3 %}
 
 <div class="d-flex justify-content-end">   
-<a href="{% url 'students:my_indexing_application_list' %}" class="btn btn-warning text-dark py-0 px-2 mr-3 mt-2 mb-4 "><i class="fa fa-times" aria-hidden="true"></i> Return to Applications List </a>
+<a href="{% url 'students:my_indexing_application_list' %}" class="btn btn-outline-success py-0 mr-3 mt-1 mb-3"><i class="fa fa-angle-double-left" aria-hidden="true"></i></i> Return to Applications List </a>
 
 
 {% else %}

@@ -2,108 +2,116 @@
 {% load static %}
 {% load crispy_forms_tags %}
 {% block title%}| Welcome {% endblock %}
-
 {% block styles %}
-
-
 {% endblock %}
-
-
-
 {% block content %}
-
-
-
-
-
-<div class="row ml-3">
-
-<div class="col-md-10 mt-4">
-
+<script src="{% static 'js/jquery.js' %}"></script>
+<div class="row ml-3 mb-4 pb-4">
+<div class="col-lg-11 col-xl-9">
 <div class="card m-b-30">
-<div class="card-body bootstrap-select-1">
-<h4 class="header-title mt-0 text-primary">Update Profile</h4>
-<p class="text-muted font-14">Please fill all relevant fields to update your profile in order to proceed with your indexing application.</p>  
-
-<form method="POST" enctype="multipart/form-data">
-{% csrf_token %}  
-
-<div class="row form-material">
-<div class="col-md-6">
-<div class="form-control-alternative mt-3" style="width: 100%; height:36px;">
-{{ form.sex|as_crispy_field }}
+<div class="card-header profile-tabs pb-0">
+<ul class="nav nav-tabs">
+<li class="nav-item">
+<a class="nav-link active" href="#about" data-toggle="tab" aria-expanded="false"><i class="ti-user mr-2"></i>Student Profile Update</a>
+</li>
+</ul>
 </div>
-</div>
-<div class="col-md-6">
-<label class="text-muted mt-3">Date of Birth</label>
-<input type="text" class="form-control" name="dob" placeholder="2017-06-04" id="mdate">
-</div>
-</div> 
-
-<div class="row form-material mt-3">
-<div class="col-md-6">
-<div class= "form-control-alternative my-0 py-0">
-{{ form.marital_status|as_crispy_field }}
-</div>
-</div>
-
-<div class="col-md-6">
-<div class="form-control-alternative" style="width: 100%; height:36px;">
-{{ form.nationality|as_crispy_field }}
-</div>
-</div>
-</div> 
-
-<div class="row form-material">
-<div class="col-md-6">
-<div class= "form-control-alternative my-0 py-0">
-{{ form.state_of_origin|as_crispy_field }}
+<div class="card-body">
+<div class="">
+<div class="tab-content">
+<div class="tab-pane active" id="about">
+<div class="row justify-content-center">
+<div class="col-md-12  profile-detail">
+<div class="">
+<h5 class="mb-3"> <i class="fa fa-graduation-cap text-primary"></i> Update Student Profile</h5>
+{% for message in messages %}
+    <div class="alert {{ message.tags }} alert-dismissible shadow fade show" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        {{ message | safe }}
+    </div>
+{% endfor %}
 </div>
 </div>
 
-
-<div class="col-md-6">
-<div class= "form-control-alternative my-0 py-0">
-{{ form.lga|as_crispy_field }}
+<div>
+<p class="detail-text mb-3">Please fill all relevant fields to update your profile in order to proceed with your indexing application.
+</p>
 </div>
-</div>
-</div> 
 
-<div class="row form-material">
-<div class="col-md-6">
-<div class= "form-control-alternative my-0 py-0">
-    {{ form.contact_address|as_crispy_field }}
+
+<div class="">
+<form class="form-horizontal form-material" method="post" enctype="multipart/form-data" id="register-institution">
+{% csrf_token %}
+{{ form.media }}
+
+<div class="form-group row">
+    <div class="col-md-6">
+    <div class= "form-control-alternative my-0 py-0">
+    {{ form.sex|as_crispy_field }}
+    </div>
+    </div>
+    <div class="col-md-6">
+    <div class= "form-control-alternative my-0 py-0">
+    {{ form.dob|as_crispy_field }}
+    </div>
     </div>
 </div>
-<div class="col-md-6">
-<div class="form-control-alternative mt-3 py-0" style="width: 100%; height:36px;">
 
+<div class="form-group row">
+    <div class="col-md-6">
+    <div class= "form-control-alternative my-0 py-0">
+    {{ form.marital_status|as_crispy_field }}
+    </div>
+    </div>
+    <div class="col-md-6">
+    <div class= "form-control-alternative my-0 py-0">
+    {{ form.nationality|as_crispy_field }}
+    </div>
+    </div>
 </div>
+
+<div class="form-group row">
+    <div class="col-md-6">
+    <div class= "form-control-alternative my-0 py-0">
+    {{ form.state_of_origin|as_crispy_field }}
+    </div>
+    </div>
+    <div class="col-md-6">
+    <div class= "form-control-alternative my-0 py-0">
+    {{ form.lga|as_crispy_field }}
+    </div>
+    </div>
 </div>
-</div> 
-<div class="d-flex justify-content-end pr-4"> 
-<!-- <button type="submit" class="btn btn-primary ml-4 px-3 py-2 mt-2 mb-4"> Save&#x21E8;</button> -->
-<button type="submit" class="btn btn-outline-primary waves-effect waves-light btn-sm px-3">Save</button>
 
-
+<div class="form-group row">
+    <div class="col-md-6">
+    <div class= "form-control-alternative my-0 py-0">
+    {{ form.contact_address|as_crispy_field }}
+    </div>
+    </div>
+    <div class="col-md-6">
+    <div class= "form-control-alternative my-0 py-0">
+  
+    </div>
+    </div>
 </div>
 
+<div class="form-group">
+<input type="submit" class="btn btn-primary btn-sm text-light px-4 mt-2 float-right" value="Save" onclick="return confirm('Are you sure you want to submit this form?')">
+</div>
 </form>
-
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
 
 
 </div>
-</div> 
 </div>
-</div> 
 
 {% endblock %}
-
-
-<<!-- div class="form-group">
-
-<button class="btn btn-primary btn-sm text-light px-4 mt-2 float-right">Upload Admission Details</button>
-</div>
-</form> -->
-
-

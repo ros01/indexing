@@ -61,7 +61,7 @@ class StudentIndexingModelForm(forms.ModelForm):
       
     class Meta:
          model = StudentIndexing
-         fields = ('academic_session', 'admission_type', 'utme_grade', 'de_grade', 'transfer_grade')
+         fields = ('academic_session', 'admission_type', 'utme_grade', 'de_grade', 'transfer_grade', 'utme_grade_result')
          
 
          widgets = {
@@ -69,4 +69,34 @@ class StudentIndexingModelForm(forms.ModelForm):
             }
 
     def __init__(self, *args, **kwargs):
-       super(StudentIndexingModelForm, self).__init__(*args, **kwargs)
+        self.request = kwargs.pop('request', None)
+        super(StudentIndexingModelForm, self).__init__(*args, **kwargs)
+        self.fields['utme_grade_result'].label = "Upload UTME Result"
+
+    # def clean(self,  **kwargs):
+    #     cleaned_data = self.cleaned_data
+    #     request = self.request
+    #     user = request.user
+    #     reg_no = user.reg_no
+    #     student_profile = StudentProfile.objects.filter(student=self.user)    
+    #     if  StudentIndexing.objects.filter(reg_no=reg_no,        
+    #                                student_profile=self.student_profile).exists():
+    #         raise ValidationError(
+    #               'Solution with this Name already exists for this problem')
+
+    #     # Always return cleaned_data
+    #     return cleaned_data
+
+    
+
+
+    
+
+
+
+
+
+
+
+
+

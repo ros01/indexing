@@ -35,7 +35,8 @@ from django.views.generic.edit import FormMixin, ProcessFormView
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.decorators import method_decorator
-
+from django.contrib import messages 
+from django.contrib.messages.views import SuccessMessageMixin
 
 
 
@@ -80,10 +81,19 @@ class DashboardView(ListView):
 	# 	return context
 
 
-class InstitutionCreateView(CreateView):
+class InstitutionCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = InstitutionProfile
     template_name = "indexing_unit/register_institution.html"
     form_class = InstitutionProfileForm
+    success_message = "%(name)s Institution Profile was created successfully"
+
+    def get_success_message(self, cleaned_data):
+        return self.success_message % dict(
+            cleaned_data,
+            name=self.object.name,
+        )
+
+
 
 # class InstitutionCreateView(CreateView):
 # 	user_form = SignupForm
@@ -110,12 +120,20 @@ class IndexingOfficerCreateView2(CreateView):
 
 
 
-class IndexingOfficerCreateView(CreateView):
+class IndexingOfficerCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
 	model = User
 	user_form = SignupForm
 	form = IndexingOfficerProfileForm
 	template_name = 'indexing_unit/create_indexing_officer.html'
 	template_name1 = 'indexing_unit/indexing_officer_details.html'
+
+	success_message = "%(last_name)s Indexing Officer Profile was created successfully"
+
+	def get_success_message(self, cleaned_data):
+		return self.success_message % dict(
+            cleaned_data,
+            last_name=self.object.last_name,
+        )
 
 	def get(self, request, *args, **kwargs):
 		user_form = self.user_form()
@@ -160,6 +178,17 @@ class InstitutionListView(ListView):
 		if query:
 			qs = qs.filter(name__icontains=query)
 		return qs  #.filter(title__icontains='vid') 
+
+ 
+class IndexingOfficerListView(ListView):
+	template_name = "indexing_unit/indexing_officers_list.html"
+	def get_queryset(self):
+		request = self.request
+		qs = User.objects.filter(role='Indexing Officer')
+		query = request.GET.get('q')
+		if query:
+			qs = qs.filter(name__icontains=query)
+		return qs  #.filter(title__icontains='vid')
 
 class AdmissionQuotaListView(ListView):
 	template_name = "indexing_unit/admission_quota_list.html"
@@ -211,16 +240,17 @@ class InstitutionCreateView1(CreateView):
 
 
 
-class InstitutionDetailView(DetailView):
+class InstitutionDetailView(SuccessMessageMixin, DetailView):
 	queryset = InstitutionProfile.objects.all()
 	template_name = "indexing_unit/institution_details.html"
+	success_message = "Institution Profiles was created successfully"
+	# def get_success_message(self, cleaned_data):
+	# 	return self.success_message % dict(
+    #         cleaned_data,
+    #         name=self.object.name,
+    #     )
 
-
-
-
-    
-
-
+ 
 class AdmissionQuotaCreateView(CreateView):
     model = AdmissionQuota
     template_name = "indexing_unit/assign_admission_quota.html"
@@ -231,9 +261,6 @@ class AdmissionQuotaCreateView(CreateView):
 class AdmissionQuotaDetailView(DetailView):
 	queryset = AdmissionQuota.objects.all()
 	template_name = "indexing_unit/admission_quota_details.html"
-
-
-
 
 
 
@@ -287,7 +314,6 @@ class IndexNumberIssuanceList(ListView):
 
 
 
-
 class InstitutionsIndexingListView(ListView):
 	template_name = "indexing_unit/issued_indexing_list.html"
 	def get_queryset(self):
@@ -321,8 +347,7 @@ class InstitutionsIndexingStudentsListView(ListView):
 	    return context
 	    print ("context:", context)
 
-    	
-    	
+    	 	
 
 class IssueIndexNumberDetails(DetailView):
 	queryset = StudentIndexing.objects.all()
@@ -353,7 +378,7 @@ class IssueIndexNumber1(CreateView):
 
 
 
-class IssueIndexNumber(CreateView, IndexObjectMixin):
+class IssueIndexingNumber(CreateView, IndexObjectMixin):
     model = IssueIndexing
     template_name = "indexing_unit/issue_index_number.html"
     form_class = IssueIndexingForm
@@ -376,10 +401,19 @@ class IssueIndexNumber(CreateView, IndexObjectMixin):
         #kwargs['initial']['hospital'] = self.payment.hospital
         
         return kwargs
-      
+
+    def form_valid(self, form):
+        indexing = form.save(commit=False)
+        indexing_payment = IndexingPayment.objects.get(student_indexing=self.student_indexing)
+        indexing.indexing_payment = indexing_payment
+        indexing.save()
+        return super(IssueIndexingNumber, self).form_valid(form)
+
 
     def form_invalid(self, form):
         return self.render_to_response(self.get_context_data())
+
+
 
 
 class IssuedIndexingApplications(ListView):
@@ -408,8 +442,9 @@ class InstitutionsIndexingPaymentDetailView(LoginRequiredMixin, DetailView):
 	template_name = "indexing_unit/institutions_payment_details.html"
 
 class InstitutionsIndexingPreIssueDetailView(LoginRequiredMixin, DetailView):
-	queryset = InstitutionPayment.objects.all()
+	queryset = InstitutionPayment.objects.prefetch_related(Prefetch('students_payments', queryset=IndexingPayment.objects.filter(payment_status = 2)))
 	template_name = "indexing_unit/institutions_indexing_pre_issue_details.html"
+
 
 
 
@@ -420,7 +455,7 @@ def verify_payment(request, id):
      object.save()
      context = {}
      context['object'] = object
-     # messages.success(request, ('Indexing Application Verified'))
+     messages.success(request, ('Indexing Application Verified'))
      return render(request, 'indexing_unit/payment_verification_successful.html',context)
 
 
@@ -469,10 +504,46 @@ class IssuedIndexingApplicationsDetails(DetailView):
 
 
 class StudentIndexingApplicationDetailView(LoginRequiredMixin, DetailView):
-    queryset = StudentIndexing.objects.all()
+    # queryset = StudentIndexing.objects.all()
     template_name = "indexing_unit/student_indexing_application_details.html"
 
-    
+    def get_object(self):
+    	institutionprofile_slug = self.kwargs.get("islug")
+    	studentindexing_slug = self.kwargs.get("sslug")
+    	obj = get_object_or_404(StudentIndexing, institution__slug = institutionprofile_slug, slug = studentindexing_slug)
+    	return obj
+
+  
+class StudentsIndexingApplicationDetails(LoginRequiredMixin, DetailView):
+    # queryset = StudentIndexing.objects.all()
+    template_name = "indexing_unit/students_indexing_application_details.html"
+
+    def get_object(self):
+    	institutionprofile_slug = self.kwargs.get("islug")
+    	studentindexing_slug = self.kwargs.get("sslug")
+    	obj = get_object_or_404(StudentIndexing, institution__slug = institutionprofile_slug, slug = studentindexing_slug)
+    	return obj
+
+def verify(request, id):
+  if request.method == 'POST':
+     object = get_object_or_404(StudentIndexing, pk=id)
+     object.verification_status = 3
+     object.save()
+     context = {}
+     context['object'] = object
+     messages.success(request, ('Indexing Application Verified'))
+     return render(request, 'indexing_unit/verification_successful.html',context)
+
+
+def reject(request, id):
+  if request.method == 'POST':
+     object = get_object_or_404(StudentIndexing, pk=id)
+     object.verification_status = 2
+     object.save()
+     context = {}
+     context['object'] = object
+     # messages.error(request, ('Indexing Application Rejected'))
+     return render(request, 'indexing_unit/verification_failed.html',context)
 class StudentIndexingNumberDetailView(LoginRequiredMixin, DetailView):
     queryset = IssueIndexing.objects.all()
     template_name = "indexing_unit/students_indexing_number_details.html"

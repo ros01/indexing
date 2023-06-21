@@ -9,6 +9,7 @@ from .views import (
     StudentProfilesListView,
     StudentIndexingApplicationsListView,
     StudentIndexingApplicationDetailView,
+    StudentIndexingApplicationDetails,
     IndexingVerificationsListView,
     IndexingVerificationsDetailView,
     IndexingPaymentsListView,
@@ -22,9 +23,10 @@ from .views import (
     StudentIndexingPaymentDetailView,
     InstitutionsIndexingPaymentDetailView,
     InstitutionsPaymentsListView,
-    
-   
-       
+    AdmissionQuotaListView,
+    AdmissionQuotaDetailView,
+
+           
 )
 
 
@@ -36,9 +38,13 @@ urlpatterns = [
     path('create_student_profile',  StudentProfileCreateView.as_view(), name='create_student_profile'),
     path('create_academic_session/', CreateAcademicSession.as_view(), name='create_academic_session'),
     path('student_profile_details/<slug:islug>/<slug:sslug>',  StudentProfileDetailView.as_view(), name='student_profile_details'),
+    path('admission_quota_list',  AdmissionQuotaListView.as_view(), name='admission_quota_list'),
+    path('<slug:slug>/admission_quota_detail',  AdmissionQuotaDetailView.as_view(), name='admission_quota_detail'),
     #path('student_profile_details/<slug:slug>',  StudentProfileDetailView.as_view(), name='student_profile_details'),
     path('student_indexing_applications_list', StudentIndexingApplicationsListView.as_view(), name='student_indexing_applications_list'),
-    path('student_indexing_indexing_application_details/<slug:slug>',  StudentIndexingApplicationDetailView.as_view(), name='student_indexing_indexing_application_details'),
+    path('student_indexing_application_details/<slug:islug>/<slug:sslug>',  StudentIndexingApplicationDetailView.as_view(), name='student_indexing_application_details'),
+    path('student_indexing_details/<slug:islug>/<slug:sslug>',  StudentIndexingApplicationDetails.as_view(), name='student_indexing_details'),
+    path('student_indexing_verification_details/<slug:slug>',  IndexingVerificationsDetailView.as_view(), name='student_indexing_verification_details'),
     path('<int:id>/verify/', views.verify, name='verify'),
     path('<int:id>/reject/', views.reject, name='reject'),
     path('<int:id>/verify_payment/', views.verify_payment, name='verify_payment'),
@@ -46,7 +52,6 @@ urlpatterns = [
     path('institutions_indexing_payment',  InstitutionPaymentCreateView.as_view(), name='institutions_indexing_payment'),
     path('student_indexing_verifications_list', IndexingVerificationsListView.as_view(), name='student_indexing_verifications_list'),
     path('generate_payment_invoice', GenerateInvoiceView.as_view(), name='generate_payment_invoice'),
-    path('student_indexing_verification_details/<slug:slug>',  IndexingVerificationsDetailView.as_view(), name='student_indexing_verification_details'),
     path('student_indexing_payments_list', IndexingPaymentsListView.as_view(), name='student_indexing_payments_list'),
     path('make_indexing_payment',  IndexingPaymentCreateView.as_view(), name='make_indexing_payment'),
     path('view_indexing_payment_details',  IndexingPaymentsDetails.as_view(), name='view_indexing_payment_details'),
@@ -55,6 +60,10 @@ urlpatterns = [
     path('verified_payments_list', VerifiedPaymentsListView.as_view(), name='verified_payments_list'),
     path('institutions_payments_list', InstitutionsPaymentsListView.as_view(), name='institutions_payments_list'),
     path('institutions_indexing_payment_details/<slug:slug>',  InstitutionsIndexingPaymentDetailView.as_view(), name='institutions_indexing_payment_details'),
-    
-    
     ]
+
+
+
+
+
+    

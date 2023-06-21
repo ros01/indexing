@@ -19,6 +19,7 @@
 </ul>
 </div>
 <div class="card-body mb-0 pb-0">
+{% include 'partials/_alerts.html' %} 
 <div class="">
 <div class="tab-content">
 <div class="tab-pane active" id="about">
@@ -115,14 +116,14 @@
                 </thead>
                 <tbody>
                 {% for student in object.students_payments.all %}
-                <tr>
+                    <tr>
                     <td>{{student.student_profile.student.last_name}} {{student.student_profile.student.first_name}}</td>
                     <td>{{student.institution.course_type}}</td>
                      <td>{{student.academic_session}}</td>
                     <td>{{student.student_profile.student.reg_no}}</td>
                     <td>{{student.student_indexing.admission_type}}</td>
                    
-                    <td><a href="{{ student.get_absolute_url }}"> <i class="fas fa-search text-primary"></i> <span class="badge badge-boxed  badge-primary">View Details </span></a></td> 
+                    <td><a href="{{student.student_indexing.get_application_url}}"> <i class="fas fa-search text-primary"></i> <span class="badge badge-boxed  badge-primary">View Details </span></a></td> 
                 </tr>
                 {% endfor %}
                 </tbody>
@@ -138,7 +139,7 @@
 <div class="d-flex justify-content-end mr-2 mb-2">   
 <!-- <a href="javascript:{document.getElementById('verify_payment{{object.id }}').submit()}"><button class="btn btn-success py-0 mr-2 mt-1 mb-1"> Verify Payment<i class="fa fa-check" aria-hidden="true"></i></button> </a>
 <a href="javascript:{document.getElementById('reject_payment{{object.id }}').submit()}"><button class="btn btn-danger py-0 mr-2 mt-1 mb-1"> Reject Payment<i class="fa fa-reply" aria-hidden="true"></i></button></a>  -->
-<a href="{% url 'indexing_unit:institutions_payments_list' %}" class="btn btn-outline-success text-success py-0 mr-2 mt-1 mb-1"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Payments List</a>  
+<a href="{% url 'indexing_unit:institutions_payments_list' %}" class="btn btn-outline-primary py-0 mr-2 mt-1 mb-1"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Payments List</a>  
 </div>
 
 </div>

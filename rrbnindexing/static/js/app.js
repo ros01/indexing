@@ -1,0 +1,4 @@
+
+
+$('.fj-date').datepicker({
+});

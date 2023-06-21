@@ -44,7 +44,7 @@ admin.site.register(AdmissionQuota, AdmissionQuotaAdmin)
 
 
 class IssueIndexingAdmin(admin.ModelAdmin):
-  list_display = ('student_profile', 'academic_session', 'student_indexing', 'index_number', 'timestamp')
+  list_display = ('student_profile', 'academic_session', 'student_indexing', 'indexing_payment', 'index_number', 'timestamp')
   list_display_links = ('student_profile', 'academic_session', 'student_indexing', 'index_number')
   list_filter = ('student_profile', 'academic_session', 'student_indexing', 'index_number')
   search_fields = ('student_profile', 'academic_session', 'student_indexing', 'index_number')

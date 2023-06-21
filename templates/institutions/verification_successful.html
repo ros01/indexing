@@ -20,6 +20,7 @@
 </ul>
 </div>
 <div class="card-body mb-0 pb-0">
+{% include 'partials/_alerts.html' %} 
 <div class="">
 <div class="tab-content">
 <div class="tab-pane active" id="about">
@@ -192,7 +193,8 @@
 
 <div class="d-flex justify-content-end mr-2 mb-2">   
 
-<a href="{% url 'institutions:student_indexing_applications_list' %}" class="btn btn-warning text-white py-1 px-1 mb-1"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Return to Verifications List</a>  
+<a href="{% url 'institutions:student_indexing_applications_list' %}" class="btn btn-outline-success py-0 mr-3 mt-1 mb-3"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Applications List</a>  
+
 </div>
 
 </div>
