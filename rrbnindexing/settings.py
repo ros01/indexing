@@ -49,6 +49,8 @@ INSTALLED_APPS = [
     'dal',
     'dal_select2',
     "bootstrap_datepicker_plus",
+    'bootstrap_modal_forms',
+    'widget_tweaks',
     # 'grappelli',
     'django.contrib.auth',
     'django.contrib.contenttypes',

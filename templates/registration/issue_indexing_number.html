@@ -50,7 +50,7 @@
 <div class="form-group row">
     <div class="col-md-6">
     <div class= "form-control-alternative my-0 py-0">
-    {{ form.reg_no|as_crispy_field }}
+    {{ form.matric_no|as_crispy_field }}
     </div>
     </div>
     <div class="col-md-6">
@@ -71,11 +71,12 @@
 </div>
 
 </div> -->
-<div class="form-group">
+<div class="d-flex justify-content-end">  
 
-<button class="btn btn-primary btn-sm text-light px-4 mt-2 float-right">Issue Student Indexing Number</button>
+<!-- <button class="btn btn-primary btn-sm text-light px-4 mt-2 float-right">Issue Student Indexing Number</button> -->
 
-<input type="submit" class="btn btn-primary btn-sm text-light px-4 mt-2 float-right" value="Issue Student Indexing Number" onclick="return confirm('Are you sure you want to issue indexing number for this student?')">
+
+<input type="submit" class="btn btn-outline-primary py-0 mt-1" value="Issue Student Indexing Number" onclick="return confirm('Are you sure you want to issue indexing number for this application?')" >
 
 </div>
 </form>

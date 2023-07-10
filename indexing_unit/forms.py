@@ -114,14 +114,14 @@ class IssueIndexingForm(forms.ModelForm):
             'academic_session',
             'student_indexing',
             'index_number',
-            'reg_no'
+            'matric_no'
                 ]
         widgets = {
          'institution': forms.HiddenInput(),
          'student_profile': forms.HiddenInput(),
          'academic_session': forms.HiddenInput(),
          'student_indexing': forms.HiddenInput(),
-         'reg_no': forms.TextInput(attrs={'readonly': True}), 
+         'matric_no': forms.TextInput(attrs={'readonly': True}), 
          # 'student_profile': forms.HiddenInput(),
          # 'student_indexing': forms.HiddenInput(),
          # 'requisition': forms.TextInput(attrs={'readonly': True}), 
@@ -136,6 +136,7 @@ class IssueIndexingForm(forms.ModelForm):
                 
             })
        #
+       self.fields['matric_no'].label = "Matric No"
        self.fields['index_number'].label = "Student Indexing Number"
        
 

@@ -25,26 +25,38 @@ class UtmeGradeAdmin(admin.ModelAdmin):
 admin.site.register(UtmeGrade, UtmeGradeAdmin)
 
 
-class DeGradeAdmin(admin.ModelAdmin):
-  list_display = ('student', 'timestamp')
-  list_display_links = ('student', 'timestamp')
-  list_filter = ('student', 'timestamp')
-  search_fields = ('student', 'timestamp')
+class GceAlevelsAdmin(admin.ModelAdmin):
+  list_display = ('matric_no', 'student_profile', 'examination_body', 'timestamp')
+  list_display_links = ('matric_no', 'student_profile', 'timestamp')
+  list_filter = ('matric_no', 'student_profile', 'timestamp')
+  search_fields = ('matric_no', 'student_profile', 'timestamp')
   list_per_page = 25
 
 
-admin.site.register(DeGrade, DeGradeAdmin)
+admin.site.register(GceAlevels, GceAlevelsAdmin)
 
 
-class TransferGradeAdmin(admin.ModelAdmin):
-  list_display = ('student', 'timestamp')
-  list_display_links = ('student', 'timestamp')
-  list_filter = ('student', 'timestamp')
-  search_fields = ('student', 'timestamp')
+class DegreeResultsAdmin(admin.ModelAdmin):
+  list_display = ('matric_no', 'student_profile', 'degree_type', 'course', 'course_grade', 'timestamp')
+  list_display_links = ('matric_no', 'student_profile', 'timestamp')
+  list_filter = ('matric_no', 'student_profile', 'timestamp')
+  search_fields = ('matric_no', 'student_profile', 'timestamp')
   list_per_page = 25
 
 
-admin.site.register(TransferGrade, TransferGradeAdmin)
+admin.site.register(DegreeResults, DegreeResultsAdmin)
+
+
+
+# class TransferGradeAdmin(admin.ModelAdmin):
+#   list_display = ('student', 'timestamp')
+#   list_display_links = ('student', 'timestamp')
+#   list_filter = ('student', 'timestamp')
+#   search_fields = ('student', 'timestamp')
+#   list_per_page = 25
+
+
+# admin.site.register(TransferGrade, TransferGradeAdmin)
 
 
 

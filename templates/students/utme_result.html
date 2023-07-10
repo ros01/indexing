@@ -1,0 +1,66 @@
+{% load widget_tweaks %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+<form method="POST" enctype="multipart/form-data" action=".">
+{% csrf_token %}
+
+ <div class="modal-header">
+    <h5 class="modal-title text-success">Enter UTME Subject Scores</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+
+  <div class="modal-body">
+    <div class="{% if form.non_field_errors %}invalid{% endif %} mb-2">
+      {% for error in form.non_field_errors %}
+        {{ error }}
+      {% endfor %}
+  </div>
+    <div class="row">
+    {% for field in form %}
+
+      <div class="form-group col-md-4{% if field.errors %} invalid{% endif %}">
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% for error in field.errors %}
+          <p class="help-block">{{ error }}</p>
+        {% endfor %}
+      </div>
+      
+    {% endfor %}
+    </div>
+  </div>
+
+  
+  
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-times text-white"></i>  Close</button>
+    <button type="button" class="submit-btn btn btn-success ml-2 pt-2 pb-1 pr-2"><i class="fa fa-podcast text-white"></i>  Submit WAEC Scores</button>
+
+  </div>
+
+</form>
+
+<div class="container">
+
+<p class="text-success m-0 p-0"> <b>Scoring Legend: </b></p>
+
+Pass Mark is C6 (Credit 50% and above)  <br>
+Grade   Defintion     Intepretation<br>
+A1      Excellent     75% - 100%<br>
+B2      Very Good     70% - 74%<br>
+B3      Good          65% - 69%<br>
+C4      Credit        60% - 64%<br>
+C5      Credit        55% - 59%<br>
+C6      Credit        50% - 54%<br>
+D7      Pass          45% - 49%<br>
+D8      Pass          40% - 45%<br>
+F9      Fail          0% - 44%<br>
+
+
+</div>
+
+
+

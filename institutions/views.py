@@ -19,7 +19,10 @@ from indexing_unit.models import *
 from django.db import transaction
 from django.db.models import F
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import Http404, HttpResponse, HttpResponseRedirect, JsonResponse
+from django.http import Http404, HttpResponse, HttpResponseRedirect, JsonResponse, StreamingHttpResponse
+from wsgiref.util import FileWrapper
+import mimetypes
+import os
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext as _
@@ -137,6 +140,17 @@ def slug_router(request, slug):
     else:
         return HttpResponseNotFound('404 Page not found')    
 
+def downloadfile(request):
+	 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+	 filename = 'students_list.csv'
+	 filepath = base_dir + '/static/csv/' + filename
+	 thefile = filepath
+	 filename = os.path.basename(thefile) 
+	 chunk_size = 8192
+	 response = StreamingHttpResponse(FileWrapper(open(thefile, 'rb'),chunk_size), content_type=mimetypes.guess_type(thefile)[0])
+	 response['Content-Length'] = os.path.getsize(thefile)
+	 response['Content-Disposition'] = "Attachment;filename=%s" % filename
+	 return response
 
 class CreateAcademicSession(LoginRequiredMixin, CreateView):
     template_name = 'store/create_vendor2.html'
@@ -174,7 +188,7 @@ class StudentProfileCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateVi
 		# print(list_of_dict)
 		objs = [
             StudentProfile(
-            	student = User.objects.get_or_create(email=row['email'], last_name=row['last_name'], first_name=row['first_name'], middle_name=row['middle_name'], phone_no=row['phone_no'], reg_no=row['reg_no'], password = make_password('Rebelspy1%'),)[0],  # This is foreignkey value
+            	student = User.objects.get_or_create(email=row['email'], last_name=row['last_name'], first_name=row['first_name'], middle_name=row['middle_name'], phone_no=row['phone_no'], matric_no=row['matric_no'], password = make_password('Rebelspy1%'),)[0],  # This is foreignkey value
             	institution=institution.first(),
             )
             for row in list_of_dict
@@ -227,47 +241,77 @@ class StudentIndexingApplicationsListView(LoginRequiredMixin, ListView):
 
 class StudentIndexingApplicationDetailView(LoginRequiredMixin, DetailView):
 	# queryset = StudentIndexing.objects.all()
-	template_name = "institutions/student_indexing_application_detail.html"
+	template_name = "institutions/student_indexing_details.html"
 
 	def get_object(self):
 		institutionprofile_slug = self.kwargs.get("islug")
 		studentindexing_slug = self.kwargs.get("sslug")
 		obj = get_object_or_404(StudentIndexing, institution__slug = institutionprofile_slug, slug = studentindexing_slug)
 		return obj
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		obj = self.get_object()
+		context['payment_object'] = obj.indexingpayment_set.first()
+		return context
 
 
 class StudentIndexingApplicationDetails(LoginRequiredMixin, DetailView):
 	# queryset = StudentIndexing.objects.all()
-	template_name = "institutions/student_indexing_post_application_details.html"
+	template_name = "institutions/students_indexing_post_application_details.html"
 
 	def get_object(self):
 		institutionprofile_slug = self.kwargs.get("islug")
 		studentindexing_slug = self.kwargs.get("sslug")
 		obj = get_object_or_404(StudentIndexing, institution__slug = institutionprofile_slug, slug = studentindexing_slug)
 		return obj
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		obj = self.get_object()
+		context['payment_object'] = obj.indexingpayment_set.first()
+		return context
 
 
 
 def verify(request, id):
   if request.method == 'POST':
      object = get_object_or_404(StudentIndexing, pk=id)
+     payment_object = object.indexingpayment_set.first()
      object.verification_status = 2
+     payment_object.payment_status = 2
      object.save()
+     payment_object.save()
      context = {}
      context['object'] = object
      messages.success(request, ('Indexing Application Verified'))
-     return render(request, 'institutions/verification_successful.html',context)
+     return HttpResponseRedirect(reverse("institutions:student_indexing_application_details", kwargs={'islug': object.institution.slug,
+            'sslug': object.slug,}))
+
+     # url_kwargs={
+     #        'islug': self.institution.slug,
+     #        'sslug': self.slug,
+     #    }
+     #    return reverse('indexing_unit:student_indexing_details', kwargs=url_kwargs)
+
+     # return reverse("institutions:student_indexing_application_details", kwargs={'islug': self.institution.slug,
+     #        'sslug': self.slug,})
+     # return render(request, 'institutions/verification_successful.html',context)
 
 
 def reject(request, id):
   if request.method == 'POST':
      object = get_object_or_404(StudentIndexing, pk=id)
+     payment_object = object.indexingpayment_set.first()
      object.verification_status = 1
+     payment_object.payment_status = 1
      object.save()
+     payment_object.save()
      context = {}
      context['object'] = object
-     # messages.error(request, ('Indexing Application Rejected'))
-     return render(request, 'institutions/verification_failed.html',context)
+     messages.success(request, ('Indexing Application Rejected'))
+     return HttpResponseRedirect(reverse("institutions:student_indexing_application_details", kwargs={'islug': object.institution.slug,
+            'sslug': object.slug,}))
 
 
 def verify_payment(request, id):
@@ -314,7 +358,19 @@ class IndexingVerificationsListView(LoginRequiredMixin, ListView):
 
 class IndexingVerificationsDetailView(LoginRequiredMixin, DetailView):
 	queryset = StudentIndexing.objects.all()
-	template_name = "institutions/student_indexing_verification_details.html"
+	template_name = "institutions/student_indexing_verifications_details.html"
+
+	def get_object(self):
+		institutionprofile_slug = self.kwargs.get("islug")
+		studentindexing_slug = self.kwargs.get("sslug")
+		obj = get_object_or_404(StudentIndexing, institution__slug = institutionprofile_slug, slug = studentindexing_slug)
+		return obj
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		obj = self.get_object()
+		context['payment_object'] = obj.indexingpayment_set.first()
+		return context
 
 
 

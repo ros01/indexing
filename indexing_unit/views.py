@@ -167,6 +167,45 @@ class IndexingOfficerDetailView(DetailView):
 	queryset = IndexingOfficerProfile.objects.all()
 	template_name = "indexing_unit/indexing_officer_details.html"
 
+	# def get_object(self):
+	# 	institutionprofile_slug = self.kwargs.get("islug")
+	# 	studentindexing_slug = self.kwargs.get("sslug")
+	# 	obj = User.objects.filter(role='Indexing Officer').first()
+	# 	return obj
+
+	# def get_context_data(self, **kwargs):
+	# 	context = super().get_context_data(**kwargs)
+	# 	obj = self.get_object()
+	# 	context['payment_object'] = obj.indexingpayment_set.first()
+	# 	return context
+
+
+
+# qs = User.objects.filter(role='Indexing Officer')
+
+def activate_user(request, slug):
+  if request.method == 'POST':
+     object = get_object_or_404(IndexingOfficerProfile, slug=slug)
+     indexing_object = object.indexing_officer
+     indexing_object.is_active = True
+     indexing_object.save()
+     context = {}
+     context['object'] = object
+     messages.success(request, ('Indexing Officer is now Active'))
+     return HttpResponseRedirect(reverse("indexing_unit:indexing_officer_detail", kwargs={'slug': object.slug,}))
+
+
+def deactivate_user(request, slug):
+  if request.method == 'POST':
+     object = get_object_or_404(IndexingOfficerProfile, slug=slug)
+     indexing_object = object.indexing_officer
+     indexing_object.is_active = False
+     indexing_object.save()
+     context = {}
+     context['object'] = object
+     messages.success(request, ('Indexing Officer has now been deactivated'))
+     return HttpResponseRedirect(reverse("indexing_unit:indexing_officer_detail", kwargs={'slug': object.slug,}))
+
 
 
 class InstitutionListView(ListView):
@@ -184,7 +223,8 @@ class IndexingOfficerListView(ListView):
 	template_name = "indexing_unit/indexing_officers_list.html"
 	def get_queryset(self):
 		request = self.request
-		qs = User.objects.filter(role='Indexing Officer')
+		# qs = User.objects.filter(role='Indexing Officer')
+		qs = IndexingOfficerProfile.objects.all()
 		query = request.GET.get('q')
 		if query:
 			qs = qs.filter(name__icontains=query)
@@ -280,26 +320,7 @@ class IndexingVerificationsDetailView(DetailView):
 	template_name = "indexing_unit/student_indexing_verification_details.html"
 
 
-def verify(request, id):
-  if request.method == 'POST':
-     object = get_object_or_404(StudentIndexing, pk=id)
-     object.indexing_status = 3
-     object.save()
-     context = {}
-     context['object'] = object
-     # messages.success(request, ('Indexing Application Verified'))
-     return render(request, 'indexing_unit/verifications_successful.html',context)
 
-
-def reject(request, id):
-  if request.method == 'POST':
-     object = get_object_or_404(StudentIndexing, pk=id)
-     object.indexing_status = 4
-     object.save()
-     context = {}
-     context['object'] = object
-     # messages.error(request, ('Indexing Application Rejected'))
-     return render(request, 'indexing_unit/verification_failed.html',context)
 
 
 class IndexNumberIssuanceList(ListView):
@@ -446,31 +467,6 @@ class InstitutionsIndexingPreIssueDetailView(LoginRequiredMixin, DetailView):
 	template_name = "indexing_unit/institutions_indexing_pre_issue_details.html"
 
 
-
-
-def verify_payment(request, id):
-  if request.method == 'POST':
-     object = get_object_or_404(InstitutionPayment, pk=id)
-     object.payment_status = 2
-     object.save()
-     context = {}
-     context['object'] = object
-     messages.success(request, ('Indexing Application Verified'))
-     return render(request, 'indexing_unit/payment_verification_successful.html',context)
-
-
-def reject_payment(request, id):
-  if request.method == 'POST':
-     object = get_object_or_404(InstitutionPayment, pk=id)
-     object.payment_status = 1
-     object.save()
-     context = {}
-     context['object'] = object
-     # messages.error(request, ('Indexing Application Rejected'))
-     return render(request, 'indexing_unit/payment_verification_failed.html',context)
-
-
-
 class VerifiedPaymentsListView(LoginRequiredMixin, ListView):
 	template_name = "indexing_unit/verified_payments_list.html"
 	
@@ -513,6 +509,12 @@ class StudentIndexingApplicationDetailView(LoginRequiredMixin, DetailView):
     	obj = get_object_or_404(StudentIndexing, institution__slug = institutionprofile_slug, slug = studentindexing_slug)
     	return obj
 
+    def get_context_data(self, **kwargs):
+    	context = super().get_context_data(**kwargs)
+    	obj = self.get_object()
+    	context['payment_object'] = obj.indexingpayment_set.first()
+    	return context
+
   
 class StudentsIndexingApplicationDetails(LoginRequiredMixin, DetailView):
     # queryset = StudentIndexing.objects.all()
@@ -524,26 +526,86 @@ class StudentsIndexingApplicationDetails(LoginRequiredMixin, DetailView):
     	obj = get_object_or_404(StudentIndexing, institution__slug = institutionprofile_slug, slug = studentindexing_slug)
     	return obj
 
-def verify(request, id):
+
+
+def approve_application(request, slug):
   if request.method == 'POST':
-     object = get_object_or_404(StudentIndexing, pk=id)
+     object = get_object_or_404(StudentIndexing, slug=slug)
+     payment_object = object.indexingpayment_set.first()
      object.verification_status = 3
+     payment_object.payment_status = 3
      object.save()
+     payment_object.save()
      context = {}
      context['object'] = object
-     messages.success(request, ('Indexing Application Verified'))
-     return render(request, 'indexing_unit/verification_successful.html',context)
+     messages.success(request, ('Indexing Application and Payment Verified'))
+     return HttpResponseRedirect(reverse("indexing_unit:student_indexing_details", kwargs={'islug': object.institution.slug,
+            'sslug': object.slug,}))
+     # return render(request, 'indexing_unit/verification_successful.html',context)
 
 
-def reject(request, id):
+def reject_application(request, slug):
   if request.method == 'POST':
-     object = get_object_or_404(StudentIndexing, pk=id)
+     object = get_object_or_404(StudentIndexing,slug=slug)
+     payment_object = object.indexingpayment_set.first()
      object.verification_status = 2
+     payment_object.payment_status = 2
+     object.save()
+     payment_object.save()
+     context = {}
+     context['object'] = object
+     messages.error(request, ('Indexing Application Rejected'))
+     return HttpResponseRedirect(reverse("indexing_unit:student_indexing_details", kwargs={'islug': object.institution.slug,
+            'sslug': object.slug,}))
+     # return render(request, 'indexing_unit/verification_failed.html',context)
+
+def verify_payment(request, slug):
+  if request.method == 'POST':
+     object = get_object_or_404(InstitutionPayment, slug=slug)
+     object.payment_status = 2
      object.save()
      context = {}
      context['object'] = object
-     # messages.error(request, ('Indexing Application Rejected'))
-     return render(request, 'indexing_unit/verification_failed.html',context)
+     messages.success(request, ('Institution Payment Verified'))
+     return HttpResponseRedirect(reverse("indexing_unit:institutions_indexing_payment_details", kwargs={'slug': object.slug}))
+     # return render(request, 'indexing_unit/payment_verification_successful.html',context)
+
+
+def reject_payment(request, slug):
+  if request.method == 'POST':
+     object = get_object_or_404(InstitutionPayment, slug=slug)
+     object.payment_status = 1
+     object.save()
+     context = {}
+     context['object'] = object
+     messages.error(request, ('Institution Payment Rejected'))
+     return HttpResponseRedirect(reverse("indexing_unit:institutions_indexing_payment_details", kwargs={'slug': object.slug}))
+     # return render(request, 'indexing_unit/payment_verification_failed.html',context)
+
+
+# def verify(request, id):
+#   if request.method == 'POST':
+#      object = get_object_or_404(StudentIndexing, pk=id)
+#      object.indexing_status = 3
+#      object.save()
+#      context = {}
+#      context['object'] = object
+#      # messages.success(request, ('Indexing Application Verified'))
+#      return render(request, 'indexing_unit/verifications_successful.html',context)
+
+
+# def reject(request, id):
+#   if request.method == 'POST':
+#      object = get_object_or_404(StudentIndexing, pk=id)
+#      object.indexing_status = 4
+#      object.save()
+#      context = {}
+#      context['object'] = object
+#      # messages.error(request, ('Indexing Application Rejected'))
+#      return render(request, 'indexing_unit/verification_failed.html',context)
+
+
+
 class StudentIndexingNumberDetailView(LoginRequiredMixin, DetailView):
     queryset = IssueIndexing.objects.all()
     template_name = "indexing_unit/students_indexing_number_details.html"

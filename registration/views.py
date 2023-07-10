@@ -114,17 +114,39 @@ class IndexNumberIssuanceList(ListView):
 	template_name = "registration/index_number_issuance_list.html"
 	def get_queryset(self):
 		request = self.request
-		qs = InstitutionPayment.objects.all()
+		# qs = InstitutionPayment.objects.prefetch_related(Prefetch('students_payments', queryset=IndexingPayment.objects.filter(payment_status = 2))).filter(payment_status=2)
+		qs_object = InstitutionPayment.objects.filter(students_payments__payment_status= 3)
+		qs = IndexingPayment.objects.filter(institutionpayment__in=qs_object)
+		# print('Hello', qs)
 		query = request.GET.get('q')
 		if query:
 			qs = qs.filter(name__icontains=query)
-		return qs.filter(payment_status=2) 
+		return qs
+
 
 
 
 class InstitutionsIndexingPreIssueDetailView(LoginRequiredMixin, DetailView):
-	queryset = InstitutionPayment.objects.prefetch_related(Prefetch('students_payments', queryset=IndexingPayment.objects.filter(payment_status = 2)))
+	# queryset = InstitutionPayment.objects.prefetch_related(Prefetch('students_payments', queryset=IndexingPayment.objects.filter(payment_status = 3)))
 	template_name = "registration/institutions_indexing_pre_issue_details.html"
+
+	def get_queryset(self):
+		request = self.request
+		# qs = InstitutionPayment.objects.prefetch_related(Prefetch('students_payments', queryset=IndexingPayment.objects.filter(payment_status = 2))).filter(payment_status=2)
+		qs_object = InstitutionPayment.objects.filter(students_payments__payment_status= 3)
+		qs = IndexingPayment.objects.filter(institutionpayment__in=qs_object)
+		# print('Hello', qs)
+		query = request.GET.get('q')
+		if query:
+			qs = qs.filter(name__icontains=query)
+		return qs
+
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		object_list = self.get_queryset()
+		context['object_list'] = object_list
+		return context
 
 
 
@@ -138,6 +160,12 @@ class StudentsIndexingApplicationDetails(LoginRequiredMixin, DetailView):
     	obj = get_object_or_404(StudentIndexing, institution__slug = institutionprofile_slug, slug = studentindexing_slug)
     	return obj
 
+    def get_context_data(self, **kwargs):
+    	context = super().get_context_data(**kwargs)
+    	obj = self.get_object()
+    	context['payment_object'] = obj.indexingpayment_set.first()
+    	return context
+
 
 class StudentIndexingApplicationDetailView(LoginRequiredMixin, DetailView):
     # queryset = StudentIndexing.objects.all()
@@ -148,6 +176,13 @@ class StudentIndexingApplicationDetailView(LoginRequiredMixin, DetailView):
     	studentindexing_slug = self.kwargs.get("sslug")
     	obj = get_object_or_404(StudentIndexing, institution__slug = institutionprofile_slug, slug = studentindexing_slug)
     	return obj
+
+
+    def get_context_data(self, **kwargs):
+    	context = super().get_context_data(**kwargs)
+    	obj = self.get_object()
+    	context['payment_object'] = obj.indexingpayment_set.first()
+    	return context
 
 
 class IndexObjectMixin(object):
@@ -178,7 +213,7 @@ class IssueIndexingNumber(LoginRequiredMixin, SuccessMessageMixin, CreateView, I
         kwargs = super().get_form_kwargs()
         kwargs['initial']['student_profile'] = self.student_indexing.student_profile
         kwargs['initial']['student_indexing'] = self.student_indexing
-        kwargs['initial']['reg_no'] = self.student_indexing.student_profile.student.reg_no
+        kwargs['initial']['matric_no'] = self.student_indexing.student_profile.student.matric_no
         kwargs['initial']['institution'] = self.student_indexing.institution
         kwargs['initial']['academic_session'] = self.student_indexing.academic_session
         #kwargs['initial']['hospital'] = self.payment.hospital
@@ -195,6 +230,8 @@ class IssueIndexingNumber(LoginRequiredMixin, SuccessMessageMixin, CreateView, I
 
     def form_invalid(self, form):
         return self.render_to_response(self.get_context_data())
+
+
 
 class InstitutionsIndexedStudentsListView(ListView):
 	template_name = "registration/institutions_indexed_students_list.html"

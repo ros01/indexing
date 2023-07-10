@@ -40,16 +40,20 @@ from institutions.models import *
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
-class DashboardView(LoginRequiredMixin, View):
+class DashboardView(LoginRequiredMixin, DetailView):
 
-    def get(self, request, *args, **kwarg):
+    template_name = "students/dashboard1.html"
+
+    def get_object(self):
         user = self.request.user
         obj = StudentProfile.objects.filter(student=user)
-        context = {
-            "obj": obj,
-        }
+        return obj
 
-        return render(request, "students/dashboard1.html", context)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        obj = self.get_object()
+        context['obj'] = obj.first()
+        return context
 
 @login_required
 def status(request):
@@ -125,8 +129,21 @@ class IndexingPaymentCreateListView(LoginRequiredMixin, ListView):
 
 
 class MyStudentProfileDetailView(LoginRequiredMixin, DetailView):
-    queryset = StudentProfile.objects.all()
+    # queryset = StudentProfile.objects.all()
     template_name = "students/my_student_profile_details.html"
+
+
+    def get_object(self):
+        institutionprofile_slug = self.kwargs.get("islug")
+        studentprofile_slug = self.kwargs.get("sslug")
+        obj = get_object_or_404(StudentProfile, institution__slug = institutionprofile_slug, slug = studentprofile_slug)
+        return obj
+
+    # def get_context_data(self, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     obj = self.get_object()
+    #     context['payment_object'] = obj.indexingpayment_set.first()
+    #     return context
 
 
 
@@ -144,6 +161,11 @@ class UpdateProfile(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
             student=self.object.student.get_full_name,
         )
 
+    def get_object(self):
+        institutionprofile_slug = self.kwargs.get("islug")
+        studentprofile_slug = self.kwargs.get("sslug")
+        obj = get_object_or_404(StudentProfile, institution__slug = institutionprofile_slug, slug = studentprofile_slug)
+        return obj
 
     
     def form_valid(self, form):
@@ -156,11 +178,227 @@ class UpdateProfile(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
         return super(UpdateProfile, self).form_valid(form)
 
     def get_success_url(self):
-        return reverse("students:my_student_profile_details", kwargs={"slug": self.object.slug})
+        obj = self.get_object()
+        return reverse("students:my_student_profile_details", kwargs={'islug': obj.institution.slug,
+            'sslug': obj.slug,})
+
+class StudentObjectMixin(object):
+    model = StudentProfile
+    def get_object(self):
+        slug = self.kwargs.get('slug')
+        obj = None
+        if slug is not None:
+            obj = get_object_or_404(self.model, slug=slug)
+        return obj 
 
 
 
-class IndexingApplicationCreateView(LoginRequiredMixin, SuccessMessageMixin,  CreateView):
+class WaecResult(LoginRequiredMixin, StudentObjectMixin, PassRequestMixin, SuccessMessageMixin, CreateView):
+    template_name = 'students/utme_result.html'
+    form_class = UtmeGradeModelForm
+    success_message = 'UTME Result Entered Successfully'
+     
+    def get_success_url(self):
+        return reverse("students:start_indexing_application", kwargs={"slug": self.object.student_profile.slug})
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        context['student_profile'] = StudentProfile.objects.select_related("student").filter(student = user, indexing_status=2) 
+        # context['schedule_qs'] = Schedule.objects.select_related("hospital_name").filter(application_status=4, hospital_name=self.schedule.hospital_name, hospital__license_type = 'Radiography Practice Permit')     
+        return context
+
+    def get_initial(self):
+        return {
+            'student_profile': self.kwargs["slug"],
+        }
+    
+    def get_form_kwargs(self):
+        self.student_profile = StudentProfile.objects.get(slug=self.kwargs['slug'])
+        kwargs = super().get_form_kwargs()
+        kwargs['initial']['student_profile'] = self.student_profile
+        kwargs['initial']['matric_no'] = self.student_profile.student.matric_no
+        kwargs['initial']['examination_body'] = "WAEC"
+        return kwargs
+      
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data())
+
+
+class NecoResult(LoginRequiredMixin, StudentObjectMixin, PassRequestMixin, SuccessMessageMixin, CreateView):
+    template_name = 'students/utme_result.html'
+    form_class = UtmeGradeModelForm
+    success_message = 'UTME Result Entered Successfully'
+     
+    def get_success_url(self):
+        return reverse("students:start_indexing_application", kwargs={"slug": self.object.student_profile.slug})
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        context['student_profile'] = StudentProfile.objects.select_related("student").filter(student = user, indexing_status=2) 
+        # context['schedule_qs'] = Schedule.objects.select_related("hospital_name").filter(application_status=4, hospital_name=self.schedule.hospital_name, hospital__license_type = 'Radiography Practice Permit')     
+        return context
+
+    def get_initial(self):
+        return {
+            'student_profile': self.kwargs["slug"],
+        }
+    
+    def get_form_kwargs(self):
+        self.student_profile = StudentProfile.objects.get(slug=self.kwargs['slug'])
+        kwargs = super().get_form_kwargs()
+        kwargs['initial']['student_profile'] = self.student_profile
+        kwargs['initial']['matric_no'] = self.student_profile.student.matric_no
+        kwargs['initial']['examination_body'] = "NECO"
+        return kwargs
+      
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data())
+
+
+class NabtebResult(LoginRequiredMixin, StudentObjectMixin, PassRequestMixin, SuccessMessageMixin, CreateView):
+    template_name = 'students/utme_result.html'
+    form_class = UtmeGradeModelForm
+    success_message = 'UTME Result Entered Successfully'
+     
+    def get_success_url(self):
+        return reverse("students:start_indexing_application", kwargs={"slug": self.object.student_profile.slug})
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        context['student_profile'] = StudentProfile.objects.select_related("student").filter(student = user, indexing_status=2) 
+        # context['schedule_qs'] = Schedule.objects.select_related("hospital_name").filter(application_status=4, hospital_name=self.schedule.hospital_name, hospital__license_type = 'Radiography Practice Permit')     
+        return context
+
+    def get_initial(self):
+        return {
+            'student_profile': self.kwargs["slug"],
+        }
+    
+    def get_form_kwargs(self):
+        self.student_profile = StudentProfile.objects.get(slug=self.kwargs['slug'])
+        kwargs = super().get_form_kwargs()
+        kwargs['initial']['student_profile'] = self.student_profile
+        kwargs['initial']['matric_no'] = self.student_profile.student.matric_no
+        kwargs['initial']['examination_body'] = "NABTEB"
+        return kwargs
+      
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data())
+
+
+
+class AlevelsResult(LoginRequiredMixin, StudentObjectMixin, PassRequestMixin, SuccessMessageMixin, CreateView):
+    template_name = 'students/gce_alevels_result.html'
+    form_class = GceAlevelsModelForm
+    success_message = 'GCE A Levels Results Entered Successfully'
+     
+    def get_success_url(self):
+        return reverse("students:start_indexing_application", kwargs={"slug": self.object.student_profile.slug})
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        context['student_profile'] = StudentProfile.objects.select_related("student").filter(student = user, indexing_status=2) 
+        # context['schedule_qs'] = Schedule.objects.select_related("hospital_name").filter(application_status=4, hospital_name=self.schedule.hospital_name, hospital__license_type = 'Radiography Practice Permit')     
+        return context
+
+    def get_initial(self):
+        return {
+            'student_profile': self.kwargs["slug"],
+        }
+    
+    def get_form_kwargs(self):
+        self.student_profile = StudentProfile.objects.get(slug=self.kwargs['slug'])
+        kwargs = super().get_form_kwargs()
+        kwargs['initial']['student_profile'] = self.student_profile
+        kwargs['initial']['matric_no'] = self.student_profile.student.matric_no
+        # kwargs['initial']['examination_body'] = "NABTEB"
+        return kwargs
+      
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data())
+
+
+class DegreeResult(LoginRequiredMixin, StudentObjectMixin, PassRequestMixin, SuccessMessageMixin, CreateView):
+    template_name = 'students/degree_result.html'
+    form_class = DegreeResultModelForm
+    success_message = 'Degree Results Entered Successfully'
+     
+    def get_success_url(self):
+        return reverse("students:start_indexing_application", kwargs={"slug": self.object.student_profile.slug})
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        context['student_profile'] = StudentProfile.objects.select_related("student").filter(student = user, indexing_status=2) 
+        # context['schedule_qs'] = Schedule.objects.select_related("hospital_name").filter(application_status=4, hospital_name=self.schedule.hospital_name, hospital__license_type = 'Radiography Practice Permit')     
+        return context
+
+    def get_initial(self):
+        return {
+            'student_profile': self.kwargs["slug"],
+        }
+    
+    def get_form_kwargs(self):
+        self.student_profile = StudentProfile.objects.get(slug=self.kwargs['slug'])
+        kwargs = super().get_form_kwargs()
+        kwargs['initial']['student_profile'] = self.student_profile
+        kwargs['initial']['matric_no'] = self.student_profile.student.matric_no
+        # kwargs['initial']['examination_body'] = "NABTEB"
+        return kwargs
+      
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data())
+
+
+
+class IndexingApplicationCreateView(LoginRequiredMixin, StudentObjectMixin, CreateView):
+    model = StudentIndexing
+    template_name = "students/start_indexing_application1.html"
+    form_class = IndexingModelForm
+    success_message = "%(student_profile)s Indexing Application Submission Successful"
+
+    def get_success_message(self, cleaned_data):
+      return self.success_message % dict(
+            cleaned_data,
+            student_profile=self.object.student_profile.student.get_full_name,
+        )
+
+    def get_initial(self):
+        # You could even get the Book model using Book.objects.get here!
+        return {
+            'student_profile': self.kwargs["slug"],
+            #'license_type': self.kwargs["pk"]
+        }
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        context['student_profile'] = StudentProfile.objects.select_related("student").filter(student = user, indexing_status=2) 
+        # context['schedule_qs'] = Schedule.objects.select_related("hospital_name").filter(application_status=4, hospital_name=self.schedule.hospital_name, hospital__license_type = 'Radiography Practice Permit')     
+        return context
+
+    def get_form_kwargs(self):
+        self.student_profile = StudentProfile.objects.get(slug=self.kwargs['slug'])
+        kwargs = super().get_form_kwargs()
+        kwargs['initial']['student_profile'] = self.student_profile
+        kwargs['initial']['matric_no'] = self.student_profile.student.matric_no
+        kwargs['initial']['institution'] = self.student_profile.institution
+        kwargs['initial']['utme_grade'] = self.student_profile.utmegrade_set.first()
+        kwargs['initial']['gce_alevels'] = self.student_profile.gcealevels_set.first()
+        kwargs['initial']['degree_result'] = self.student_profile.degreeresults_set.first()
+        #kwargs['initial']['hospital'] = self.payment.hospital
+        print (kwargs)
+        return kwargs
+
+    
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data())
+
+class IndexingApplicationCreateView1(LoginRequiredMixin, SuccessMessageMixin,  CreateView):
     template_name = "students/start_indexing_application.html"
     utme_form = UtmeGradeModelForm
     student_indexing_form = StudentIndexingModelForm
@@ -188,7 +426,7 @@ class IndexingApplicationCreateView(LoginRequiredMixin, SuccessMessageMixin,  Cr
     
     def post(self, request, *args, **kwargs):
         student_indexing_form = self.student_indexing_form(request.POST, request.FILES)
-        utme_form = self.utme_form(request.POST)
+        utme_form = self.utme_form(request.POST, request.FILES)
 
         if utme_form.is_valid() and student_indexing_form.is_valid():
             utme = utme_form.save()
@@ -226,13 +464,13 @@ class IndexingPaymentCreateView(LoginRequiredMixin, SuccessMessageMixin,  Create
         payment = form.save(commit=False)
         user = self.request.user
         student_profile = StudentProfile.objects.get(student = user)
-        reg_no = user.reg_no
+        matric_no = user.matric_no
         institution = InstitutionProfile.objects.get(name = student_profile.institution)
         student_indexing = StudentIndexing.objects.get(student_profile = student_profile)
         payment.institution = institution
         payment.student_indexing = student_indexing 
         payment.student_profile = student_profile
-        payment.reg_no = reg_no
+        payment.matric_no = matric_no
         payment.save()
         return super(IndexingPaymentCreateView, self).form_valid(form)
 
@@ -279,8 +517,25 @@ class IndexingPaymentCreateView(LoginRequiredMixin, SuccessMessageMixin,  Create
         #     qs = qs.owned(user)
 
 class MyIndexingApplicationDetailView(LoginRequiredMixin, DetailView):
-    queryset = StudentIndexing.objects.all()
+    # queryset = StudentIndexing.objects.all()
     template_name = "students/my_indexing_application_details.html"
+
+    def get_object(self):
+        institutionprofile_slug = self.kwargs.get("islug")
+        studentindexing_slug = self.kwargs.get("sslug")
+        obj = get_object_or_404(StudentIndexing, institution__slug = institutionprofile_slug, slug = studentindexing_slug)
+        return obj
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        obj = self.get_object()
+        context['payment_object'] = obj.indexingpayment_set.first()
+        return context
+
+
+
+
+
 
 
 class MyIndexingPaymentListView(LoginRequiredMixin, ListView):

@@ -32,7 +32,7 @@
                     <td>{{object.institution.course_type}}</td>
                     <td>{{object.academic_session}}</td>
                     <td>{{object.timestamp}}</td>
-                    <td><h6 class="mb-1 text-center"><a href="{% url 'students:my_indexing_application_details' object.slug %}"><span class="badge badge-pill badge-primary">View Indexing Details </span></a></h6> </td>
+                    <td><h6 class="mb-1 text-center"><a href="{{ object.get_student_application_details_url }}"><span class="badge badge-pill badge-primary">View Indexing Details </span></a></h6> </td>
                 </tr>
                 {% endfor %}
                 </tbody>

@@ -5,26 +5,17 @@
 
 {% block content %}
 
-
-
-<div class="row mx-2 mb-4">
-
-
+<div class="row mx-2">
 <div class="col-md-12 mt-4 mx-1">
 <div class="row">
 <div class="col-md-12">
-<div class="card">
-
-
-<div class="card-body">
-
+<div class="card">   
+ <div class="card-body">
 <h4 class="mt-0 header-title text-primary">List of Institutions with Valid Accreditations for Radiography and MIPT Practice</h4>
-<p class="text-muted  font-14">Download the printable version of the list of Institutions with Valid Accreditations for Radiography and MIPT Practice in any of the available formats below
-
+<p class="text-muted  font-14">Download the printable version of the list of Institutions with Valid Accreditations for Radiography and MIPT Practice in any of the available formats below.
 </p>
-
- <table id="datatable-buttons" class="table table-striped table-bordered dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
-                <thead>
+<table id="datatable-buttons" class="table table-striped table-bordered dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+<thead>
 <tr>
 <th>Name</th>
 <th>Address</th>
@@ -34,8 +25,6 @@
 
 </tr>
 </thead>
-
-
 <tbody>
 {% for object in object_list %}
 <tr>
@@ -58,11 +47,11 @@
 </div>
 </div> <!-- end col -->
 </div> <!-- end row -->
+</div>
+</div>
 
 
 
 
 
-  </div>
-  </div>
 {% endblock content %}

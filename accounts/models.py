@@ -62,11 +62,11 @@ class User(AbstractBaseUser, PermissionsMixin):
         )
 
     email = models.EmailField(unique=True)
-    first_name = models.CharField(max_length=30, blank=True)
-    last_name = models.CharField(max_length=30, blank=True)
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=30)
     middle_name = models.CharField(max_length=30, blank=True)
     phone_no = models.CharField(max_length=100, blank=True)
-    reg_no = models.CharField(max_length=200, blank=True)
+    matric_no = models.CharField(max_length=200, blank=True)
     role = models.CharField (max_length=20, choices = ROLE, blank=True, default='Student')
     date_joined = models.DateTimeField(_('date joined'), auto_now_add=True)
     avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
@@ -118,6 +118,7 @@ class IndexingOfficerProfile(models.Model):
     indexing_officer = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.CASCADE)
     institution = models.ForeignKey(InstitutionProfile, null=True, blank=True, on_delete=models.CASCADE)
     slug  = models.SlugField(blank=True, null=True, unique=True)
+    status = models.BooleanField(default=True)
     updated         = models.DateTimeField(auto_now=True)
     timestamp       = models.DateTimeField(auto_now_add=True)
     

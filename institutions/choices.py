@@ -1,6 +1,7 @@
 PAYMENT_METHOD = (
         ('Bank', 'Bank'),
         ('Card', 'Card'),
+        ('Cash', 'Cash'),
         
         )
 
@@ -309,6 +310,17 @@ UTME_COURSES = (
         ('Mathematics', 'Mathematics'),
         )
 
+UTME_SCORES = (
+        ('A1', 'A1'),
+        ('B2', 'B2'),
+        ('B3', 'B3'),
+        ('C4', 'C4'),
+        ('C5', 'C5'),
+        ('C6', 'C6'),
+        ('D7', 'D7'),
+        ('D8', 'D8'),
+        ('F9', 'F9'),
+        )
 
 UTME_COURSE_GRADES = (
         ('Distinction', 'Distinction'),
@@ -317,19 +329,81 @@ UTME_COURSE_GRADES = (
         ('Fail', 'Fail'),
         )
 
-DE_COURSES = (
+
+GCE_EXAM_BODY= (
+        ('Cambridge', 'Cambridge'),
+        ('IJMB', 'IJMB'),
+        ('JUPEB', 'JUPEB'),
+        ('NABTEB', 'NABTEB'),
+        ('GCE', 'GCE'),
+        ('SAT', 'SAT'),
+        )
+
+GCE_A_LEVEL_COURSES = (
         ('Physics', 'Physics'),
         ('Chemistry', 'Chemistry'),
         ('Biology', 'Biology'),
         )
 
 
-DE_COURSE_GRADES = (
-        ('Distinction', 'Distinction'),
-        ('Credit', 'Credit'),
-        ('Pass', 'Pass'),
-        ('Fail', 'Fail'),
+GCE_A_LEVELS_SCORES = (
+        ('A+', 'A+'),
+        ('B', 'B'),
+        ('C', 'C'),
+        ('D', 'D'),
+        ('E', 'E'),
         )
+
+DEGREE_TYPE = (
+        ('B.Sc', 'B.Sc'),
+        ('M.Sc', 'M.Sc'),
+        ('HND', 'HND'),
+        ('ND', 'ND'),
+        ('NCE', 'NCE'),
+        )
+
+DEGREE_COURSES = (
+        ('Physical Sciences', 'Physical Sciences'),
+        ('Biological Sciences', 'Biological Sciences'),
+        ('DIR', 'DIR'),
+        ('DCR', 'DCR'),
+        ('MIPT', 'MIPT'),
+        ('X-RAY Technician', 'X-RAY Technician'),
+        )
+
+
+DEGREE_COURSE_GRADES = (
+        ('1st Class', '1st Class'),
+        ('2nd Class Upper', '2nd Class Upper'),
+        ('2nd Class Lower', '2nd Class Lower'),
+        ('3rd Class', '3rd Class'),
+        ('Distinction', 'Distinction'),
+        ('Upper Credit', 'Upper Credit'),
+        ('Lower Credit', 'Lower Credit'),
+        ('Pass', 'Pass'),
+        )
+
+
+TRANSFER_COURSES = (
+        ('Physical Sciences', 'Physical Sciences'),
+        ('Biological Sciences', 'Biological Sciences'),
+        ('DIR', 'DIR'),
+        ('DCR', 'DCR'),
+        )
+
+
+TRANSFER_COURSE_GRADES = (
+        ('1st Class', '1st Class'),
+        ('2nd Class Upper', '2nd Class Upper'),
+        ('2nd Class Lower', '2nd Class Lower'),
+        ('3rd Class', '3rd Class'),
+        ('Distinction', 'Distinction'),
+        ('Upper Credit', 'Upper Credit'),
+        ('Lower Credit', 'Lower Credit'),
+        ('Pass', 'Pass'),
+        )
+
+
 
 ACADEMIC_SESSION = (
         ('2022/2023', '2022/2023' ),

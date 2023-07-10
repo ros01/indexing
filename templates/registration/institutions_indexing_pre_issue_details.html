@@ -30,12 +30,15 @@
 
 <h5 class="mb-1"> <i class="fa fa-graduation-cap text-primary"></i> Institution Details</h5> 
 </div> 
+
+
 {% if object.payment_status == 1 %}
  <h5 class="mb-1"> <span class="badge badge-warning">Pending Verification</span></h5> 
-{% else %} 
-<h5 class="mb-1"> <span class="badge badge-primary">VERIFIED</span></h5>
+{% elif object.payment_status == 2 %}
+ <h5 class="mb-1"> <span class="badge badge-primary">VERIFIED BY INSTITUTE</span></h5> 
+{% else %}
+<h5 class="mb-1"> <span class="badge badge-primary">VERIFIED BY REGISTRATION</span></h5>
 {% endif %}
-
 </div> 
 </div>
 
@@ -106,20 +109,20 @@
                     <th>Student Name</th>
                     <th>Course</th>
                     <th>Academic Session</th>
-                    <th>Reg No</th>
+                    <th>Matric No</th>
                     <th>Admission Type</th>
                     <th>Actions</th>
                 </tr>
                 </thead>
                 <tbody>
 
-                {% for student in object.students_payments.all %}
+                {% for student in object_list %}
 
                 <tr>
                     <td> {{student.student_profile.student.last_name}} {{student.student_profile.student.first_name}}</td>
                     <td>{{student.institution.course_type}}</td>
                      <td>{{student.academic_session}}</td>
-                    <td>{{student.student_profile.student.reg_no}}</td>
+                    <td>{{student.student_profile.student.matric_no}}</td>
                     <td>{{student.student_indexing.admission_type}}</td>
                    
                     

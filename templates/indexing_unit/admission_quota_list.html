@@ -32,7 +32,7 @@
                     <td>{{object.academic_session}}</td>
                     <td>{{object.institution.course_type}}</td>
                     <td>{{object.admission_quota}}</td>
-                    <td><a href="{{ object.get_absolute_url }}"><span class="badge badge-boxed  badge-primary">View Institution Admission Quota Details </span> <i class="fas fa-list-ol text-primary"></i></a></td> 
+                    <td><a href="{{object.get_absolute_url}}"><span class="badge badge-boxed  badge-primary">View Institution Admission Quota Details <i class="fas fa-podcast"></i>  </span> </a></td>
                 </tr>
                 {% endfor %}
           

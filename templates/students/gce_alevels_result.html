@@ -1,0 +1,61 @@
+{% load widget_tweaks %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+<form method="POST" enctype="multipart/form-data" action=".">
+{% csrf_token %}
+
+ <div class="modal-header">
+    <h5 class="modal-title text-success">Enter GCE A Levels Subject Scores</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+
+  <div class="modal-body">
+    <div class="{% if form.non_field_errors %}invalid{% endif %} mb-2">
+      {% for error in form.non_field_errors %}
+        {{ error }}
+      {% endfor %}
+  </div>
+    <div class="row">
+    {% for field in form %}
+
+      <div class="form-group col-md-4{% if field.errors %} invalid{% endif %}">
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% for error in field.errors %}
+          <p class="help-block">{{ error }}</p>
+        {% endfor %}
+      </div>
+      
+    {% endfor %}
+    </div>
+  </div>
+
+  
+  
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-times text-white"></i>  Close</button>
+    <button type="button" class="submit-btn btn btn-success ml-2 pt-2 pb-1 pr-2"><i class="fa fa-podcast text-white"></i>  Submit GCE A Levels Scores</button>
+
+  </div>
+
+</form>
+
+<div class="container">
+
+<p class="text-success m-0 p-0"> <b>Scoring Legend: </b></p>
+
+Pass Mark is C6 (Credit 60% and above)  <br>
+Grade         Defintion       Intepretation<br>
+A*            Excellent       90% - 100%<br>
+A             Very Good       80% - 89%<br>
+B             Good            70% - 79%<br>
+C             Credit          60% - 69%<br>
+D             Pass            50% - 59%<br>
+E             Pass            40% - 49%<br>
+
+
+
+</div>

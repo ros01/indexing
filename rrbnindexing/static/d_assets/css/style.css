@@ -125,6 +125,34 @@ a.text-primary:hover {
   color: #707070 !important;
 }
 
+
+.the-legend {
+  border-style: none;
+  border-width: 0;
+  font-size: 14px;
+  line-height: 20px;
+  margin-bottom: 0;
+  margin-top: -20px;
+  width: auto;
+  padding: 0 10px;
+  border: 1px solid #000000;
+  background-color: #ffffff;
+}
+
+.the-fieldset {
+  border: 1px solid #000000;
+  padding: 10px;
+
+}
+
+
+
+.hidden{
+  display: none!important;
+}
+
+
+
 .container-alt {
   margin-left: auto;
   margin-right: auto;

@@ -1,0 +1,99 @@
+{% load widget_tweaks %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+<form method="POST" enctype="multipart/form-data" action=".">
+{% csrf_token %}
+
+ <div class="modal-header">
+    <h5 class="modal-title text-success">Enter Degree Result</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+
+  <div class="modal-body">
+    <div class="{% if form.non_field_errors %}invalid{% endif %} mb-2">
+      {% for error in form.non_field_errors %}
+        {{ error }}
+      {% endfor %}
+  </div>
+    <div class="row">
+    {% for field in form %}
+
+      <div class="form-group col-md-4{% if field.errors %} invalid{% endif %}">
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% for error in field.errors %}
+          <p class="help-block">{{ error }}</p>
+        {% endfor %}
+      </div>
+      
+    {% endfor %}
+    </div>
+  </div>
+
+  
+  
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-times text-white"></i>  Close</button>
+    <button type="button" class="submit-btn btn btn-success ml-2 pt-2 pb-1 pr-2"><i class="fa fa-podcast text-white"></i>  Submit Degree Result</button>
+
+  </div>
+
+</form>
+
+<div class="container">
+
+<p class="text-success m-0 p-0"> <b>Scoring Legend: </b></p>
+
+A minimum of 3.50 CGPA on a 5- point scale or 2.80 on a 4-point Scale is required for Admssion  <br>
+<table>
+
+<thead>
+<tr>
+<th>Grade</th>
+<th>Intepretation</th>
+</tr>
+</thead>
+
+
+<tbody>
+<tr>
+<td>First Class </td>
+<td> 4.5 - 5.00</td>
+</tr>
+
+<tr>
+<td>Second Class Upper Division </td>
+<td> 3.5 - 4.49</td>
+</tr>
+
+<tr>
+<td>Second Class Lower Division </td>
+<td> 2.49 - 3.49</td>
+</tr>
+
+<tr>
+<td>Third Class </td>
+<td> 1.50 - 2.48</td>
+</tr>
+
+
+
+<tr>
+<td>Good Academic Standing </td>
+<td> 1.0 and above</td>
+</tr>
+
+
+</tbody>
+</table>
+
+
+
+
+
+
+
+</div>

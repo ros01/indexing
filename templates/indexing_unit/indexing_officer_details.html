@@ -63,7 +63,7 @@
 <div>  
 <p class="text-sm mb-0">
 <ul class="list-unstyled">                           
-<li>Name of Institution: <span class="text-dark font-weight-bold ms-sm-2">{{object.institution.name}}</span></li>
+<li>Name of Institution:<span class="text-dark font-weight-bold ms-sm-2">{{object.institution.name}}</span></li>
 <li>Address: <span class="text-dark font-weight-bold ms-sm-2">{{object.institution.address}}</span></li>
 <li>Phone No: <span class="text-dark font-weight-bold ms-sm-2">{{object.institution.phone_no}}</span></li>
 <li>Email: <span class="text-dark font-weight-bold ms-sm-2">{{object.institution.email}}</span></li>
@@ -75,17 +75,36 @@
 </div>
 </div>
 
-<div class="d-flex justify-content-end mr-2 mb-2">   
-<a href="{% url 'indexing_unit:indexing_officers_list' %}" class="btn btn-outline-primary py-0 mr-2 mt-1 mb-3"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Indexing Officers List</a>  
+<div class="d-flex justify-content-end mr-2 mb-2"> 
+
+
+{% if object.indexing_officer.is_active == False %} 
+<a href="javascript:{document.getElementById('activate{{object.slug }}').submit()}">
+<input type="submit" class="btn btn-outline-primary py-0 mr-3 mt-1" value="Activate User" onclick="return confirm('Are you sure you want to activate this Indexing Officer?')">
+</a>
+
+{% else %}
+
+<a href="javascript:{document.getElementById('deactivate{{object.slug }}').submit()}">
+<input type="submit" class="btn btn-outline-primary py-0 mr-3 mt-1" value="Deactivate User" onclick="return confirm('Are you sure you want to de-activate this Indexing Officer?')" >
+</a>
+{% endif %}
+
+<a href="{% url 'indexing_unit:dashboard' %}" class="btn btn-outline-primary py-0 mr-2 mt-1 mb-3"><i class="fas fa-times"></i> Close </a>  
 </div>
 
 
+<form id="activate{{object.slug }}" method="POST" action="{% url 'indexing_unit:activate_user' object.slug %}">
+{% csrf_token%}
+<input type="hidden">
+</form>
+
+<form id="deactivate{{object.slug }}" method="POST" action="{% url 'indexing_unit:deactivate_user' object.slug %}">
+{% csrf_token%}
+<input type="hidden">
+</form>
+
 </div>
-
-
-
-
-
 </div>
 
 </div>

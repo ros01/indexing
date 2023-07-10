@@ -60,7 +60,7 @@ class UserAdmin(BaseUserAdmin):
     form = UpdateUserForm
     add_form = AddUserForm
 
-    list_display = ('id', 'email', 'first_name', 'last_name', 'role', 'reg_no', 'is_staff')
+    list_display = ('id', 'email', 'first_name', 'last_name', 'role', 'matric_no', 'is_staff')
     list_filter = ('email', 'is_staff',)
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
@@ -94,8 +94,8 @@ admin.site.register(User, UserAdmin)
 # admin.site.register(IndexingOfficerProfile, IndexingOfficerProfileAdmin)
 
 class IndexingOfficerProfileAdmin(admin.ModelAdmin):
-    list_filter = ['indexing_officer', 'updated', 'timestamp']
-    list_display = ['indexing_officer', 'id', 'institution', 'slug',  'updated', 'timestamp']
+    list_filter = ['indexing_officer', 'updated', 'status', 'timestamp']
+    list_display = ['indexing_officer', 'id', 'institution', 'slug', 'status', 'updated', 'timestamp']
     readonly_fields = ['updated', 'timestamp']
     search_fields = ['indexing_officer', 'institution', 'slug']
     # raw_id_fields = ['institution']

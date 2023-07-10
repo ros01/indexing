@@ -203,10 +203,10 @@
 
 <tbody>
 
-{% if object.utme_grade_result %}
+{% if object.utme_grade.utme_grade_result %}
 <tr> <td width="40%" scope="col">UTME Result:</td> 
 <td width="60%" scope="col"><i class="fa fa-eye text-dark"></i>
-<a class="text-danger" href="{{object.utme_grade_result.url}}" target="_blank">&nbsp; View UTME Result</a></td>  
+<a class="text-danger" href="{{object.utme_grade.utme_grade_result.url}}" target="_blank">&nbsp; View UTME Result</a></td>  
 </tr>
 {% endif %}
 

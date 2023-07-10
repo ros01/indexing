@@ -109,7 +109,7 @@
                     <th>Student Name</th>
                     <th>Course</th>
                     <th>Academic Session</th>
-                    <th>Reg No</th>
+                    <th>Matric No</th>
                     <th>Admission Type</th>
                     <th>Actions</th>
                 </tr>
@@ -120,7 +120,7 @@
                     <td>{{student.student_profile.student.last_name}} {{student.student_profile.student.first_name}}</td>
                     <td>{{student.institution.course_type}}</td>
                      <td>{{student.academic_session}}</td>
-                    <td>{{student.student_profile.student.reg_no}}</td>
+                    <td>{{student.student_profile.student.matric_no}}</td>
                     <td>{{student.student_indexing.admission_type}}</td>
                    
                     <td><a href="{{student.student_indexing.get_application_url}}"> <i class="fas fa-search text-primary"></i> <span class="badge badge-boxed  badge-primary">View Details </span></a></td> 

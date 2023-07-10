@@ -1,0 +1,340 @@
+{% extends 'students/dashboard_base1.html'%}
+{% load static %}
+{% load widget_tweaks %}
+{% load crispy_forms_tags %}
+{% block title%}| Welcome {% endblock %}
+
+{% block styles %}
+
+
+{% endblock %}
+
+
+
+{% block content %}
+
+{% include "_modal.html" %}
+
+
+
+<div class="row ml-3 mb-4 pb-4">
+<div class="col-lg-12 col-xl-10">
+<div class="card m-b-30">
+<div class="card-header profile-tabs pb-0">
+<ul class="nav nav-tabs">
+<li class="nav-item">
+<a class="nav-link active" href="#about" data-toggle="tab" aria-expanded="false"><i class="ti-user mr-2"></i>Indexing Profile Application</a>
+</li>
+</ul>
+</div>
+
+<div class="card-body">
+{% include 'partials/_alerts.html' %}
+<div class="">
+<div class="tab-content">
+<div class="tab-pane active" id="about">
+<div class="row justify-content-center">
+<div class="col-md-12  profile-detail">
+<div class="">
+<h5 class="mb-3"> <i class="fa fa-graduation-cap text-primary"></i> Apply for Student Indexing</h5>
+<!-- {% for message in messages %}
+    <div class="alert {{ message.tags }} alert-dismissible shadow fade show" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        {{ message | safe }}
+    </div>
+{% endfor %} -->
+</div>
+</div>
+
+
+
+
+
+
+<div>
+<p class="detail-text mb-3">Kindly note that you will be required to upload your indexing payment receipt in order to conclude this process.
+</p>
+</div>
+
+<div class="form-group" id="form-wrapper"  name="admission_select">
+<fieldset class="the-fieldset">
+<legend class="the-legend text-dark">Select Admission Type</legend>
+
+<div class="col d-flex">
+
+<div class="form-check mr-3 mt-1">
+<input class="form-check-input" type="radio" name="de_subjects" id="de_admssion" data-form-url="">
+<label class="form-check-label" for="de_subjects">
+DE
+</label>
+</div>
+
+<div class="form-check mr-3 mt-1">
+<input class="form-check-input" type="radio" name="utmesubject" value="UTME" id="utme" data-form-url="">
+<label class="form-check-label" for="utmesubject">
+UTME
+</label>
+</div>
+
+<div class="form-check mr-3 mt-1">
+<input class="bs-modal form-check-input" type="radio" name="transfer_subjects" id="transfer_admssion" data-form-url="">
+<label class="form-check-label" for="transfer_subjects">
+TRANSFER
+</label>
+</div>
+</div>
+
+</fieldset>
+</div>
+
+
+<div class="form-group hidden" id="exam-body">
+<fieldset class="the-fieldset">
+<legend class="the-legend text-dark">Select Examination Body</legend>
+{% if student_profile %}
+{% for object in student_profile %}
+
+<div class="col d-flex">
+
+<div class="form-check mr-3 mt-1">
+<input class="bs-modal form-check-input" type="radio" name="waecexam" id="waec" value="WAEC"data-form-url="{% url 'students:waec_result' object.slug %}">
+
+<label class="form-check-label" for="waecexam">
+WAEC:
+</label>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" id="modal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content"></div>
+  </div>
+</div>
+
+<!-- Create book button -->
+<!-- <button id="create-book" class="btn btn-primary" type="button" name="button">Create book</button> -->
+
+<div class="form-check mr-3 mt-1">
+<input class="bs-modal form-check-input" type="radio" name="neco_exam" id="neco" data-form-url="{% url 'students:neco_result' object.slug %}">
+<label class="form-check-label" for="exampleRadios2">
+NECO
+</label>
+</div>
+
+<div class="form-check mr-3 mt-1">
+<input class="bs-modal form-check-input" type="radio" name="nabteb_exam" id="nabteb" data-form-url="{% url 'students:nabteb_result' object.slug %}">
+<label class="form-check-label" for="exampleRadios2">
+NABTEB
+</label>
+</div>
+
+
+</div>
+<!-- <script src="{% static 'js/jquery.js' %}"></script>
+<script src="{% static 'js/jquery.bootstrap.modal.forms.js' %}"></script>
+<script src="{% static 'js/bootstrap.min.js' %}"></script>  -->
+{% endfor %}
+{% endif %} 
+</fieldset>
+</div>
+
+
+
+
+<div class="form-group hidden" id="de-exam-type">
+<fieldset class="the-fieldset">
+<legend class="the-legend text-dark">Select DE Examination Type</legend>
+{% if student_profile %}
+{% for object in student_profile %}
+
+<div class="col d-flex">
+
+<div class="form-check mr-3 mt-1">
+<input class="bs-modal form-check-input" type="radio" name="gce_alevels_exam" id="gce_alevels" value="GCE A Levels"data-form-url="{% url 'students:gce_alevels_result' object.slug %}">
+
+<label class="form-check-label" for="gce_alevels_exam">
+GCE A Levels:
+</label>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" id="modal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content"></div>
+  </div>
+</div>
+
+
+<div class="form-check mr-3 mt-1">
+<input class="bs-modal form-check-input" type="radio" name="degree_results" id="degree_type" data-form-url="{% url 'students:degree_result' object.slug %}">
+<label class="form-check-label" for="degree_results">
+Degrees Results
+</label>
+</div>
+
+
+</div>
+<!-- <script src="{% static 'js/jquery.js' %}"></script>
+<script src="{% static 'js/jquery.bootstrap.modal.forms.js' %}"></script>
+<script src="{% static 'js/bootstrap.min.js' %}"></script>  -->
+{% endfor %}
+{% endif %} 
+</fieldset>
+</div>
+
+
+
+<div class="">
+<form class="form-horizontal form-material" method="post" enctype="multipart/form-data">
+{% csrf_token %}
+{{ form.non_field_errors }}
+
+<div class="form-group">
+
+{{form.institution}}
+{{form.student_profile}}
+{{form.utme_grade}}
+{{form.gce_alevels}}
+{{form.degree_result}}
+
+</div>
+
+<div class="form-group row">
+    <div class="col-md-6">
+    <div class= "form-control-alternative my-0 py-0">
+    {{ form.matric_no|as_crispy_field }}
+    </div>
+    </div>
+    <div class="col-md-6">
+    <div class= "form-control-alternative my-0 py-0">
+    {{ form.academic_session|as_crispy_field }}
+    </div>
+    </div>
+</div>
+
+<div class="form-group">
+<input type="submit" class="btn btn-primary btn-sm text-light px-4 mt-2 float-right" value="Submit Admission Details" onclick="return confirm('Are you sure you want to submit this form?')">
+</div>
+</form>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!--Jquery plugin-->
+<script src="{% static 'js/jquery.js' %}"></script>
+
+<script src="{% static 'js/bootstrap.js' %}"></script>
+<script src="{% static 'js/jquery.bootstrap.modal.forms.js' %}"></script> 
+   
+
+<!--other javascript plugins
+  <script src="{% static 'js/bootstrap.min.js' %}"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>-->
+
+
+
+
+
+  <!--Jquery plugin-->
+<!-- <script>
+var form = document.getElementById('utme')
+        form.addEventListener('click', function(e){
+            e.preventDefault()
+            $('input[name=admission_type][value=1]')
+            alert('Form Submitted...')
+            
+        })
+</script> -->
+
+<script>
+$('#utme').on('input',function(e){$('#utme_admission').val(String($('#utme').val()));
+});
+</script>
+
+<script>
+$('#waec').on('input',function(e){$('#id_examination_body').val(String($('#waec').val()));
+});
+</script>
+
+
+<!-- <script>
+$(function () {
+       $( "#utme" ).click(function() {
+document.getElementById('utme').value;
+
+
+        }); 
+    });
+
+</script> -->
+
+
+
+
+
+
+<!-- <script>
+$(document).ready(function(){
+    {alert("hello");}
+
+});
+</script> -->
+
+<script>
+$(function () {
+       $( "#utme" ).change(function() {
+           document.getElementById('exam-body').classList.remove("hidden");  
+           document.getElementById('de-exam-type').classList.add("hidden");  
+        }); 
+    });
+</script>
+
+
+<script>
+$(function () {
+       $( "#de_admssion" ).change(function() {
+           document.getElementById('exam-body').classList.remove("hidden");
+           document.getElementById('de-exam-type').classList.remove("hidden");  
+            if($('#utme').is(':checked')){
+                $('#utme').attr('checked', false);
+                }else{
+                $('#de_admssion').attr('checked', true);
+                }    
+        }); 
+    });
+</script>
+
+
+
+
+
+<script type="text/javascript">
+    $(function() {
+    
+        $(".bs-modal").each(function () {
+          $(this).modalForm({
+              formURL: $(this).data('form-url')
+          });
+        });
+    
+    });
+</script>
+
+
+
+
+
+{% endblock %}
+
+
+
+
+
+
+

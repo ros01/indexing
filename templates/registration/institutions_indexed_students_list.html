@@ -21,7 +21,7 @@
                     <th>Student Name</th>
                     <th>Institution</th>
                     <th>Academic Session</th>
-                    <th>Registration Number</th>
+                    <th>Matric Number</th>
                     <th>Indexing Number</th>
                     <th>Actions</th>
                 </tr>
@@ -32,7 +32,7 @@
                     <td>{{object.institution}}</td>
                     <td>{{object.student_profile.student.last_name}} {{object.student_profile.student.first_name}}</td>
                     <td>{{object.academic_session}}</td>
-                    <td>{{object.reg_no}}</td>
+                    <td>{{object.matric_no}}</td>
                     <td>{{object.index_number}}</td>
                     <td><a href="{{ object.get_absolute_url }}"><span class="badge badge-boxed  badge-primary">View Students Details </span> <i class="fas fa-list-ol text-primary"></i></a></td> 
                 </tr>
