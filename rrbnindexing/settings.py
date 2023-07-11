@@ -114,7 +114,7 @@ WSGI_APPLICATION = 'rrbnindexing.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'rrbnindexingdb1',
+        'NAME': 'rrbnindexingdb',
         'USER': 'postgres',
         'PASSWORD': 'blackstone1',
         'HOST': 'localhost',

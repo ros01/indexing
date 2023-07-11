@@ -34,7 +34,7 @@
                     <td>{{object.institution}}</td>
                     <td>{{object.indexing_officer.phone_no}}</td>
                     <td>{{object.indexing_officer.email}}</td>
-                    <td>{% if object.is_active == False %} <span class="text-danger">DISABLED <i class="fas fa-times"></i></span> {% else %} <span class="text-primary">ACTIVE <i class="fas fa-check"></i></span>{% endif %}</td>
+                    <td>{% if object.indexing_officer.is_active == False %} <span class="text-danger">DISABLED <i class="fas fa-times"></i></span> {% else %} <span class="text-primary">ACTIVE <i class="fas fa-check"></i></span>{% endif %}</td>
                     <td><a href="{{object.get_absolute_url}}"><span class="badge badge-boxed  badge-primary"><i class="fas fa-wrench"></i> View/Edit Indexing Officer</span> </a></td> 
                 </tr>
                 {% endfor %}
