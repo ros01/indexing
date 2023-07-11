@@ -13,14 +13,14 @@
             <p class="text-muted font-14">Students can view their indexing payment from the list below.
             </p>
 
-            <table id="datatable" class="table table-bordered dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+            <table id="datatable-buttons" class="table table-bordered dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
 
                 <thead>
                 <tr>
                     <th>Student Name</th>
                     <th>Institution</th>
                     <th>Course</th>
-                    <th>Reg No</th>
+                    <th>Matric No</th>
                     <th>Payment Amount</th>
                     <th>Actions</th>
                 </tr>
@@ -33,7 +33,7 @@
                     <td>{{object.student_profile.student.last_name}} {{object.student_profile.student.first_name}}</td>
                     <td>{{object.institution}}</td>
                     <td>{{object.institution.course_type}}</td>
-                    <td>{{object.reg_no}}</td>
+                    <td>{{object.matric_no}}</td>
                     <td>N{{object.payment_amount}}</td>
                     <td><h6 class="mb-1 text-center"><a href="{% url 'students:my_indexing_payment_details' object.slug %}"><span class="badge badge-pill badge-primary">View Indexing Payment</span></a></h6> </td>
 
