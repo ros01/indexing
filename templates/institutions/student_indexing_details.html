@@ -333,13 +333,16 @@
 {% if object.verification_status == 1 %}
 <div class="d-flex justify-content-end">  
 
-<a href="javascript:{document.getElementById('approve{{object.id }}').submit()}">
+<a href="javascript:{document.getElementById('approve{{object.slug }}').submit()}">
 
 <!-- <button class="btn btn-success py-0 mr-3 mt-1 mb-3"> Approve Application<i class="fa fa-check" aria-hidden="true"></i></button> -->
 
 <input type="submit" class="btn btn-success py-0 mr-3 mt-1" value="Approve Application" onclick="return confirm('Are you sure you want to approve this application and payment?')" >
 </a>
-<a href="javascript:{document.getElementById('reject{{object.id }}').submit()}"><button class="btn btn-danger py-0 mr-3 mt-1"> Reject Application <i class="fa fa-reply" aria-hidden="true"></i></button></a> 
+<a href="javascript:{document.getElementById('reject{{object.slug }}').submit()}">
+<input type="submit" class="btn btn-danger py-0 mr-3 mt-1" value="Reject Application" onclick="return confirm('Are you sure you want to reject this application and payment?')" >
+<!-- <button class="btn btn-danger py-0 mr-3 mt-1"> Reject Application <i class="fa fa-reply" aria-hidden="true"></i></button> -->
+</a> 
 
 <a href="{% url 'institutions:dashboard' %}" class="btn btn-outline-success py-0 mr-3 mt-1"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Return to Dashboard</a>  
 
@@ -350,12 +353,12 @@
 
 {% endif %}
 
-<form id="approve{{object.id }}" method="POST" action="{% url 'institutions:verify' object.id %}">
+<form id="approve{{object.slug }}" method="POST" action="{% url 'institutions:verify_application' object.slug %}">
 {% csrf_token%}
 <input type="hidden">
 </form>
 
-<form id="reject{{object.id }}" method="POST" action="{% url 'institutions:reject' object.id %}">
+<form id="reject{{object.slug }}" method="POST" action="{% url 'institutions:reject_application' object.slug %}">
 {% csrf_token%}
 <input type="hidden">
 </form>

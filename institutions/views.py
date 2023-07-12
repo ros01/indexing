@@ -274,9 +274,9 @@ class StudentIndexingApplicationDetails(LoginRequiredMixin, DetailView):
 
 
 
-def verify(request, id):
+def verify_application(request, slug):
   if request.method == 'POST':
-     object = get_object_or_404(StudentIndexing, pk=id)
+     object = get_object_or_404(StudentIndexing, slug=slug)
      payment_object = object.indexingpayment_set.first()
      object.verification_status = 2
      payment_object.payment_status = 2
@@ -299,9 +299,9 @@ def verify(request, id):
      # return render(request, 'institutions/verification_successful.html',context)
 
 
-def reject(request, id):
+def reject_application(request, slug):
   if request.method == 'POST':
-     object = get_object_or_404(StudentIndexing, pk=id)
+     object = get_object_or_404(StudentIndexing, slug=slug)
      payment_object = object.indexingpayment_set.first()
      object.verification_status = 1
      payment_object.payment_status = 1
@@ -309,7 +309,7 @@ def reject(request, id):
      payment_object.save()
      context = {}
      context['object'] = object
-     messages.success(request, ('Indexing Application Rejected'))
+     messages.error(request, ('Indexing Application Rejected'))
      return HttpResponseRedirect(reverse("institutions:student_indexing_application_details", kwargs={'islug': object.institution.slug,
             'sslug': object.slug,}))
 

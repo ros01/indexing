@@ -147,8 +147,6 @@ class StudentProfileManager(models.Manager):
 
 
 class StudentProfile(models.Model):
-
-
     student = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.CASCADE)
     institution = models.ForeignKey(InstitutionProfile,  on_delete=models.DO_NOTHING)
     # admission_type = models.CharField(max_length=100, choices = EXAMINATION_BODY, blank=True)
@@ -171,9 +169,7 @@ class StudentProfile(models.Model):
 
     def get_utmeresult (self):
         utmeresult = self.utmeresult_set.first()
-        return utmeresult
-
-        
+        return utmeresult  
 
     @property
     def get_indexing_officer_profile_qs(self):
@@ -187,8 +183,6 @@ class StudentProfile(models.Model):
             'sslug': self.slug,
         }
         return reverse('students:my_student_profile_details',kwargs=url_kwargs)
-
-
 
     
     def update_student_profile_details_url(self):
@@ -275,6 +269,9 @@ class GceAlevels(models.Model):
     updated         = models.DateTimeField(auto_now=True)
     timestamp       = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        unique_together = ('matric_no','student_profile')
+
     def __str__(self):
         return str(self.examination_body)
 
@@ -288,6 +285,9 @@ class DegreeResults(models.Model):
     degree_result = models.FileField(null=True, blank=True, upload_to='%Y/%m/%d/')
     updated         = models.DateTimeField(auto_now=True)
     timestamp       = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('matric_no','student_profile')
 
     def __str__(self):
         return str(self.degree_type)
@@ -308,7 +308,7 @@ class StudentIndexing(models.Model):
     institution = models.ForeignKey(InstitutionProfile,  on_delete=models.DO_NOTHING)
     slug  = models.SlugField(blank=True)
     matric_no = models.CharField(max_length=200, unique=True)
-    academic_session = models.CharField(max_length=200, choices = ACADEMIC_SESSION,  null=True, blank=True)
+    academic_session = models.CharField(max_length=200, choices = ACADEMIC_SESSION)
     admission_type = models.CharField(max_length=200, null=True, blank=True)
     utme_grade = models.ForeignKey(UtmeGrade, null=True, blank=True, on_delete=models.CASCADE) 
     gce_alevels = models.ForeignKey(GceAlevels, null=True, blank=True, on_delete=models.DO_NOTHING)
@@ -325,6 +325,7 @@ class StudentIndexing(models.Model):
 
     class Meta:
         unique_together = ('student_profile', 'matric_no')
+
 
     def get_absolute_url(self):
         url_kwargs={
@@ -504,7 +505,6 @@ class InstitutionPayment(models.Model):
         
     def __str__(self):
         return  str(self.institution)
-
     
     def get_absolute_url(self):
         return reverse('institutions:institutions_indexing_payment_details', kwargs={"slug": self.slug})

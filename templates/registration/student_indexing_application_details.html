@@ -36,7 +36,7 @@
 
 <div class="col-md-12  profile-detail">
 <div class="d-flex justify-content-between align-items-center">
- <div class="w-50">
+ <div class="w-150">
 
 <h5 class="mb-0 pb-2"> <i class="fa fa-graduation-cap text-primary"></i> Student Indexing Application Details </h5>
 </div> 
@@ -168,7 +168,7 @@
 {% include 'partials/_alerts.html' %} 
 <div class="col-md-12  profile-detail">
 <div class="d-flex justify-content-between align-items-center">
-<div class="w-50">
+<div class="w-150">
 
 <h5 class="mb-0 pb-2"> <i class="fa fa-graduation-cap text-primary"></i> Student Indexing Payment Details </h5>
 </div> 
@@ -179,7 +179,7 @@
 {% elif  payment_object.payment_status == 2 %}
 <h5 class="mb-1"> <span class="badge badge-primary">PAYMENT VERFIED BY INSTITUTION</span></h5>
 {% elif  payment_object.payment_status >= 3 %}
-<h5 class="mb-1"> <span class="badge badge-primary">PAYMENT VERFIED BY INDEXING UNIT</span></h5>
+<h5 class="mb-1"> <span class="badge badge-primary">PAYMENT VERFIED BY RRBN INSTITUTE</span></h5>
 {% else %} 
 <h5 class="mb-1"> <span class="badge badge-primary"></span></h5>
 {% endif %}
@@ -200,7 +200,7 @@
 <li>Student Name: <span class="text-dark font-weight-bold ms-sm-2">{{payment_object.student_profile.student.last_name}} {{payment_object.student_profile.student.first_name}} {{payment_object.student_profile.student.middle_name}}</span></li>
 <li>Institution: <span class="text-dark font-weight-bold ms-sm-2">{{payment_object.student_profile.institution}}</span></li>
 <li>Course of Study:  <span class="text-dark font-weight-bold ms-sm-2">{{payment_object.student_profile.institution.course_type}}</span></li>
-<li>Registration No: <span class="text-dark font-weight-bold ms-sm-2">{{payment_object.student_profile.student.reg_no}}</span></li>
+<li>Matric No: <span class="text-dark font-weight-bold ms-sm-2">{{payment_object.student_profile.student.matric_no}}</span></li>
 </ul>
 </div>
 

@@ -53,10 +53,9 @@
 {% else %} 
 <h5 class="mb-1"> <span class="badge badge-primary"></span></h5>
 {% endif %}
-
 </div>
 <div class="col-md-12 alert alert-primary mt-1 mb-3 py-2" role="alert">
-    <h4 class="alert-heading font-18">Kindly review both admission and payment details before issuing indexing number for this application application</h4>
+    <h4 class="alert-heading font-18">Admission and payment details for this application application verified by RRBN Institute</h4>
     </div>
 </div>
 <div class="col-md-7 mt-0">
@@ -193,7 +192,7 @@
 
 </div>
 <div class="col-md-12 alert alert-primary mt-1 mb-3 py-2" role="alert">
-<h4 class="alert-heading font-18">Kindly review both admission and payment details before issuing indexing number for this application</h4>
+<h4 class="alert-heading font-18">Admission and payment details for this application application verified by RRBN Institute</h4>
 </div>
 </div>
 
@@ -205,7 +204,7 @@
 <li>Student Name: <span class="text-dark font-weight-bold ms-sm-2">{{payment_object.student_profile.student.last_name}} {{payment_object.student_profile.student.first_name}} {{payment_object.student_profile.student.middle_name}}</span></li>
 <li>Institution: <span class="text-dark font-weight-bold ms-sm-2">{{payment_object.student_profile.institution}}</span></li>
 <li>Course of Study:  <span class="text-dark font-weight-bold ms-sm-2">{{payment_object.student_profile.institution.course_type}}</span></li>
-<li>Registration No: <span class="text-dark font-weight-bold ms-sm-2">{{payment_object.student_profile.student.reg_no}}</span></li>
+<li>Matric No: <span class="text-dark font-weight-bold ms-sm-2">{{payment_object.student_profile.student.matric_no}}</span></li>
 </ul>
 </div>
 

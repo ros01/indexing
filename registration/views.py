@@ -200,6 +200,13 @@ class IssueIndexingNumber(LoginRequiredMixin, SuccessMessageMixin, CreateView, I
     model = IssueIndexing
     template_name = "registration/issue_indexing_number.html"
     form_class = IssueIndexingForm
+    success_message = "Student Indexing Number issued successfully for %(name)s"
+
+    def get_success_message(self, cleaned_data):
+        return self.success_message % dict(
+            cleaned_data,
+            name=self.object.student_profile.student.get_full_name,
+        )
 
     def get_initial(self):
         # You could even get the Book model using Book.objects.get here!

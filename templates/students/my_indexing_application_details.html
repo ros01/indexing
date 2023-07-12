@@ -36,7 +36,7 @@
 
 <div class="col-md-12  profile-detail">
 <div class="d-flex justify-content-between align-items-center">
- <div class="w-50">
+ <div class="w-150">
 
 <h5 class="mb-0 pb-2"> <i class="fa fa-graduation-cap text-primary"></i> Student Indexing Application Details </h5>
 </div> 
@@ -144,6 +144,31 @@
         </ul>
         </div>
         {% endif %}
+
+
+        {% if object.gce_alevels %}
+        <h5 class="mb-1"> <i class="fas fa-desktop text-primary"></i> DE Results</h5>
+        <div>  
+        <p class="text-sm mb-0">
+        <ul class="list-unstyled">                           
+        <li>Examination Body: <span class="text-dark font-weight-bold ms-sm-2">{{object.gce_alevels.examination_body}}</span></li>
+        <li>Physics Score:   <span class="text-dark font-weight-bold ms-sm-2">{{object.gce_alevels.physics_score}}</span></li>
+        <li>Chemistry Score:   <span class="text-dark font-weight-bold ms-sm-2">{{object.gce_alevels.chemistry_score}}</span></li>
+        <li>Biology Score:   <span class="text-dark font-weight-bold ms-sm-2">
+        {{object.gce_alevels.biology_score}}</span></li>
+        {% if object.gce_alevels.gce_alevels_result %}
+        <li>GCE A Levels Certificate:   <span class="text-dark font-weight-bold ms-sm-2">
+        <i class="fa fa-eye text-primary"></i>
+        <a class="text-primary" href="{{object.gce_alevels.gce_alevels_result.url}}" target="_blank">&nbsp; View Result</a>
+        </span></li>
+        {% endif %}
+        </ul>
+        </div>
+        {% endif %}
+
+
+
+
         </div>
         </div>
         </div>

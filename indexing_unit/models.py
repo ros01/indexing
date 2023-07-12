@@ -21,11 +21,12 @@ class IssueIndexing(models.Model):
     academic_session = models.CharField(max_length=200, choices = ACADEMIC_SESSION,  null=True, blank=True)
     student_indexing = models.ForeignKey(StudentIndexing, null=True, on_delete=models.CASCADE)
     indexing_payment = models.ForeignKey(IndexingPayment, null=True, on_delete=models.CASCADE)
-    index_number = models.CharField(max_length=200)
+    index_number = models.CharField(max_length=200, unique=True)
     updated         = models.DateTimeField(auto_now=True)
     timestamp       = models.DateTimeField(auto_now_add=True)
-    
-    
+
+    class Meta:
+        unique_together = ('matric_no','index_number')
 
     def __str__(self):
         return  str(self.student_profile)
