@@ -58,6 +58,7 @@ class InstitutionProfileForm(forms.ModelForm):
         widgets = {
         'address': forms.Textarea(attrs={'rows':1, 'cols':12}),
         "accreditation_date": DatePickerInput(),
+        "accreditation_due_date": DatePickerInput(),
   
         
         }
