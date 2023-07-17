@@ -8,6 +8,8 @@ from .views import (
     IndexingOfficerDetailView,
     AdmissionQuotaListView,
     AdmissionQuotaDetailView,
+    InstitutionsPaymentsListView,
+    InstitutionsVerifiedPaymentsList,
     IndexNumberIssuanceList,
     InstitutionsIndexingPreIssueDetailView,
     StudentsIndexingApplicationDetails,
@@ -15,6 +17,7 @@ from .views import (
     InstitutionsIndexedStudentsListView,
     StudentIndexingNumberDetailView,
     StudentIndexingApplicationDetailView,
+    InstitutionsIndexingPaymentDetailView,
 
 
 
@@ -35,6 +38,8 @@ urlpatterns = [
     path('<slug:slug>/indexing_officer_detail',  IndexingOfficerDetailView.as_view(), name='indexing_officer_detail'),
     path('admission_quota_list',  AdmissionQuotaListView.as_view(), name='admission_quota_list'),
     path('<slug:slug>/admission_quota_detail',  AdmissionQuotaDetailView.as_view(), name='admission_quota_detail'),
+    path('institutions_payments_list', InstitutionsPaymentsListView.as_view(), name='institutions_payments_list'),
+    path('institutions_verified_payments_list', InstitutionsVerifiedPaymentsList.as_view(), name='institutions_verified_payments_list'),
     path('students_index_number_list', IndexNumberIssuanceList.as_view(), name='students_index_number_list'),
     path('institutions_indexing_pre_issue_details/<slug:slug>',  InstitutionsIndexingPreIssueDetailView.as_view(), name='institutions_indexing_pre_issue_details'),
     path('<slug:slug>/issue_indexing_number',  IssueIndexingNumber.as_view(), name='issue_indexing_number'),
@@ -42,6 +47,11 @@ urlpatterns = [
     path('student_indexing_details/<slug:islug>/<slug:sslug>',  StudentIndexingApplicationDetailView.as_view(), name='student_indexing_details'),
     path('students_indexing_details/<slug:islug>/<slug:sslug>',  StudentsIndexingApplicationDetails.as_view(), name='students_indexing_details'),
     path('student_indexing_number_details/<slug:slug>',  StudentIndexingNumberDetailView.as_view(), name='student_indexing_number_details'),
+    path('<slug:slug>/approve_application/', views.approve_application, name='approve_application'),
+    path('<slug:slug>/reject_application/', views.reject_application, name='reject_application'),
+    path('<slug:slug>/verify_payment/', views.verify_payment, name='verify_payment'),
+    path('<slug:slug>/reject_payment/', views.reject_payment, name='reject_payment'),
+    path('institutions_indexing_payment_details/<slug:slug>',  InstitutionsIndexingPaymentDetailView.as_view(), name='institutions_indexing_payment_details'),
 
     ]
 

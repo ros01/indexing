@@ -17,6 +17,8 @@ from .views import (
     MyIndexingPaymentDetailView,
     MyIndexingPaymentListView,
     IndexingPaymentCreateListView,
+    MyIndexingCompleteListView,
+    MyIndexingNumberDetailView,
     WaecResult,
     NecoResult,
     NabtebResult,
@@ -51,6 +53,8 @@ urlpatterns = [
     path('my_indexing_application_details/<slug:islug>/<slug:sslug>',  MyIndexingApplicationDetailView.as_view(), name='my_indexing_application_details'),
     path('my_indexing_payment_list', MyIndexingPaymentListView.as_view(), name='my_indexing_payment_list'),
     path('my_indexing_payment_details/<slug:slug>',  MyIndexingPaymentDetailView.as_view(), name='my_indexing_payment_details'),
+    path('my_indexing_complete_view',  MyIndexingCompleteListView.as_view(), name='my_indexing_complete_view'),
+    path('my_indexing_number_details/<slug:slug>',  MyIndexingNumberDetailView.as_view(), name='my_indexing_number_details'),
     
     # path('assign_admission_quota',  AdmissionQuotaCreateView.as_view(), name='assign_admission_quota'),
     # path('<slug:slug>/admission_quota_detail',  AdmissionQuotaDetailView.as_view(), name='admission_quota_detail'),

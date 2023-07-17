@@ -12,6 +12,7 @@ from .forms import *
 from institutions.forms import *
 from accounts.forms import SignupForm
 from accounts.models import *
+from indexing_unit.models import *
 from .models import *
 from django.db import transaction
 from django.db.models import F
@@ -21,6 +22,7 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext as _
 from django.views import static
+from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
@@ -40,7 +42,20 @@ from institutions.models import *
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
-class DashboardView(LoginRequiredMixin, DetailView):
+
+class StaffRequiredMixin(object):
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.role == 'Student':
+            messages.error(
+                request,
+                'You do not have the permission required to perform the '
+                'requested operation.')
+            return redirect(settings.LOGIN_URL)
+        return super(StaffRequiredMixin, self).dispatch(request,
+            *args, **kwargs)
+
+class DashboardView(StaffRequiredMixin, DetailView):
 
     template_name = "students/dashboard1.html"
 
@@ -66,11 +81,13 @@ def status(request):
         return IndexingPaymentCreateListView.as_view()(request)
     elif StudentIndexing.objects.filter(student_profile__student = user, indexing_status=2):
         return MyIndexingApplicationListView.as_view()(request)
+    elif IssueIndexing.objects.filter(student_profile__student = user):
+        return MyIndexingCompleteListView.as_view()(request)
     else:
-         return MyIndexingApplicationListView.as_view()(request)
+         return MyIndexingCompleteListView.as_view()(request)
 
 
-class MyIndexingApplicationListView(LoginRequiredMixin, ListView):
+class MyIndexingApplicationListView(StaffRequiredMixin, ListView):
     template_name = "students/my_indexing_application_list.html"
     def get_queryset(self):
         request = self.request
@@ -94,7 +111,7 @@ class MyIndexingApplicationListView(LoginRequiredMixin, ListView):
         #     qs = qs.owned(user)
 
 
-class MyStudentProfileListView(LoginRequiredMixin, ListView):
+class MyStudentProfileListView(StaffRequiredMixin, ListView):
     template_name = "students/my_student_profile_list.html"
     def get_queryset(self):
         request = self.request
@@ -106,7 +123,7 @@ class MyStudentProfileListView(LoginRequiredMixin, ListView):
         return qs
 
 
-class ApplicationList(LoginRequiredMixin, ListView):
+class ApplicationList(StaffRequiredMixin, ListView):
     template_name = "students/my_application_list.html"
     def get_queryset(self):
         request = self.request
@@ -117,7 +134,7 @@ class ApplicationList(LoginRequiredMixin, ListView):
             qs = qs.filter(student__icontains=query)
         return qs
 
-class IndexingPaymentCreateListView(LoginRequiredMixin, ListView):
+class IndexingPaymentCreateListView(StaffRequiredMixin, ListView):
     template_name = "students/my_indexing_payment_create_list.html"
     def get_queryset(self):
         request = self.request
@@ -128,7 +145,7 @@ class IndexingPaymentCreateListView(LoginRequiredMixin, ListView):
         return qs 
 
 
-class MyStudentProfileDetailView(LoginRequiredMixin, DetailView):
+class MyStudentProfileDetailView(StaffRequiredMixin, DetailView):
     # queryset = StudentProfile.objects.all()
     template_name = "students/my_student_profile_details.html"
 
@@ -147,7 +164,7 @@ class MyStudentProfileDetailView(LoginRequiredMixin, DetailView):
 
 
 
-class UpdateProfile(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+class UpdateProfile(StaffRequiredMixin, SuccessMessageMixin, UpdateView):
     model = StudentProfile
     form_class = StudentProfileModelForm
     template_name = "students/update_profile.html"
@@ -193,7 +210,7 @@ class StudentObjectMixin(object):
 
 
 
-class WaecResult(LoginRequiredMixin, StudentObjectMixin, PassRequestMixin, SuccessMessageMixin, CreateView):
+class WaecResult(StaffRequiredMixin, StudentObjectMixin, PassRequestMixin, SuccessMessageMixin, CreateView):
     template_name = 'students/utme_result.html'
     form_class = UtmeGradeModelForm
     success_message = 'UTME Result Entered Successfully'
@@ -225,7 +242,7 @@ class WaecResult(LoginRequiredMixin, StudentObjectMixin, PassRequestMixin, Succe
         return self.render_to_response(self.get_context_data())
 
 
-class NecoResult(LoginRequiredMixin, StudentObjectMixin, PassRequestMixin, SuccessMessageMixin, CreateView):
+class NecoResult(StaffRequiredMixin, StudentObjectMixin, PassRequestMixin, SuccessMessageMixin, CreateView):
     template_name = 'students/utme_result.html'
     form_class = UtmeGradeModelForm
     success_message = 'UTME Result Entered Successfully'
@@ -257,7 +274,7 @@ class NecoResult(LoginRequiredMixin, StudentObjectMixin, PassRequestMixin, Succe
         return self.render_to_response(self.get_context_data())
 
 
-class NabtebResult(LoginRequiredMixin, StudentObjectMixin, PassRequestMixin, SuccessMessageMixin, CreateView):
+class NabtebResult(StaffRequiredMixin, StudentObjectMixin, PassRequestMixin, SuccessMessageMixin, CreateView):
     template_name = 'students/utme_result.html'
     form_class = UtmeGradeModelForm
     success_message = 'UTME Result Entered Successfully'
@@ -290,7 +307,7 @@ class NabtebResult(LoginRequiredMixin, StudentObjectMixin, PassRequestMixin, Suc
 
 
 
-class AlevelsResult(LoginRequiredMixin, StudentObjectMixin, PassRequestMixin, SuccessMessageMixin, CreateView):
+class AlevelsResult(StaffRequiredMixin, StudentObjectMixin, PassRequestMixin, SuccessMessageMixin, CreateView):
     template_name = 'students/gce_alevels_result.html'
     form_class = GceAlevelsModelForm
     success_message = 'GCE A Levels Results Entered Successfully'
@@ -322,7 +339,7 @@ class AlevelsResult(LoginRequiredMixin, StudentObjectMixin, PassRequestMixin, Su
         return self.render_to_response(self.get_context_data())
 
 
-class DegreeResult(LoginRequiredMixin, StudentObjectMixin, PassRequestMixin, SuccessMessageMixin, CreateView):
+class DegreeResult(StaffRequiredMixin, StudentObjectMixin, PassRequestMixin, SuccessMessageMixin, CreateView):
     template_name = 'students/degree_result.html'
     form_class = DegreeResultModelForm
     success_message = 'Degree Results Entered Successfully'
@@ -355,7 +372,7 @@ class DegreeResult(LoginRequiredMixin, StudentObjectMixin, PassRequestMixin, Suc
 
 
 
-class IndexingApplicationCreateView(LoginRequiredMixin, StudentObjectMixin, CreateView):
+class IndexingApplicationCreateView(StaffRequiredMixin, StudentObjectMixin, CreateView):
     model = StudentIndexing
     template_name = "students/start_indexing_application1.html"
     form_class = IndexingModelForm
@@ -394,11 +411,16 @@ class IndexingApplicationCreateView(LoginRequiredMixin, StudentObjectMixin, Crea
         print (kwargs)
         return kwargs
 
-    
+    def clean_matric_no(self):     
+        if matric_no.exist:
+           raise ValidationError("Matric Number already exists")
+
+
     def form_invalid(self, form):
+        messages.error(request, 'Form already submitted')
         return self.render_to_response(self.get_context_data())
 
-class IndexingApplicationCreateView1(LoginRequiredMixin, SuccessMessageMixin,  CreateView):
+class IndexingApplicationCreateView1(StaffRequiredMixin, SuccessMessageMixin,  CreateView):
     template_name = "students/start_indexing_application.html"
     utme_form = UtmeGradeModelForm
     student_indexing_form = StudentIndexingModelForm
@@ -454,7 +476,7 @@ class IndexingApplicationCreateView1(LoginRequiredMixin, SuccessMessageMixin,  C
     def form_invalid(self, form):
         return self.render_to_response(self.get_context_data())
 
-class IndexingPaymentCreateView(LoginRequiredMixin, SuccessMessageMixin,  CreateView):
+class IndexingPaymentCreateView(StaffRequiredMixin, SuccessMessageMixin,  CreateView):
     model = IndexingPayment
     template_name = "students/indexing_payment.html"
     form_class = IndexingPaymentModelForm
@@ -516,7 +538,7 @@ class IndexingPaymentCreateView(LoginRequiredMixin, SuccessMessageMixin,  Create
         # if user.is_authenticated():
         #     qs = qs.owned(user)
 
-class MyIndexingApplicationDetailView(LoginRequiredMixin, DetailView):
+class MyIndexingApplicationDetailView(StaffRequiredMixin, DetailView):
     # queryset = StudentIndexing.objects.all()
     template_name = "students/my_indexing_application_details.html"
 
@@ -538,7 +560,7 @@ class MyIndexingApplicationDetailView(LoginRequiredMixin, DetailView):
 
 
 
-class MyIndexingPaymentListView(LoginRequiredMixin, ListView):
+class MyIndexingPaymentListView(StaffRequiredMixin, ListView):
     template_name = "students/my_indexing_payment_list.html"
     def get_queryset(self):
         request = self.request
@@ -549,9 +571,44 @@ class MyIndexingPaymentListView(LoginRequiredMixin, ListView):
         return qs 
 
 
-class MyIndexingPaymentDetailView(LoginRequiredMixin, DetailView):
+class MyIndexingPaymentDetailView(StaffRequiredMixin, DetailView):
     queryset = IndexingPayment.objects.all()
     template_name = "students/my_indexing_payment_details.html"
+
+
+
+class MyIndexingCompleteListView(StaffRequiredMixin, ListView):
+    template_name = "students/my_indexing_complete_view.html"
+    def get_queryset(self):
+        request = self.request
+        qs = IssueIndexing.objects.filter(student_profile__student = request.user)
+        query = self.request.GET.get('q')
+        if query:
+            qs = qs.filter(name__icontains=query)
+        return qs 
+
+    def get_context_data(self, **kwargs):
+        context = super(MyIndexingCompleteListView, self).get_context_data(**kwargs)
+        request = self.request
+        st_profile = StudentProfile.objects.filter(student = request.user)
+        student_profile = st_profile.first()
+        institutions = InstitutionProfile.objects.filter(name = student_profile.institution)
+        students = IssueIndexing.objects.filter(institution__in=institutions).filter(student_profile = student_profile)
+        context = {
+        'student_profile':student_profile,
+        'institutions':institutions,
+        'students':students,
+        }
+        print ("context:", context)
+        return context
+        print ("context:", context)
+
+
+
+class MyIndexingNumberDetailView(StaffRequiredMixin, DetailView):
+    queryset = IssueIndexing.objects.all()
+    template_name = "students/my_indexing_number_details.html"
+
 
 # class IndexingApplicationCreateView(CreateView):
 #     utme_form = UtmeGradeModelForm

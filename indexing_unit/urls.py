@@ -12,6 +12,7 @@ from .views import (
     InstitutionListView,
     AdmissionQuotaCreateView,
     AdmissionQuotaDetailView,
+    AdmissionQuotaUpdateView,
     AdmissionQuotaListView,
     IndexingApplicationsListView,
     IndexingVerificationsDetailView,
@@ -51,6 +52,7 @@ urlpatterns = [
     path('<slug:slug>/activate_user/', views.activate_user, name='activate_user'),
     path('<slug:slug>/deactivate_user/', views.deactivate_user, name='deactivate_user'),
     path('assign_admission_quota',  AdmissionQuotaCreateView.as_view(), name='assign_admission_quota'),
+    path('<slug:slug>/update_admission_quota/', AdmissionQuotaUpdateView.as_view(), name='update_admission_quota'),
     path('<slug:slug>/admission_quota_detail',  AdmissionQuotaDetailView.as_view(), name='admission_quota_detail'),
     path('admission_quota_list',  AdmissionQuotaListView.as_view(), name='admission_quota_list'),
     path('institutions_payments_list', InstitutionsPaymentsListView.as_view(), name='institutions_payments_list'),
@@ -65,7 +67,6 @@ urlpatterns = [
     path('issued_indexing_applications', IssuedIndexingApplications.as_view(), name='issued_indexing_applications'),
     path('<slug:slug>/issued_indexing_application_details',  IssuedIndexingApplicationsDetails.as_view(), name='issued_indexing_application_details'),
     path('institution_autocomplete', InstitutionAutocomplete.as_view(), name='institution_autocomplete'),
-
     path('institutions_indexing_payment_details/<slug:slug>',  InstitutionsIndexingPaymentDetailView.as_view(), name='institutions_indexing_payment_details'),
     path('institutions_indexing_pre_issue_details/<slug:slug>',  InstitutionsIndexingPreIssueDetailView.as_view(), name='institutions_indexing_pre_issue_details'),
     path('<slug:slug>/verify_payment/', views.verify_payment, name='verify_payment'),

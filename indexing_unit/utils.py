@@ -3,6 +3,21 @@ import string
 
 from django.contrib.humanize.templatetags.humanize import intcomma
 from django.utils.text import slugify
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
+from django.template import loader
+from rrbnindexing.settings import EMAIL_HOST_PASSWORD
+from django.http import HttpResponse
+import sendgrid
+from django.views.decorators.csrf import csrf_exempt
+from sendgrid.helpers.mail import Mail,Email,Content
+from django.contrib.auth import get_user_model
+from django.core.mail import EmailMessage
+from django.core.mail import send_mail
+from django.template.loader import get_template, render_to_string
+from django.template import Context
+AUTH_USER_MODEL='accounts.User'
 
 def unique_string_generator(size=5, chars=string.ascii_lowercase + string.digits):
     return "".join(random.choice(chars) for _ in range(size))
@@ -107,3 +122,62 @@ def create_slug7(instance, new_slug=None):
         newly_created_slug = slug + "-{id_}".format(id_=string_unique)
         return create_slug(instance, new_slug=newly_created_slug)
     return slug
+
+
+
+# def reset_password(user, request):
+#     c = {
+#         'email': user.email,
+#         'domain': request.META['HTTP_HOST'],
+#         'site_name': 'indexing',
+#         'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+#         'user': user,
+#         'token': default_token_generator.make_token(user),
+#         'protocol': 'https' if request.is_secure() else 'http',
+#     }
+#     subject_template_name = 'accounts/password_reset_subject.txt'
+#     email_template_name = 'accounts/password_reset_email.html'
+#     subject = loader.render_to_string(subject_template_name, c)
+#     # Email subject *must not* contain newlines
+#     subject = ''.join(subject.splitlines())
+#     email = loader.render_to_string(email_template_name, c)
+#     try:
+#         to_email = Email(user.email)
+#         from_email = Email("institute@rrbn.gov.ng")
+#         content = Content('text/html', email)
+#         message = Mail(from_email, subject, to_email, content)
+#         message.content_subtype = 'html'
+#         sg = sendgrid.SendGridAPIClient(apikey=EMAIL_HOST_PASSWORD)
+#         sg.client.mail.send.post(request_body=message.get())
+#     except Exception as e:
+#         print(e)
+
+
+def reset_password(user, request):
+    context = {}
+    context['email'] = user.email 
+    context['domain'] = request.META['HTTP_HOST'] 
+    context['site_name'] = 'indexing' 
+    context['uid'] = urlsafe_base64_encode(force_bytes(user.pk))
+    context['user'] = user 
+    context['token'] = default_token_generator.make_token(user)
+    context["protocol"] = 'https' if request.is_secure() else 'http'
+    subject = 'Password Change Request'
+    html_template = 'accounts/password_reset_email.html'
+    html_message = render_to_string(html_template, context)
+    try:        
+        from_email ="institute@rrbn.gov.ng"
+        to_email = [user.email]
+        message = EmailMessage(subject, html_message, from_email, to_email)
+        message.content_subtype = 'html'
+        message.send()
+    except Exception as e:
+        print(e)
+
+
+
+
+
+
+
+

@@ -1,6 +1,9 @@
 from django.conf import settings
 from django.db import models
 from django.db.models import Prefetch, Q
+from django.core.mail import EmailMessage
+from django.template import Context
+from django.template.loader import get_template
 from django.db.models.signals import pre_save, post_save, m2m_changed
 from django.dispatch import receiver
 from django.urls import reverse
@@ -11,6 +14,7 @@ from datetime import datetime
 from datetime import date
 from indexing_unit.utils import *
 from multiselectfield import MultiSelectField
+
 
 
 
@@ -42,6 +46,7 @@ class InstitutionProfile(models.Model):
     accreditation_score = models.DecimalField(blank=True, max_digits=5, decimal_places=2)
     accreditation_date = models.DateField(null=True)
     accreditation_type = models.CharField(max_length=100, choices = ACCREDITATION_TYPE, blank=True)
+    accreditation_due_date = models.DateField(null=True)
     address = models.TextField(blank=True)
     updated         = models.DateTimeField(auto_now=True)
     timestamp       = models.DateTimeField(auto_now_add=True)
@@ -89,6 +94,8 @@ pre_save.connect(pre_save_institution_receiver, sender=InstitutionProfile)
 
 class AcademicSession(models.Model):
     title = models.CharField(max_length=120)
+    institution  = models.ForeignKey(InstitutionProfile, on_delete=models.SET_NULL, null=True)
+    academic_session = models.CharField(max_length=100, choices = ACADEMIC_SESSION, blank=True)
     slug = models.SlugField(blank=True)
     updated = models.DateTimeField(auto_now=True)
     timestamp = models.DateTimeField(auto_now_add=True)
@@ -151,6 +158,7 @@ class StudentProfile(models.Model):
     institution = models.ForeignKey(InstitutionProfile,  on_delete=models.DO_NOTHING)
     # admission_type = models.CharField(max_length=100, choices = EXAMINATION_BODY, blank=True)
     slug  = models.SlugField(blank=True)
+    academic_session = models.CharField(max_length=200, null=True, blank=True)
     indexing_status = models.IntegerField(default=1)
     sex = models.CharField(max_length=200, choices = SEX, null=True, blank=True)
     dob = models.DateField(null=True, blank=True)
@@ -208,7 +216,6 @@ def pre_save_student_profile_receiver(sender, instance, *args, **kwargs):
 pre_save.connect(pre_save_student_profile_receiver, sender=StudentProfile)
 
 
-
 class AdmissionTypeManager(models.Manager):
     def get_queryset(self):
         return AdmissionTypeQuerySet(self.model, using=self._db)
@@ -240,14 +247,14 @@ pre_save.connect(pre_save_admission_type_receiver, sender=AdmissionType)
 class UtmeGrade(models.Model):
     # title = models.CharField(max_length=120)
     matric_no = models.CharField(max_length=200, unique=True)
-    student_profile = models.ForeignKey(StudentProfile,  null=True, blank=True, on_delete=models.DO_NOTHING)
+    student_profile = models.ForeignKey(StudentProfile,  null=True, blank=True, on_delete=models.CASCADE)
     examination_body = models.CharField(max_length=200, null=True, blank=True) 
     physics_score = models.CharField(max_length=200, choices = UTME_SCORES,  null=True, blank=True)
     chemistry_score = models.CharField(max_length=200, choices = UTME_SCORES,  null=True, blank=True)
     biology_score = models.CharField(max_length=200, choices = UTME_SCORES,  null=True, blank=True)
     english_score = models.CharField(max_length=200, choices = UTME_SCORES,  null=True, blank=True)
     mathematics_score = models.CharField(max_length=200, choices = UTME_SCORES,  null=True, blank=True)
-    utme_grade_result = models.FileField(null=True, blank=True, upload_to='%Y/%m/%d/')
+    utme_grade_result = models.FileField(blank=True, upload_to='%Y/%m/%d/')
     updated         = models.DateTimeField(auto_now=True)
     timestamp       = models.DateTimeField(auto_now_add=True)
 
@@ -260,12 +267,12 @@ class UtmeGrade(models.Model):
 
 class GceAlevels(models.Model):
     matric_no = models.CharField(max_length=200, unique=True)
-    student_profile = models.ForeignKey(StudentProfile,  null=True, blank=True, on_delete=models.DO_NOTHING)
+    student_profile = models.ForeignKey(StudentProfile,  null=True, blank=True, on_delete=models.CASCADE)
     examination_body = models.CharField(max_length=200, choices = GCE_EXAM_BODY,  null=True, blank=True) 
     chemistry_score = models.CharField(max_length=200, choices = GCE_A_LEVELS_SCORES,  null=True, blank=True)
     biology_score = models.CharField(max_length=200, choices = GCE_A_LEVELS_SCORES,  null=True, blank=True)
     physics_score = models.CharField(max_length=200, choices = GCE_A_LEVELS_SCORES,  null=True, blank=True)
-    gce_alevels_result = models.FileField(null=True, blank=True, upload_to='%Y/%m/%d/')
+    gce_alevels_result = models.FileField(blank=True, upload_to='%Y/%m/%d/')
     updated         = models.DateTimeField(auto_now=True)
     timestamp       = models.DateTimeField(auto_now_add=True)
 
@@ -278,11 +285,11 @@ class GceAlevels(models.Model):
 
 class DegreeResults(models.Model):
     matric_no = models.CharField(max_length=200, unique=True)
-    student_profile = models.ForeignKey(StudentProfile,  null=True, blank=True, on_delete=models.DO_NOTHING)
+    student_profile = models.ForeignKey(StudentProfile,  null=True, blank=True, on_delete=models.CASCADE)
     degree_type = models.CharField(max_length=200, choices = DEGREE_TYPE,  null=True, blank=True) 
     course = models.CharField(max_length=200, choices = DEGREE_COURSES,  null=True, blank=True)
     course_grade = models.CharField(max_length=200, choices = DEGREE_COURSE_GRADES,  null=True, blank=True)
-    degree_result = models.FileField(null=True, blank=True, upload_to='%Y/%m/%d/')
+    degree_result = models.FileField(blank=True, upload_to='%Y/%m/%d/')
     updated         = models.DateTimeField(auto_now=True)
     timestamp       = models.DateTimeField(auto_now_add=True)
 
@@ -304,7 +311,7 @@ class TransferGrade(models.Model):
 
 
 class StudentIndexing(models.Model):    
-    student_profile = models.ForeignKey(StudentProfile,  null=True, blank=True, on_delete=models.DO_NOTHING)
+    student_profile = models.ForeignKey(StudentProfile,  null=True, blank=True, on_delete=models.CASCADE)
     institution = models.ForeignKey(InstitutionProfile,  on_delete=models.DO_NOTHING)
     slug  = models.SlugField(blank=True)
     matric_no = models.CharField(max_length=200, unique=True)
@@ -439,20 +446,20 @@ pre_save.connect(pre_save_student_indexing_receiver, sender=StudentIndexing)
 
 class IndexingPayment(models.Model):
     institution = models.ForeignKey(InstitutionProfile, on_delete=models.DO_NOTHING)
-    student_profile = models.ForeignKey(StudentProfile,  null=True, blank=True, on_delete=models.DO_NOTHING)
-    student_indexing = models.ForeignKey(StudentIndexing,  null=True, blank=True, on_delete=models.DO_NOTHING)
+    student_profile = models.ForeignKey(StudentProfile,  null=True, blank=True, on_delete=models.CASCADE)
+    student_indexing = models.ForeignKey(StudentIndexing,  null=True, blank=True, on_delete=models.CASCADE)
     # institution_payment = models.ForeignKey("InstitutionPayment", null=True, blank=True, on_delete=models.DO_NOTHING)
     slug  = models.SlugField(blank=True)
     matric_no = models.CharField(max_length=200, unique=True)
-    academic_session = models.CharField(max_length=200, choices = ACADEMIC_SESSION,  null=True, blank=True)
+    academic_session = models.CharField(max_length=200, choices = ACADEMIC_SESSION)
     payment_status = models.IntegerField(default=1)
     indexing_status = models.IntegerField(default=1)
     payment_verification_status = models.IntegerField(default=1)
     rrr_number = models.CharField(max_length=100, null=True, blank=True)
-    receipt_number = models.CharField(max_length=100)
+    receipt_number = models.CharField(max_length=100, null=True, blank=True)
     payment_amount = models.CharField(max_length=100)
     payment_method = models.CharField(max_length=100, choices = PAYMENT_METHOD)
-    payment_receipt = models.FileField(upload_to='%Y/%m/%d/')
+    payment_receipt = models.FileField(null=True, blank=True, upload_to='%Y/%m/%d/')
     payment_date = models.DateField(default=date.today)  
     
     # class Meta:
@@ -511,6 +518,10 @@ class InstitutionPayment(models.Model):
 
     def get_indexing_url(self):
         return reverse('indexing_unit:institutions_indexing_payment_details', kwargs={"slug": self.slug})
+
+
+    def get_reg_indexing_url(self):
+        return reverse('registration:institutions_indexing_payment_details', kwargs={"slug": self.slug})
 
     # def save(self, *args, **kwargs):       
     #     for student in self.students_payments.all():

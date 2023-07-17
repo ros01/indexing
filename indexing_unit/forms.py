@@ -52,6 +52,7 @@ class InstitutionProfileForm(forms.ModelForm):
             'accreditation_score',
             'accreditation_date',
             'accreditation_type',
+            'accreditation_due_date',
             'address',
                 ]
         widgets = {
@@ -73,6 +74,7 @@ class InstitutionProfileForm(forms.ModelForm):
        self.fields['accreditation_type'].label = "Accreditation Type"
        self.fields['accreditation_score'].label = "Accreditation Score"
        self.fields['accreditation_date'].label = "Accreditation Date"
+       self.fields['accreditation_due_date'].label = "Accreditation Due Date"
        self.fields['institution_type'].label = "Institution Type"
        # self.fields['accreditation_date'].widget.attrs['placeholder'] = "Click Calendar button to enter Accreditation Date"
        

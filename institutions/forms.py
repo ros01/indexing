@@ -65,9 +65,11 @@ class IndexingPaymentModelForm(forms.ModelForm):
        self.fields['rrr_number'].label = "RRR Number"
        self.fields['rrr_number'].widget.attrs['placeholder'] = "Optional (Enter RRR Number if available)"
        self.fields['receipt_number'].label = "Receipt Number"
+       self.fields['receipt_number'].widget.attrs['placeholder'] = "Optional (Enter Receipt Number if available)"
        self.fields['payment_amount'].label = "Payment Amount"
        self.fields['payment_method'].label = "Payment Method"
        self.fields['payment_receipt'].label = "Payment Receipt"
+       self.fields['payment_receipt'].widget.attrs['placeholder'] = "PDF or Jpeg format"
 
 
 

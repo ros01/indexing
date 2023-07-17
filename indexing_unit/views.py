@@ -37,6 +37,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.decorators import method_decorator
 from django.contrib import messages 
 from django.contrib.messages.views import SuccessMessageMixin
+from indexing_unit.utils import *
 
 
 
@@ -46,6 +47,17 @@ User = get_user_model()
 from dal import autocomplete
 
 
+class StaffRequiredMixin(object):
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.role == 'Indexing Unit':
+            messages.error(
+                request,
+                'You do not have the permission required to perform the '
+                'requested operation.')
+            return redirect(settings.LOGIN_URL)
+        return super(StaffRequiredMixin, self).dispatch(request,
+            *args, **kwargs)
 
 
 class InstitutionAutocomplete(autocomplete.Select2QuerySetView):
@@ -62,7 +74,7 @@ class InstitutionAutocomplete(autocomplete.Select2QuerySetView):
         return qs
 
 
-class DashboardView(LoginRequiredMixin, ListView):
+class DashboardView(StaffRequiredMixin, ListView):
 	#queryset = InstitutionProfile.objects.all()
 	template_name = "indexing_unit/dashboard1.html"
 
@@ -81,7 +93,7 @@ class DashboardView(LoginRequiredMixin, ListView):
 	# 	return context
 
 
-class InstitutionCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+class InstitutionCreateView(StaffRequiredMixin, SuccessMessageMixin, CreateView):
     model = InstitutionProfile
     template_name = "indexing_unit/register_institution.html"
     form_class = InstitutionProfileForm
@@ -120,7 +132,7 @@ class IndexingOfficerCreateView2(CreateView):
 
 
 
-class IndexingOfficerCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+class IndexingOfficerCreateView(StaffRequiredMixin, SuccessMessageMixin, CreateView):
 	model = User
 	user_form = SignupForm
 	form = IndexingOfficerProfileForm
@@ -154,6 +166,8 @@ class IndexingOfficerCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateV
                 institution = indexing_officer.institution,
                 )
 			indexing_officer = IndexingOfficerProfile.objects.filter(indexing_officer=user).first()
+			user = user
+			reset_password(user, request)
 			return redirect(indexing_officer.get_absolute_url())
 
 	   	# 	return redirect('index')  	
@@ -163,7 +177,7 @@ class IndexingOfficerCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateV
     
 
 
-class IndexingOfficerDetailView(LoginRequiredMixin, DetailView):
+class IndexingOfficerDetailView(StaffRequiredMixin, DetailView):
 	queryset = IndexingOfficerProfile.objects.all()
 	template_name = "indexing_unit/indexing_officer_details.html"
 
@@ -208,7 +222,7 @@ def deactivate_user(request, slug):
 
 
 
-class InstitutionListView(LoginRequiredMixin, ListView):
+class InstitutionListView(StaffRequiredMixin, ListView):
 	template_name = "indexing_unit/institutions_list1.html"
 	def get_queryset(self):
 		request = self.request
@@ -219,7 +233,7 @@ class InstitutionListView(LoginRequiredMixin, ListView):
 		return qs  #.filter(title__icontains='vid') 
 
  
-class IndexingOfficerListView(LoginRequiredMixin, ListView):
+class IndexingOfficerListView(StaffRequiredMixin, ListView):
 	template_name = "indexing_unit/indexing_officers_list.html"
 	def get_queryset(self):
 		request = self.request
@@ -230,7 +244,7 @@ class IndexingOfficerListView(LoginRequiredMixin, ListView):
 			qs = qs.filter(name__icontains=query)
 		return qs  #.filter(title__icontains='vid')
 
-class AdmissionQuotaListView(LoginRequiredMixin, ListView):
+class AdmissionQuotaListView(StaffRequiredMixin, ListView):
 	template_name = "indexing_unit/admission_quota_list.html"
 	def get_queryset(self):
 		request = self.request
@@ -280,7 +294,7 @@ class InstitutionCreateView1(CreateView):
 
 
 
-class InstitutionDetailView(LoginRequiredMixin, SuccessMessageMixin, DetailView):
+class InstitutionDetailView(StaffRequiredMixin, SuccessMessageMixin, DetailView):
 	queryset = InstitutionProfile.objects.all()
 	template_name = "indexing_unit/institution_details.html"
 	success_message = "Institution Profiles was created successfully"
@@ -291,20 +305,39 @@ class InstitutionDetailView(LoginRequiredMixin, SuccessMessageMixin, DetailView)
     #     )
 
  
-class AdmissionQuotaCreateView(LoginRequiredMixin, CreateView):
+class AdmissionQuotaCreateView(StaffRequiredMixin, CreateView):
     model = AdmissionQuota
     template_name = "indexing_unit/assign_admission_quota.html"
     form_class = AdmissionQuotaForm
 
 
 
-class AdmissionQuotaDetailView(LoginRequiredMixin, DetailView):
+class AdmissionQuotaDetailView(StaffRequiredMixin, DetailView):
 	queryset = AdmissionQuota.objects.all()
 	template_name = "indexing_unit/admission_quota_details.html"
 
 
 
-class IndexingApplicationsListView(LoginRequiredMixin, ListView):
+class AdmissionQuotaUpdateView (StaffRequiredMixin, SuccessMessageMixin, UpdateView):
+    model = AdmissionQuota
+    form_class = AdmissionQuotaForm
+    template_name = "indexing_unit/assign_admission_quota.html"
+    # success_message = "Student Profile Update Successful"
+
+    success_message = "%(institution)s Admision Quota Update Successful"
+
+    def get_success_message(self, cleaned_data):
+      return self.success_message % dict(
+            cleaned_data,
+            institution=self.object.institution.name,
+        )
+
+ 
+    def get_success_url(self):
+        obj = self.get_object()
+        return reverse("indexing_unit:admission_quota_list")
+
+class IndexingApplicationsListView(StaffRequiredMixin, ListView):
 	template_name = "indexing_unit/students_indexing_applications_list.html"
 	def get_queryset(self):
 		request = self.request
@@ -315,7 +348,7 @@ class IndexingApplicationsListView(LoginRequiredMixin, ListView):
 		return qs.filter(indexing_status=2) 
 
 
-class IndexingVerificationsDetailView(LoginRequiredMixin, DetailView):
+class IndexingVerificationsDetailView(StaffRequiredMixin, DetailView):
 	queryset = StudentIndexing.objects.all()
 	template_name = "indexing_unit/student_indexing_verification_details.html"
 
@@ -323,7 +356,7 @@ class IndexingVerificationsDetailView(LoginRequiredMixin, DetailView):
 
 
 
-class IndexNumberIssuanceList(LoginRequiredMixin, ListView):
+class IndexNumberIssuanceList(StaffRequiredMixin, ListView):
 	template_name = "indexing_unit/index_number_issuance_list.html"
 	def get_queryset(self):
 		request = self.request
@@ -335,7 +368,7 @@ class IndexNumberIssuanceList(LoginRequiredMixin, ListView):
 
 
 
-class InstitutionsIndexingListView(LoginRequiredMixin, ListView):
+class InstitutionsIndexingListView(StaffRequiredMixin, ListView):
 	template_name = "indexing_unit/issued_indexing_list.html"
 	def get_queryset(self):
 		request = self.request
@@ -346,7 +379,7 @@ class InstitutionsIndexingListView(LoginRequiredMixin, ListView):
 		return qs 
 
 
-class InstitutionsIndexingStudentsListView(LoginRequiredMixin, ListView):
+class InstitutionsIndexingStudentsListView(StaffRequiredMixin, ListView):
 	template_name = "indexing_unit/institutions_indexing_students_list.html"
 	def get_queryset(self):
 		request = self.request
@@ -370,7 +403,7 @@ class InstitutionsIndexingStudentsListView(LoginRequiredMixin, ListView):
 
     	 	
 
-class IssueIndexNumberDetails(LoginRequiredMixin, DetailView):
+class IssueIndexNumberDetails(StaffRequiredMixin, DetailView):
 	queryset = StudentIndexing.objects.all()
 	template_name = "indexing_unit/assign_index_number_detail.html"
 
@@ -399,7 +432,7 @@ class IssueIndexNumber1(CreateView):
 
 
 
-class IssueIndexingNumber(LoginRequiredMixin, CreateView, IndexObjectMixin):
+class IssueIndexingNumber(StaffRequiredMixin, CreateView, IndexObjectMixin):
     model = IssueIndexing
     template_name = "indexing_unit/issue_index_number.html"
     form_class = IssueIndexingForm
@@ -437,7 +470,7 @@ class IssueIndexingNumber(LoginRequiredMixin, CreateView, IndexObjectMixin):
 
 
 
-class IssuedIndexingApplications(LoginRequiredMixin, ListView):
+class IssuedIndexingApplications(StaffRequiredMixin, ListView):
 	template_name = "indexing_unit/issued_indexing_applications_list.html"
 	def get_queryset(self):
 		request = self.request
@@ -447,7 +480,7 @@ class IssuedIndexingApplications(LoginRequiredMixin, ListView):
 			qs = qs.filter(name__icontains=query)
 		return qs
 
-class InstitutionsPaymentsListView(LoginRequiredMixin, ListView):
+class InstitutionsPaymentsListView(StaffRequiredMixin, ListView):
 	template_name = "indexing_unit/institutions_payments_list.html"
 	def get_queryset(self):
 		request = self.request
@@ -458,7 +491,7 @@ class InstitutionsPaymentsListView(LoginRequiredMixin, ListView):
 		return qs.filter(payment_status=1)
 
 
-class InstitutionsVerifiedPaymentsList(LoginRequiredMixin, ListView):
+class InstitutionsVerifiedPaymentsList(StaffRequiredMixin, ListView):
 	template_name = "indexing_unit/institutions_verified_payments_list.html"
 	def get_queryset(self):
 		request = self.request
@@ -469,7 +502,7 @@ class InstitutionsVerifiedPaymentsList(LoginRequiredMixin, ListView):
 		return qs.filter(payment_status=2)
 
 
-class InstitutionsIndexingPaymentDetailView(LoginRequiredMixin, DetailView):
+class InstitutionsIndexingPaymentDetailView(StaffRequiredMixin, DetailView):
 	queryset = InstitutionPayment.objects.all()
 	template_name = "indexing_unit/institutions_payment_details.html"
 
@@ -491,12 +524,12 @@ class InstitutionsIndexingPaymentDetailView(LoginRequiredMixin, DetailView):
 	# 	context['object_list'] = object_list
 	# 	return context
 
-class InstitutionsIndexingPreIssueDetailView(LoginRequiredMixin, DetailView):
+class InstitutionsIndexingPreIssueDetailView(StaffRequiredMixin, DetailView):
 	queryset = InstitutionPayment.objects.prefetch_related(Prefetch('students_payments', queryset=IndexingPayment.objects.filter(payment_status = 2)))
 	template_name = "indexing_unit/institutions_indexing_pre_issue_details.html"
 
 
-class VerifiedPaymentsListView(LoginRequiredMixin, ListView):
+class VerifiedPaymentsListView(StaffRequiredMixin, ListView):
 	template_name = "indexing_unit/verified_payments_list.html"
 	
 	def get_queryset(self):
@@ -509,7 +542,7 @@ class VerifiedPaymentsListView(LoginRequiredMixin, ListView):
 		except:
 			raise Http404
 
-class InstitutionsPaymentsListView1(LoginRequiredMixin, ListView):
+class InstitutionsPaymentsListView1(StaffRequiredMixin, ListView):
 	template_name = "indexing_unit/institutions_payments_list.html"
 	
 	def get_queryset(self):
@@ -522,13 +555,13 @@ class InstitutionsPaymentsListView1(LoginRequiredMixin, ListView):
 		except:
 			raise Http404
 
-class IssuedIndexingApplicationsDetails(LoginRequiredMixin, DetailView):
+class IssuedIndexingApplicationsDetails(StaffRequiredMixin, DetailView):
 	queryset = IssueIndexing.objects.all()
 	template_name = "indexing_unit/issued_indexing_applications_details.html"
 
 
 
-class StudentIndexingApplicationDetailView(LoginRequiredMixin, DetailView):
+class StudentIndexingApplicationDetailView(StaffRequiredMixin, DetailView):
     # queryset = StudentIndexing.objects.all()
     template_name = "indexing_unit/student_indexing_application_details.html"
 
@@ -545,7 +578,7 @@ class StudentIndexingApplicationDetailView(LoginRequiredMixin, DetailView):
     	return context
 
   
-class StudentsIndexingApplicationDetails(LoginRequiredMixin, DetailView):
+class StudentsIndexingApplicationDetails(StaffRequiredMixin, DetailView):
     # queryset = StudentIndexing.objects.all()
     template_name = "indexing_unit/students_indexing_application_details.html"
 
@@ -635,7 +668,7 @@ def reject_payment(request, slug):
 
 
 
-class StudentIndexingNumberDetailView(LoginRequiredMixin, DetailView):
+class StudentIndexingNumberDetailView(StaffRequiredMixin, DetailView):
     queryset = IssueIndexing.objects.all()
     template_name = "indexing_unit/students_indexing_number_details.html"
 

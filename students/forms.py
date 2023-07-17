@@ -20,9 +20,7 @@ class UtmeGradeModelForm(PopRequestMixin, CreateUpdateAjaxMixin, forms.ModelForm
     class Meta:
          model = UtmeGrade
          # fields = ('examination_body', 'course_1', 'course_1_grade', 'course_2', 'course_2_grade', 'course_3', 'course_3_grade', 'course_4', 'course_4_grade', 'course_5', 'course_5_grade')
-         fields = ('matric_no', 'examination_body', 'physics_score', 'chemistry_score', 'biology_score', 'english_score', 'mathematics_score', 'utme_grade_result', 'student_profile')
-         
-
+         fields = ('matric_no', 'examination_body', 'physics_score', 'chemistry_score', 'biology_score', 'english_score', 'mathematics_score', 'utme_grade_result', 'student_profile')     
          widgets = {
          'matric_no': forms.TextInput(attrs={'readonly': True}),
          'examination_body': forms.TextInput(attrs={'readonly': True}),
@@ -38,7 +36,7 @@ class UtmeGradeModelForm(PopRequestMixin, CreateUpdateAjaxMixin, forms.ModelForm
                 'class': 'form-control',
             })
        self.fields['student_profile'].label = ""
-       self.fields['utme_grade_result'].label = "Upload Result Statement/Certificate"
+       self.fields['utme_grade_result'].label = "Upload Result in PDF or Jpeg format"
        self.fields['utme_grade_result'].widget.attrs['placeholder'] = "PDF or Jpeg format"
        self.fields['matric_no'].label = "Matric Number"
        self.fields['examination_body'].label = "Exam Body"
@@ -84,7 +82,7 @@ class GceAlevelsModelForm(PopRequestMixin, CreateUpdateAjaxMixin, forms.ModelFor
                 'class': 'form-control',
             })
        self.fields['student_profile'].label = ""
-       self.fields['gce_alevels_result'].label = "Upload Result Statement/Certificate"
+       self.fields['gce_alevels_result'].label = "Upload Result in PDF or Jpeg format"
        self.fields['gce_alevels_result'].widget.attrs['placeholder'] = "PDF or Jpeg format"
        self.fields['examination_body'].label = "Exam Body"
        self.fields['physics_score'].label = "Physics Score"
@@ -127,7 +125,7 @@ class DegreeResultModelForm(PopRequestMixin, CreateUpdateAjaxMixin, forms.ModelF
                 'class': 'form-control',
             })
        self.fields['student_profile'].label = ""
-       self.fields['degree_result'].label = "Upload Result Statement/Certificate"
+       self.fields['degree_result'].label = "Upload Result in PDF or Jpeg format"
        self.fields['degree_result'].widget.attrs['placeholder'] = "PDF or Jpeg format"
        self.fields['degree_type'].label = "Degree Type"
        self.fields['course_grade'].label = "Course Grade"
@@ -251,6 +249,14 @@ class IndexingModelForm(forms.ModelForm):
        #
        self.fields['matric_no'].label = "Matric Number"
        self.fields['academic_session'].label = "Academic Session"
+
+    def clean_matric_no(self):  
+        matric_no = self.cleaned_data.get("matric_no")
+        if User.objects.filter(matric_no =['matric_no']).exists():
+        # new = User.objects.filter(matric_no = matric_no)  
+        # if new.count():  
+            raise ValidationError("Student with this Matric Number Already Exist")  
+        return matric_no  
 
     
 

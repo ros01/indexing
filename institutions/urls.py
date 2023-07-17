@@ -25,6 +25,10 @@ from .views import (
     InstitutionsPaymentsListView,
     AdmissionQuotaListView,
     AdmissionQuotaDetailView,
+    InstitutionDetailView,
+    IndexedStudentsListView,
+    StudentIndexingNumberDetailView,
+
 
            
 )
@@ -34,13 +38,14 @@ app_name = 'institutions'
 
 urlpatterns = [
 	path('dashboard', DashboardView.as_view(), name='dashboard'),
+    path('<slug:slug>/institution_detail',  InstitutionDetailView.as_view(), name='institution_detail'),
+    path('admission_quota_list',  AdmissionQuotaListView.as_view(), name='admission_quota_list'),
+    path('<slug:slug>/admission_quota_detail',  AdmissionQuotaDetailView.as_view(), name='admission_quota_detail'),
     path('student_profiles_list/', StudentProfilesListView.as_view(), name='student_profiles_list'),
     path('create_student_profile',  StudentProfileCreateView.as_view(), name='create_student_profile'),
     path('downloadfile', views.downloadfile, name='downloadfile'),
     path('create_academic_session/', CreateAcademicSession.as_view(), name='create_academic_session'),
     path('student_profile_details/<slug:islug>/<slug:sslug>',  StudentProfileDetailView.as_view(), name='student_profile_details'),
-    path('admission_quota_list',  AdmissionQuotaListView.as_view(), name='admission_quota_list'),
-    path('<slug:slug>/admission_quota_detail',  AdmissionQuotaDetailView.as_view(), name='admission_quota_detail'),
     #path('student_profile_details/<slug:slug>',  StudentProfileDetailView.as_view(), name='student_profile_details'),
     path('student_indexing_applications_list', StudentIndexingApplicationsListView.as_view(), name='student_indexing_applications_list'),
     path('student_indexing_application_details/<slug:islug>/<slug:sslug>',  StudentIndexingApplicationDetailView.as_view(), name='student_indexing_application_details'),
@@ -61,6 +66,8 @@ urlpatterns = [
     path('verified_payments_list', VerifiedPaymentsListView.as_view(), name='verified_payments_list'),
     path('institutions_payments_list', InstitutionsPaymentsListView.as_view(), name='institutions_payments_list'),
     path('institutions_indexing_payment_details/<slug:slug>',  InstitutionsIndexingPaymentDetailView.as_view(), name='institutions_indexing_payment_details'),
+    path('indexed_students_list', IndexedStudentsListView.as_view(), name='indexed_students_list'),
+    path('student_indexing_number_details/<slug:slug>',  StudentIndexingNumberDetailView.as_view(), name='student_indexing_number_details'),
     ]
 
 

@@ -65,16 +65,16 @@
 <div class="col d-flex">
 
 <div class="form-check mr-3 mt-1">
-<input class="form-check-input" type="radio" name="de_subjects" id="de_admssion" data-form-url="">
-<label class="form-check-label" for="de_subjects">
-DE
+<input class="form-check-input" type="radio" name="utmesubject" value="UTME" id="utme" data-form-url="">
+<label class="form-check-label" for="utmesubject">
+UTME
 </label>
 </div>
 
 <div class="form-check mr-3 mt-1">
-<input class="form-check-input" type="radio" name="utmesubject" value="UTME" id="utme" data-form-url="">
-<label class="form-check-label" for="utmesubject">
-UTME
+<input class="form-check-input" type="radio" name="de_subjects" id="de_admssion" data-form-url="">
+<label class="form-check-label" for="de_subjects">
+DE
 </label>
 </div>
 
@@ -301,7 +301,7 @@ $(function () {
 <script>
 $(function () {
        $( "#de_admssion" ).change(function() {
-           document.getElementById('exam-body').classList.remove("hidden");
+           
            document.getElementById('de-exam-type').classList.remove("hidden");  
             if($('#utme').is(':checked')){
                 $('#utme').attr('checked', false);

@@ -57,9 +57,9 @@
 {% if object.payment_status == 1 %}
  <h5 class="mb-1"> <span class="badge badge-warning">Pending Verification</span></h5> 
 {% elif object.payment_status == 2 %}
- <h5 class="mb-1"> <span class="badge badge-primary">VERIFIED BY INSTITUTE</span></h5> 
+ <h5 class="mb-1"> <span class="badge badge-primary">VERIFIED BY RRBN REGISTRATION DEPT</span></h5> 
 {% else %}
-<h5 class="mb-1"> <span class="badge badge-primary">VERIFIED BY REGISTRATION</span></h5>
+<h5 class="mb-1"> <span class="badge badge-primary"></span></h5>
 {% endif %}
 
 </div> 
@@ -177,7 +177,7 @@
 {% if object.payment_status == 1 %}
 <h5 class="mb-1"> <span class="badge badge-warning">Pending</span></h5> 
 {% elif  object.payment_status == 2 %}
-<h5 class="mb-1"> <span class="badge badge-primary">VERIFIED BY INSTITUTE</span></h5>
+<h5 class="mb-1"> <span class="badge badge-primary">VERIFIED BY RRBN REGISTRATION DEPT</span></h5>
 {% else %} 
 <h5 class="mb-1"> <span class="badge badge-primary"></span></h5>
 {% endif %}

@@ -39,6 +39,12 @@ class IssueIndexing(models.Model):
     def get_indexing_absolute_url(self):
         return reverse('indexing_unit:student_indexing_number_details', kwargs={"slug": self.slug})
 
+    def get_institution_absolute_url(self):
+        return reverse('institutions:student_indexing_number_details', kwargs={"slug": self.slug})
+
+    def get_student_absolute_url(self):
+        return reverse('students:my_indexing_number_details', kwargs={"slug": self.slug})
+
 
 
     def save(self, *args, **kwargs):

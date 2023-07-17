@@ -17,9 +17,9 @@
 <li class="nav-item">
 <a class="nav-link active" href="#admission" data-toggle="tab" aria-expanded="false"><i class="ti-user mr-2"></i>Admission Details</a>
 </li>
-<li class="nav-item">
+<!-- <li class="nav-item">
 <a class="nav-link" href="#payment" data-toggle="tab" aria-expanded="false"><i class="ti-image mr-2"></i>Payment Details</a>
-</li>
+</li> -->
 
 <!-- <li class="nav-item">
 <a class="nav-link" href="#settings" data-toggle="tab" aria-expanded="false"><i class="ti-settings mr-2"></i>Settings</a>
@@ -49,13 +49,13 @@
 {% elif  object.verification_status == 2 %}
 <h5 class="mb-1"> <span class="badge badge-primary">VERFIED BY INSTITUTION</span></h5>
 {% elif  object.verification_status == 3 %}
-<h5 class="mb-1"> <span class="badge badge-primary">VERFIED BY RRBN INSTITUTE</span></h5>
+<h5 class="mb-1"> <span class="badge badge-primary">VERFIED BY RRBN REGISTRATION DEPT</span></h5>
 {% else %} 
 <h5 class="mb-1"> <span class="badge badge-primary"></span></h5>
 {% endif %}
 </div>
 <div class="col-md-12 alert alert-primary mt-1 mb-3 py-2" role="alert">
-    <h4 class="alert-heading font-18">Admission and payment details for this application application verified by RRBN Institute</h4>
+    <h4 class="alert-heading font-18">Admission and payment details for this application application verified by RRBN Registration Dept</h4>
     </div>
 </div>
 <div class="col-md-7 mt-0">
@@ -240,7 +240,7 @@
 
 {% else %}
 <div class="d-flex justify-content-end">   
-<a href="{% url 'registration:students_index_number_list' %}" class="btn btn-outline-success py-0 mr-3 mt-1 mb-3"><i class="fa fa-times" aria-hidden="true"></i> Return to Index Numbering List </a>
+<a href="{% url 'registration:institutions_indexed_students_list' %}" class="btn btn-outline-success py-0 mr-3 mt-1 mb-3"><i class="fa fa-times" aria-hidden="true"></i> Issued Indexing List </a>
 </div>
 {% endif %}
 </div>

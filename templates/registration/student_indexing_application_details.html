@@ -14,9 +14,9 @@
 <li class="nav-item">
 <a class="nav-link active" href="#admission" data-toggle="tab" aria-expanded="false"><i class="ti-user mr-2"></i>Admission Details</a>
 </li>
-<li class="nav-item">
+<!-- <li class="nav-item">
 <a class="nav-link" href="#payment" data-toggle="tab" aria-expanded="false"><i class="ti-image mr-2"></i>Payment Details</a>
-</li>
+</li> -->
 
 <!-- <li class="nav-item">
 <a class="nav-link" href="#settings" data-toggle="tab" aria-expanded="false"><i class="ti-settings mr-2"></i>Settings</a>
@@ -46,15 +46,25 @@
 {% elif  object.verification_status == 2 %}
 <h5 class="mb-1"> <span class="badge badge-primary">VERFIED BY INSTITUTION</span></h5>
 {% elif  object.verification_status == 3 %}
-<h5 class="mb-1"> <span class="badge badge-primary">VERFIED BY RRBN INSTITUTE</span></h5>
+<h5 class="mb-1"> <span class="badge badge-primary">VERFIED BY RRBN REGISTRATION DEPT</span></h5>
 {% else %} 
 <h5 class="mb-1"> <span class="badge badge-primary"></span></h5>
 {% endif %}
 
 </div>
-<!-- <div class="col-md-12 alert alert-primary mt-1 mb-3 py-2" role="alert">
-<h4 class="alert-heading font-18">Kindly review both admission and payment details before issuing indexing number for this application application</h4>
-</div> -->
+
+{% if object.verification_status == 2 %}
+
+<div class="col-md-12 alert alert-primary mt-1 mb-3 py-2" role="alert">
+<h4 class="alert-heading font-18">Kindly review admission details for this application application before proceeding to approve institutions payment</h4>
+</div>
+
+{% else %}
+<div class="col-md-12 alert alert-primary mt-1 mb-3 py-2" role="alert">
+<h4 class="alert-heading font-18">Admission Details Verified for {{object.student_profile.student.last_name}} {{object.student_profile.student.first_name}} {{object.student_profile.student.middle_name}}</h4>
+</div>
+{% endif %}
+
 </div>
 <div class="col-md-7 mt-0">
 <h5 class="mb-1"> <i class="fa fa-graduation-cap text-primary"></i> Basic Details</h5>
@@ -179,7 +189,7 @@
 {% elif  payment_object.payment_status == 2 %}
 <h5 class="mb-1"> <span class="badge badge-primary">PAYMENT VERFIED BY INSTITUTION</span></h5>
 {% elif  payment_object.payment_status >= 3 %}
-<h5 class="mb-1"> <span class="badge badge-primary">PAYMENT VERFIED BY RRBN INSTITUTE</span></h5>
+<h5 class="mb-1"> <span class="badge badge-primary">PAYMENT VERFIED BY RRBN REGISTRATION DEPT</span></h5>
 {% else %} 
 <h5 class="mb-1"> <span class="badge badge-primary"></span></h5>
 {% endif %}
@@ -187,9 +197,21 @@
 
 
 </div>
-<!-- <div class="col-md-12 alert alert-primary mt-1 mb-3 py-2" role="alert">
-<h4 class="alert-heading font-18">Kindly review both admission and payment details before issuing indexing number for this application</h4>
-</div> -->
+
+{% if payment_object.payment_status == 2 %}
+<div class="col-md-12 alert alert-primary mt-1 mb-3 py-2" role="alert">
+<h4 class="alert-heading font-18">Kindly review both admission and payment details before approving or rejecting application</h4>
+</div>
+
+{% else %}
+
+<div class="col-md-12 alert alert-primary mt-1 mb-3 py-2" role="alert">
+<h4 class="alert-heading font-18">Payment Details Verified for {{payment_object.student_profile.student.last_name}} {{payment_object.student_profile.student.first_name}} {{payment_object.student_profile.student.middle_name}}</h4>
+</div>
+
+
+{% endif %}
+
 </div>
 
 <div class="col-md-7 mt-0">
@@ -241,8 +263,45 @@
 </div>
 {% endif %} -->
 
-<div class="d-flex justify-content-end">   
+<!-- div class="d-flex justify-content-end">   
 <a href="{% url 'registration:institutions_indexed_students_list' %}" class="btn btn-outline-success py-0 mr-3 mt-1 mb-3"><i class="fa fa-times" aria-hidden="true"></i> Return to Issued Indexing List </a>
+</div> -->
+
+
+{% if object.verification_status == 2 %}
+<div class="d-flex justify-content-end">  
+
+<a href="javascript:{document.getElementById('approve{{object.slug }}').submit()}">
+
+<!-- <button class="btn btn-success py-0 mr-3 mt-1 mb-3"> Approve Application<i class="fa fa-check" aria-hidden="true"></i></button> -->
+
+<input type="submit" class="btn btn-outline-primary py-0 mr-3 mt-1" value="Approve Application" onclick="return confirm('Are you sure you want to approve this indexing application?')" >
+</a>
+<a href="javascript:{document.getElementById('reject{{object.slug }}').submit()}">
+<!-- <button class="btn btn-danger py-0 mr-3 mt-1"> Reject Application <i class="fa fa-reply" aria-hidden="true"></i></button> -->
+<input type="submit" class="btn btn-outline-danger py-0 mr-3 mt-1" value="Reject Application" onclick="return confirm('Are you sure you want to reject this indexing application?')" >
+</a>
+
+<a href="{% url 'registration:institutions_payments_list' %}" class="btn btn-outline-success py-0 mr-3 mt-1"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Return to Institutions Payment List</a>  
+
+{% else %}
+<div class="d-flex justify-content-end mr-3">  
+<a href="{% url 'registration:dashboard' %}" class="btn btn-outline-primary py-0 mr-3 mt-1"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Return to Dashboard</a>  
+</div>
+
+{% endif %}
+
+<form id="approve{{object.slug }}" method="POST" action="{% url 'registration:approve_application' object.slug %}">
+{% csrf_token%}
+<input type="hidden">
+</form>
+
+<form id="reject{{object.slug }}" method="POST" action="{% url 'registration:reject_application' object.slug %}">
+{% csrf_token%}
+<input type="hidden">
+</form>
+
+
 </div>
 
 
