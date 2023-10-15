@@ -236,10 +236,14 @@
 <li>Payment Amount: <span class="text-dark font-weight-bold ms-sm-2">{{payment_object.payment_amount}}</span></li>
 <li>Payment Method: <span class="text-dark font-weight-bold ms-sm-2">{{payment_object.payment_method}}</span></li>
 <li>Payment Date: <span class="text-dark font-weight-bold ms-sm-2">{{payment_object.payment_date}}</span></li>
+
+{% if payment_object.payment_receipt %}
 <li>Payment Receipt:   <span class="text-dark font-weight-bold ms-sm-2">
 <i class="fa fa-eye text-primary"></i>
 <a class="text-primary" href="{{payment_object.payment_receipt.url}}" target="_blank">&nbsp; View Receipt</a>
 </span></li>
+{% endif %}
+
 </ul>
 </div>
 
@@ -272,21 +276,21 @@
 <div class="d-flex justify-content-end">  
 
 <a href="javascript:{document.getElementById('approve{{object.slug }}').submit()}">
-
-<!-- <button class="btn btn-success py-0 mr-3 mt-1 mb-3"> Approve Application<i class="fa fa-check" aria-hidden="true"></i></button> -->
-
 <input type="submit" class="btn btn-outline-primary py-0 mr-3 mt-1" value="Approve Application" onclick="return confirm('Are you sure you want to approve this indexing application?')" >
 </a>
 <a href="javascript:{document.getElementById('reject{{object.slug }}').submit()}">
-<!-- <button class="btn btn-danger py-0 mr-3 mt-1"> Reject Application <i class="fa fa-reply" aria-hidden="true"></i></button> -->
 <input type="submit" class="btn btn-outline-danger py-0 mr-3 mt-1" value="Reject Application" onclick="return confirm('Are you sure you want to reject this indexing application?')" >
 </a>
 
-<a href="{% url 'registration:institutions_payments_list' %}" class="btn btn-outline-success py-0 mr-3 mt-1"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Return to Institutions Payment List</a>  
+
+<a href="{% url 'registration:institutions_indexing_payment_details' object.institution.slug %}" class="btn btn-outline-success py-0 mr-3 mt-1"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Return to Institutions Payment Details</a>  
 
 {% else %}
 <div class="d-flex justify-content-end mr-3">  
-<a href="{% url 'registration:dashboard' %}" class="btn btn-outline-primary py-0 mr-3 mt-1"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Return to Dashboard</a>  
+
+<a href="{% url 'registration:institutions_indexing_payment_details' object.institution.slug %}" class="btn btn-outline-success py-0 mr-3 mt-1"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Return to Institutions Payment Details</a> 
+
+<!-- <a href="{% url 'registration:dashboard' %}" class="btn btn-outline-primary py-0 mr-3 mt-1"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Return to Dashboard</a>   -->
 </div>
 
 {% endif %}

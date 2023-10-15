@@ -5,6 +5,8 @@ from . import views
 from .views import (
     DashboardView,
     InstitutionCreateView,
+    AcademicSessionCreateView,
+    AcademicSessionDetailView,
     IndexingOfficerCreateView,
     IndexingOfficerDetailView,
     IndexingOfficerListView,
@@ -14,6 +16,7 @@ from .views import (
     AdmissionQuotaDetailView,
     AdmissionQuotaUpdateView,
     AdmissionQuotaListView,
+    AcademicSessionListView,
     IndexingApplicationsListView,
     IndexingVerificationsDetailView,
     IndexNumberIssuanceList,
@@ -29,8 +32,10 @@ from .views import (
     InstitutionsIndexingPreIssueDetailView,
     StudentIndexingApplicationDetailView,
     StudentIndexingNumberDetailView,
-    InstitutionsIndexingListView,
-    InstitutionsIndexingStudentsListView,
+    
+    InstitutionsIndexedStudentsList,
+    InstitutionsIndexedStudentsListView,
+    
     StudentsIndexingApplicationDetails,
 
        
@@ -44,10 +49,13 @@ app_name = 'indexing_unit'
 urlpatterns = [
 	path('dashboard', DashboardView.as_view(), name='dashboard'),
     path('institutions_list', InstitutionListView.as_view(), name='institutions_list'),
+    path('academic_session_list',  AcademicSessionListView.as_view(), name='academic_session_list'),
+    path('create_academic_session',  AcademicSessionCreateView.as_view(), name='create_academic_session'),
     path('create_institution',  InstitutionCreateView.as_view(), name='create_institution'),
     path('create_indexing_officer',  IndexingOfficerCreateView.as_view(), name='create_indexing_officer'),
     path('indexing_officers_list', IndexingOfficerListView.as_view(), name='indexing_officers_list'),
     path('<slug:slug>/institution_detail',  InstitutionDetailView.as_view(), name='institution_detail'),
+    path('<slug:slug>/academic_session_detail',  AcademicSessionDetailView.as_view(), name='academic_session_detail'),
     path('<slug:slug>/indexing_officer_detail',  IndexingOfficerDetailView.as_view(), name='indexing_officer_detail'),
     path('<slug:slug>/activate_user/', views.activate_user, name='activate_user'),
     path('<slug:slug>/deactivate_user/', views.deactivate_user, name='deactivate_user'),
@@ -78,8 +86,9 @@ urlpatterns = [
     path('<slug:slug>/approve_application/', views.approve_application, name='approve_application'),
     path('<slug:slug>/reject_application/', views.reject_application, name='reject_application'),
     path('student_indexing_number_details/<slug:slug>',  StudentIndexingNumberDetailView.as_view(), name='student_indexing_number_details'),
-    path('institutions_indexing_list', InstitutionsIndexingListView.as_view(), name='institutions_indexing_list'),
-    path('institutions_indexing_students_list', InstitutionsIndexingStudentsListView.as_view(), name='institutions_indexing_students_list'),
+   
+    path('indexed_students_list', InstitutionsIndexedStudentsList.as_view(), name='indexed_students_list'),
+    path('institutions_indexed_students_list', InstitutionsIndexedStudentsListView.as_view(), name='institutions_indexed_students_list'),
     
 
 

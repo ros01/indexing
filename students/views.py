@@ -8,12 +8,17 @@ from django.views.generic import (
      DeleteView,
      TemplateView
 )
+import os
+from formtools.wizard.views import SessionWizardView
+from formtools.preview import FormPreview
+from django.core.files.storage import FileSystemStorage
 from .forms import *
 from institutions.forms import *
 from accounts.forms import SignupForm
 from accounts.models import *
 from indexing_unit.models import *
 from .models import *
+from django.forms.models import model_to_dict
 from django.db import transaction
 from django.db.models import F
 from django.shortcuts import render, get_object_or_404, redirect
@@ -41,6 +46,9 @@ from django.views.generic.edit import FormMixin, ProcessFormView
 from institutions.models import *
 from django.contrib.auth import get_user_model
 User = get_user_model()
+
+
+
 
 
 class StaffRequiredMixin(object):
@@ -81,6 +89,8 @@ def status(request):
         return IndexingPaymentCreateListView.as_view()(request)
     elif StudentIndexing.objects.filter(student_profile__student = user, indexing_status=2):
         return MyIndexingApplicationListView.as_view()(request)
+    # elif StudentIndexing.objects.filter(student_profile__student = user, indexing_status=3):
+    #     return MyIndexingApplicationListView.as_view()(request)
     elif IssueIndexing.objects.filter(student_profile__student = user):
         return MyIndexingCompleteListView.as_view()(request)
     else:
@@ -371,7 +381,6 @@ class DegreeResult(StaffRequiredMixin, StudentObjectMixin, PassRequestMixin, Suc
         return self.render_to_response(self.get_context_data())
 
 
-
 class IndexingApplicationCreateView(StaffRequiredMixin, StudentObjectMixin, CreateView):
     model = StudentIndexing
     template_name = "students/start_indexing_application1.html"
@@ -419,6 +428,181 @@ class IndexingApplicationCreateView(StaffRequiredMixin, StudentObjectMixin, Crea
     def form_invalid(self, form):
         messages.error(request, 'Form already submitted')
         return self.render_to_response(self.get_context_data())
+
+
+
+
+class IndexingApplicationCreateView0(StaffRequiredMixin, StudentObjectMixin, CreateView):
+    model = StudentIndexing
+    template_name = "students/start_indexing_application1.html"
+    form_class = IndexingModelForm
+    success_message = "%(student_profile)s Indexing Application Submission Successful"
+
+    def get_success_message(self, cleaned_data):
+      return self.success_message % dict(
+            cleaned_data,
+            student_profile=self.object.student_profile.student.get_full_name,
+        )
+
+    def get_initial(self):
+        # You could even get the Book model using Book.objects.get here!
+        return {
+            'student_profile': self.kwargs["slug"],
+            #'license_type': self.kwargs["pk"]
+        }
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        context['student_profile'] = StudentProfile.objects.select_related("student").filter(student = user, indexing_status=2) 
+        # context['schedule_qs'] = Schedule.objects.select_related("hospital_name").filter(application_status=4, hospital_name=self.schedule.hospital_name, hospital__license_type = 'Radiography Practice Permit')     
+        return context
+
+    def get_form_kwargs(self):
+        self.student_profile = StudentProfile.objects.get(slug=self.kwargs['slug'])
+        kwargs = super().get_form_kwargs()
+        kwargs['initial']['student_profile'] = self.student_profile
+        kwargs['initial']['matric_no'] = self.student_profile.student.matric_no
+        kwargs['initial']['institution'] = self.student_profile.institution
+        kwargs['initial']['utme_grade'] = self.student_profile.utmegrade_set.first()
+        kwargs['initial']['gce_alevels'] = self.student_profile.gcealevels_set.first()
+        kwargs['initial']['degree_result'] = self.student_profile.degreeresults_set.first()
+        #kwargs['initial']['hospital'] = self.payment.hospital
+        print (kwargs)
+        return kwargs
+
+    def clean_matric_no(self):     
+        if matric_no.exist:
+           raise ValidationError("Matric Number already exists")
+
+
+    def form_invalid(self, form):
+        messages.error(request, 'Form already submitted')
+        return self.render_to_response(self.get_context_data())
+
+
+
+FORMS = [("start_application", IndexingModelForm),
+         ("utme_admission", UtmeGradeModelForm),
+         ("gce_alevels", GceAlevelsModelForm),
+         ("degree_result", DegreeResultModelForm),
+         ("transfer_admission", TransferGradeModelForm)]
+
+
+# def show_business_form(wizard):
+#     cleaned_data = wizard.get_cleaned_data_for_step('0') or {}
+#     return cleaned_data.get('is_business_guest')
+
+
+
+
+def submit_indexing_application(wizard):
+    cleaned_data = wizard.get_cleaned_data_for_step('utme_admission') or {'direct_entry': 'none'}
+    cleaned_data['direct_entry'] == False
+
+
+def show_gce_alevels_form(wizard):
+    cleaned_data = wizard.get_cleaned_data_for_step('utme_admission') or {'direct_entry': 'none'}
+    return cleaned_data['direct_entry'] == '2'
+
+
+def show_degree_result_form(wizard):
+    cleaned_data = wizard.get_cleaned_data_for_step('utme_admission') or {'direct_entry': 'none'}
+    return cleaned_data['direct_entry'] == '3'
+
+def show_transfer_form(wizard):
+    cleaned_data = wizard.get_cleaned_data_for_step('utme_admission') or {'direct_entry': 'none'}
+    return cleaned_data['direct_entry'] == '4'
+
+class StudentIndexingWizardView(SessionWizardView):
+    # form_list = [IndexingModelForm, UtmeGradeModelForm, GceAlevelsModelForm, DegreeResultModelForm, TransferGradeModelForm] 
+    form_list = [("start_application", IndexingModelForm),
+         ("utme_admission", UtmeGradeModelForm),
+         ("gce_alevels", GceAlevelsModelForm),
+         ("degree_result", DegreeResultModelForm),
+         ("transfer_admission", TransferGradeModelForm)]
+    template_name = "students/student_indexing.html"
+    file_storage = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, 'photos'))
+    condition_dict = {'gce_alevels': show_gce_alevels_form,
+                      'degree_result': show_degree_result_form,
+                      'transfer_admission': show_transfer_form}
+
+    def done(self, form_list, **kwargs):
+        self.student_profile = StudentProfile.objects.get(slug=self.kwargs['slug'])
+        indexing_form = form_list[0]
+        indexing = indexing_form.save(commit=False)
+        utme = form_list[1]
+        utme_grade = utme.save()
+        gce_alevels = form_list[2]
+        degree_result = form_list[-2]
+        transfer_admission = form_list[-1]
+
+        if utme.cleaned_data['direct_entry'] == '2':
+            gce_alevels = form_list[2].save()
+            indexing.gce_alevels = gce_alevels
+        elif utme.cleaned_data['direct_entry'] == '3':
+            degree_result = form_list[2].save()
+            indexing.degree_result = degree_result
+        elif utme.cleaned_data['direct_entry'] == '4':
+            transfer_admission = form_list[2].save()
+            indexing.transfer_grade = transfer_admission
+        else:
+            utme_grade = utme.save()
+        
+        indexing.utme_grade = utme_grade
+        indexing.student_profile = self.student_profile
+        indexing.institution = self.student_profile.institution
+        indexing.matric_no = self.student_profile.student.matric_no
+        indexing.save()
+        url_kwargs={
+            'islug': indexing.institution.slug,
+            'sslug': indexing.slug,
+        }
+
+        return HttpResponseRedirect(reverse('students:my_indexing_application_details', kwargs=url_kwargs)) 
+
+
+        # if utme.cleaned_data['direct_entry'] == '2':
+        #     gce_alevels = form_list[2].save()
+        #     indexing.gce_alevels = gce_alevels
+        # if utme.cleaned_data['direct_entry'] == '3':
+        #     degree_result = form_list[-2].save()
+        #     indexing.degree_result = degree_result
+        # if utme.cleaned_data['direct_entry'] == '4':
+        #     transfer_admission = form_list[4].save()
+        #     indexing.transfer_grade = transfer_admission
+       
+        # utme = form_list[1].save()
+        # indexing.utme_grade = utme
+        # indexing.student_profile = self.student_profile
+        # indexing.institution = self.student_profile.institution
+        # indexing.matric_no = self.student_profile.student.matric_no
+        # indexing.save()
+
+            
+        # student_profile.save()
+        # utme = form_list[-1].save(commit=False)
+        # utme.student_profile = utme
+        # guest_form = form_list[0]
+        # if guest_form.cleaned_data.get('is_business_guest'):
+        #     business = form_list[1].save()
+        #     guest = guest_form.save(commit=False)
+        #     guest.business = business
+        #     guest.save()
+        # else:
+        #     guest = guest_form.save()
+
+        # business = form_list[-1].save(commit=False)
+        # booking.guest = guest
+        # booking.save()
+
+        # index = get_object_or_404(StudentIndexing, slug = indexing)
+
+        # print ("index:", index)
+
+
+
+
 
 class IndexingApplicationCreateView1(StaffRequiredMixin, SuccessMessageMixin,  CreateView):
     template_name = "students/start_indexing_application.html"
@@ -599,9 +783,8 @@ class MyIndexingCompleteListView(StaffRequiredMixin, ListView):
         'institutions':institutions,
         'students':students,
         }
-        print ("context:", context)
         return context
-        print ("context:", context)
+       
 
 
 

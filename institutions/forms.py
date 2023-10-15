@@ -106,7 +106,7 @@ class InstitutionPaymentModelForm(forms.ModelForm):
     
     class Meta:
          model = InstitutionPayment
-         fields = ('students_payments', 'academic_session', 'rrr_number', 'receipt_number', 'payment_amount', 'payment_method', 'payment_receipt')  
+         fields = ('students_payments', 'academic_session', 'rrr_number', 'payment_amount', 'payment_method', 'payment_receipt')  
     
 
     def __init__(self, *args, **kwargs):
@@ -118,34 +118,17 @@ class InstitutionPaymentModelForm(forms.ModelForm):
        self.fields['students_payments'].queryset = IndexingPayment.objects.filter(institution = user.get_indexing_officer_profile.institution, student_indexing__verification_status = 2, payment_verification_status=1)
        self.fields['academic_session'].label = "Academic Session"
        self.fields['rrr_number'].label = "RRR Number"
-       self.fields['receipt_number'].label = "Receipt Number"
        self.fields['payment_amount'].label = "Payment Amount"
        self.fields['payment_method'].label = "Payment Method"
-       self.fields['payment_receipt'].label = "Payment Receipt"
+       self.fields['payment_receipt'].label = "Payment Receipt (Jpeg or PDF)"
+       self.fields['payment_receipt'].widget.attrs['placeholder'] = "Jpeg or PDF"
        self.fields['students_payments'].label = "Select Students for Institution Indexing Payment"
   
     
 
 
-
-
-
-
-
-
       
-class AcademicSessionModelForm(forms.ModelForm):
-      
-    class Meta:
-         model = AcademicSession
-         fields = ('title',)
-         
-         widgets = {
-            # 'contact_address': forms.Textarea(attrs={'rows':2, 'cols':3}),    
-            }
 
-    def __init__(self, *args, **kwargs):
-       super(AcademicSessionModelForm, self).__init__(*args, **kwargs)
 
 
 class IndexingPaymentForm(forms.ModelForm):

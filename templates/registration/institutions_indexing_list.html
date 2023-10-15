@@ -1,0 +1,83 @@
+{% extends 'registration/dashboard_base.html'%}
+{% load widget_tweaks %}
+{% load crispy_forms_tags %}
+
+{% block title %}Registration | {{ block.super }}{% endblock title %}
+
+
+{% block content %}
+
+<div class="row mx-2">
+<div class="col-md-12 mt-4 mx-1">
+<div class="row">
+<div class="col-md-10">
+    <div class="card">
+        <div class="card-body">
+            <h4 class="mt-0 ml-3 header-title text-primary">Students Indexing Issuance List</h4>
+            
+            <p class="ml-3 text-muted  font-14"> Select desired Academic Session and Institution and Click Search to narrow down results.
+            </p>
+
+
+            <div class="mb-4 col-md-4">
+
+            <form class="form-horizontal form-material" method="get" action="{% url 'registration:students_index_number_list' %}">
+
+         
+            {{ form.academic_session.label_tag }}
+            {% render_field form.academic_session class='custom-select mb-4' %}
+            
+
+            {{ form.institution.label_tag }}
+            {% render_field form.institution class='custom-select mb-4' autocomplete="off" %}
+            
+
+
+            <button type="submit" class="btn btn-primary">Search</button>
+
+
+            </form>
+
+        </div>
+
+
+            
+           <div class="ml-3">
+           {% if indexing %}
+            <table id="datatable-buttons" class="table table-striped table-bordered dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                <thead>
+                <tr>
+                    <th>Institution</th>
+                    <th>Address</th>
+                    <th>Academic Session</th>
+                    <th>Amount Paid</th>
+                    <th>Payment Date</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for object in indexing %}
+                <tr>
+                    <td>{{object.institution}}</td>
+                    <td>{{object.institution.address}}</td>
+                    <td>{{object.academic_session}}</td>
+                    <td>{{object.payment_amount}}</td>
+                    <td>{{object.payment_date}}</td>
+                    <td><a href="{% url 'registration:institutions_indexing_pre_issue_details' object.slug %}"><span class="badge badge-boxed  badge-primary">View Students <i class="fas fa-podcast"></i></span></a></td>                 
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% endif %} 
+
+            </div>
+
+         
+
+        </div>
+    </div>
+</div> <!-- end col -->
+</div> <!-- end row -->
+</div>
+</div>
+{% endblock content %}

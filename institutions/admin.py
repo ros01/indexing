@@ -26,10 +26,10 @@ admin.site.register(UtmeGrade, UtmeGradeAdmin)
 
 
 class GceAlevelsAdmin(admin.ModelAdmin):
-  list_display = ('matric_no', 'student_profile', 'examination_body', 'timestamp')
-  list_display_links = ('matric_no', 'student_profile', 'timestamp')
-  list_filter = ('matric_no', 'student_profile', 'timestamp')
-  search_fields = ('matric_no', 'student_profile', 'timestamp')
+  list_display = ('examination_body', 'timestamp')
+  list_display_links = ('examination_body', 'timestamp')
+  list_filter = ('examination_body', 'timestamp')
+  search_fields = ('examination_body', 'timestamp')
   list_per_page = 25
 
 
@@ -37,10 +37,10 @@ admin.site.register(GceAlevels, GceAlevelsAdmin)
 
 
 class DegreeResultsAdmin(admin.ModelAdmin):
-  list_display = ('matric_no', 'student_profile', 'degree_type', 'course', 'course_grade', 'timestamp')
-  list_display_links = ('matric_no', 'student_profile', 'timestamp')
-  list_filter = ('matric_no', 'student_profile', 'timestamp')
-  search_fields = ('matric_no', 'student_profile', 'timestamp')
+  list_display = ('degree_type', 'course', 'course_grade', 'timestamp')
+  list_display_links = ('degree_type', 'course', 'timestamp')
+  list_filter = ('degree_type', 'course', 'timestamp')
+  search_fields = ('degree_type', 'course', 'timestamp')
   list_per_page = 25
 
 
@@ -48,15 +48,15 @@ admin.site.register(DegreeResults, DegreeResultsAdmin)
 
 
 
-# class TransferGradeAdmin(admin.ModelAdmin):
-#   list_display = ('student', 'timestamp')
-#   list_display_links = ('student', 'timestamp')
-#   list_filter = ('student', 'timestamp')
-#   search_fields = ('student', 'timestamp')
-#   list_per_page = 25
+class TransferGradeAdmin(admin.ModelAdmin):
+  list_display = ('course', 'degree_type', 'timestamp')
+  list_display_links = ('course', 'degree_type', 'timestamp')
+  list_filter = ('course', 'degree_type', 'timestamp')
+  search_fields = ('course', 'degree_type', 'timestamp')
+  list_per_page = 25
 
 
-# admin.site.register(TransferGrade, TransferGradeAdmin)
+admin.site.register(TransferGrade, TransferGradeAdmin)
 
 
 
@@ -96,19 +96,26 @@ admin.site.register(IndexingPayment, IndexingPaymentAdmin)
 # admin.site.register(InstitutionPayment, InstitutionPaymentAdmin)
 
 class InstitutionPaymentAdmin(admin.ModelAdmin):
-  list_display = ('institution', 'academic_session', 'payment_status', 'rrr_number', 'receipt_number', 'payment_amount')
-  list_display_links = ('institution', 'academic_session', 'payment_status', 'rrr_number', 'receipt_number')
-  list_filter = ('institution', 'academic_session', 'payment_status', 'rrr_number', 'receipt_number')
-  search_fields = ('institution', 'academic_session', 'payment_status', 'rrr_number', 'receipt_number')
+  list_display = ('institution', 'academic_session', 'payment_status', 'rrr_number', 'payment_amount')
+  list_display_links = ('institution', 'academic_session', 'payment_status', 'rrr_number')
+  list_filter = ('institution', 'academic_session', 'payment_status', 'rrr_number')
+  search_fields = ('institution', 'academic_session', 'payment_status', 'rrr_number')
   list_per_page = 25
-
-
-  # def list_students(self, obj):
-  #       return "\n".join([a.students for a in obj.student_profile.all()])
-
 
 admin.site.register(InstitutionPayment, InstitutionPaymentAdmin)
 
 
+class AcademicSessionAdmin(admin.ModelAdmin):
+    list_filter = ['updated', 'timestamp']
+    list_display = ['name', 'slug', 'timestamp', 'updated']
+    readonly_fields = ['updated', 'timestamp']
+    search_fields = ['name', 'timestamp', 'slug', 'updated']
+    
+    class Meta:
+        model = AcademicSession
 
+    def short_title(self, obj):
+        return obj.name[:3]
+
+admin.site.register(AcademicSession, AcademicSessionAdmin)
 

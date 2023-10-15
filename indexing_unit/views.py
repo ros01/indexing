@@ -12,7 +12,8 @@ from django.views.generic import (
 import random
 from accounts.forms import SignupForm
 from .forms import *
-from .models import *
+from registration.forms import *
+from institutions.models import *
 from institutions.models import *
 from django.db import transaction
 from django.db.models import F
@@ -91,6 +92,37 @@ class DashboardView(StaffRequiredMixin, ListView):
 	# 	context['random_number'] = random.randint(100, 10000)
 	# 	print(context)
 	# 	return context
+
+
+class AcademicSessionCreateView(StaffRequiredMixin, SuccessMessageMixin, CreateView):
+    model = AcademicSession
+    template_name = "indexing_unit/create_academic_session.html"
+    form_class = AcademicSessionModelForm
+    success_message = "%(name)s Academic Session created successfully"
+
+    def get_success_message(self, cleaned_data):
+        return self.success_message % dict(
+            cleaned_data,
+            name=self.object.name,
+        )
+
+
+class AcademicSessionDetailView(StaffRequiredMixin, DetailView):
+	queryset = AcademicSession.objects.all()
+	template_name = "indexing_unit/academic_session_details.html"
+
+
+
+class AcademicSessionListView(StaffRequiredMixin, ListView):
+	template_name = "indexing_unit/academic_session_list.html"
+	def get_queryset(self):
+		request = self.request
+		qs = AcademicSession.objects.all()
+		query = request.GET.get('q')
+		if query:
+			qs = qs.filter(name__icontains=query)
+		return qs 
+
 
 
 class InstitutionCreateView(StaffRequiredMixin, SuccessMessageMixin, CreateView):
@@ -367,16 +399,50 @@ class IndexNumberIssuanceList(StaffRequiredMixin, ListView):
 		return qs.filter(payment_status=2) 
 
 
-
-class InstitutionsIndexingListView(StaffRequiredMixin, ListView):
-	template_name = "indexing_unit/issued_indexing_list.html"
+class InstitutionsIndexedStudentsList(ListView):
+	template_name = "indexing_unit/indexed_students_list.html"
 	def get_queryset(self):
-		request = self.request
-		qs = InstitutionProfile.objects.all()
-		query = request.GET.get('q')
-		if query:
-			qs = qs.filter(name__icontains=query)
-		return qs 
+		institutions = InstitutionProfile.objects.all()
+		qs = IssueIndexing.objects.filter(institution__in=institutions)
+		return qs	
+	def get_context_data(self, **kwargs):
+		context = super(InstitutionsIndexedStudentsList, self).get_context_data(**kwargs)
+		filter_set = self.get_queryset()
+		form = InstitutionPaymentForm()
+		academic_session = form['academic_session'].value()
+		institution = form['institution'].value()
+		if self.request.GET.get('academic_session'):
+			academic_session = self.request.GET.get('academic_session')
+			filter_set = filter_set.filter(academic_session=academic_session)
+		if self.request.GET.get('institution'):
+			institution = self.request.GET.get('institution')
+			filter_set = filter_set.filter(institution=institution)
+		context['form'] = InstitutionPaymentForm()	
+		context['indexing'] = filter_set
+		return context
+
+class InstitutionsIndexedStudentsListView(ListView):
+	template_name = "indexing_unit/institutions_indexed_students_list.html"
+	def get_queryset(self):
+		institutions = InstitutionProfile.objects.all()
+		qs = IssueIndexing.objects.filter(institution__in=institutions)
+		return qs
+	def get_context_data(self, **kwargs):
+		context = super(InstitutionsIndexedStudentsListView, self).get_context_data(**kwargs)
+		filter_set = self.get_queryset()
+		form = InstitutionPaymentForm()
+		academic_session = form['academic_session'].value()
+		institution = form['institution'].value()
+		if self.request.GET.get('academic_session'):
+			academic_session = self.request.GET.get('academic_session')
+			filter_set = filter_set.filter(academic_session=academic_session)
+		if self.request.GET.get('institution'):
+			institution = self.request.GET.get('institution')
+			filter_set = filter_set.filter(institution=institution)
+		context['form'] = InstitutionPaymentForm()	
+		context['indexing'] = filter_set
+		return context
+
 
 
 class InstitutionsIndexingStudentsListView(StaffRequiredMixin, ListView):

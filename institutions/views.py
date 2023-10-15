@@ -10,6 +10,7 @@ from django.views.generic import (
      RedirectView
 )
 from django.db.models import Q
+from django.db import IntegrityError
 from accounts.forms import SignupForm
 from django.forms.models import modelformset_factory # model form for querysets
 from .forms import *
@@ -44,7 +45,7 @@ from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
 import io, csv
 from django.contrib.auth.hashers import make_password
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.auth.forms import PasswordResetForm
@@ -76,6 +77,56 @@ class StaffRequiredMixin(object):
             return redirect(settings.LOGIN_URL)
         return super(StaffRequiredMixin, self).dispatch(request,
             *args, **kwargs)
+
+
+
+# def staff_required(self, request, *args, **kwargs):
+	
+# 	if not request.user.role == 'Indexing Officer':
+#             messages.error(
+#                 request,
+#                 ('You do not have the permission required to perform the '
+#                 'requested operation.'))
+#             return redirect(settings.LOGIN_URL)
+
+# def staff_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, login_url=settings.LOGIN_URL):
+#     '''
+#     Decorator for views that checks that the logged in user is a teacher,
+#     redirects to the log-in page if necessary.
+#     '''
+#     actual_decorator = user_passes_test(
+#         lambda u: u.is_active and u.role == 'Indexing Officer',
+#         login_url=login_url,
+#         redirect_field_name=redirect_field_name
+#     )            
+
+def staff_required(function):
+    def _function(request, *args, **kwargs):
+        if request.user.role != 'Indexing Officer':
+            messages.error(request, 'You do not have the permission required to perform the requested operation.')
+            return HttpResponseRedirect(settings.LOGIN_URL)
+        return _function
+
+
+#@user_passes_test(staff_required)
+
+        
+        # student_profile.save()
+        # utme = form_list[-1].save(commit=False)
+        # utme.student_profile = utme
+
+        # guest_form = form_list[0]
+        # if guest_form.cleaned_data.get('is_business_guest'):
+        #     business = form_list[1].save()
+        #     guest = guest_form.save(commit=False)
+        #     guest.business = business
+        #     guest.save()
+        # else:
+        #     guest = guest_form.save()
+
+        # business = form_list[-1].save(commit=False)
+        # booking.guest = guest
+        # booking.save()
 
 
 class DashboardView(StaffRequiredMixin, DetailView):
@@ -171,34 +222,8 @@ class AdmissionQuotaDetailView(StaffRequiredMixin, DetailView):
 	# 	except:
 	# 		raise Http404
 
-class StudentProfilesListView(StaffRequiredMixin, ListView):
-	template_name = "institutions/students_profiles_list.html"
 
-	def get_queryset(self):
-		# qs = InstitutionProfile.objects.filter(slug=self.kwargs.get('slug'))
-		user = self.request.user
-		
-		# print ("qs1:", qs1)
-		try:
-			qs1 = InstitutionProfile.objects.filter(name=user.get_indexing_officer_profile.institution)
-			obj = qs1.first().studentprofile_set.all()
-			# print ("obj:", obj)
-			if obj.exists():
-				return obj
-		except:
-			raise Http404
-		
-
-	def get_context_data(self, **kwargs):
-	    context = super(StudentProfilesListView, self).get_context_data(**kwargs)
-	    user = self.request.user
-	    qs1 = InstitutionProfile.objects.filter(name=user.get_indexing_officer_profile.institution)
-	    obj = qs1.first().studentprofile_set.all()
-	    context['obj'] = obj
-	    return context
-		
-
-    
+@login_required
 def slug_router(request, slug):
     if InstitutionProfile.objects.filter(slug=slug).exists():
         return StudentProfilesListView.as_view()(request, slug=slug)
@@ -219,10 +244,10 @@ def downloadfile(request):
 	 response['Content-Disposition'] = "Attachment;filename=%s" % filename
 	 return response
 
-class CreateAcademicSession(StaffRequiredMixin, CreateView):
-    template_name = 'store/create_vendor2.html'
-    form_class = AcademicSessionModelForm
-    success_message = 'Academic Session created Successfully.'
+# class CreateAcademicSession(StaffRequiredMixin, CreateView):
+#     template_name = 'store/create_vendor2.html'
+#     form_class = AcademicSessionModelForm
+#     success_message = 'Academic Session created Successfully.'
 
 
 class InstitutionObjectMixin(object):
@@ -261,34 +286,45 @@ class StudentProfileCreateView(StaffRequiredMixin, SuccessMessageMixin, CreateVi
 
 		try:
 			context = {}
-			if User.objects.filter(email =['email']).exists():
-				messages.error(request, "f'user `{email}` already exists'")
-				print(f'user `{email}` already exists')
-				return redirect("institutions:create_student_profile")
-
+			
 			if len(students_list) >= int(admission_quota.admission_quota):
 				messages.error(request, "Admission Quota exceeded!")				
 				print("Admission Quota exceeded")
 				return redirect("institutions:create_student_profile")
+    		
+			for row in list_of_dict:
+				data = row['email']
+				students_list = User.objects.filter(email = data)
+				# print("Students:", students_list)
+				try:
+					if students_list.exists():
+						for student in students_list:
+							messages.error(request, f'This User: {student} and possibly other students on this list exit already exist')
+						return redirect("institutions:create_student_profile")
+					else:
+						student = User.objects.create(email=row['email'], last_name=row['last_name'], first_name=row['first_name'], middle_name=row['middle_name'], phone_no=row['phone_no'], matric_no=row['matric_no'], password = make_password('Rebelspy1%'),)
+						
+				except Exception as e:
+					messages.error(request, e)
 
 			objs = [
 	            StudentProfile(
-	            	student = User.objects.get_or_create(email=row['email'], last_name=row['last_name'], first_name=row['first_name'], middle_name=row['middle_name'], phone_no=row['phone_no'], matric_no=row['matric_no'], password = make_password('Rebelspy1%'),)[0],  # This is foreignkey value
+	            	student = User.objects.get(email=row['email']),
 	            	institution=institution.first(),
 	            	academic_session = academic_session,
 	            )
-	            for row in list_of_dict
+	            for row in list_of_dict   	
 	         ]
-
 			for obj in objs:
-				obj.slug = create_slug3(instance=obj)		
-
+				obj.slug = create_slug3(instance=obj)
 			nmsg = StudentProfile.objects.bulk_create(objs)
 			messages.success(request, "Bulk Create of Students successful!")
 			returnmsg = {"status_code": 200}
-			user = obj.student
-			reset_password(user, request)
-			return redirect(institution.first().get_student_profiles_list())			
+			for obj in objs:
+				user = obj.student
+				reset_password(user, request)
+			# return redirect(institution.first().get_student_profiles_list())
+			return redirect("institutions:create_student_profile")			
 		except Exception as e:
 			print('Error While Importing Data: ', e)
 			returnmsg = {"status_code": 500}
@@ -408,6 +444,142 @@ class StudentProfileDetailView(StaffRequiredMixin, DetailView):
 		studentprofile_slug = self.kwargs.get("sslug")
 		obj = get_object_or_404(StudentProfile, institution__slug = institutionprofile_slug, slug = studentprofile_slug)
 		return obj
+
+# @user_passes_test(staff_required)
+@login_required
+def students_applications_list(request):
+	academic_sessions = AcademicSession.objects.all()
+	context = {'academic_sessions': academic_sessions}
+	print("User Role:", request.user.role)
+	return render(request, 'institutions/academic_sessions.html', context)
+
+@login_required
+def applications_list(request):
+	academic_session = request.GET.get('academic_session')
+	user = request.user
+	applications = StudentIndexing.objects.filter(academic_session=academic_session, institution=user.get_indexing_officer_profile.institution, verification_status=1)
+	context = {'applications': applications}
+	return render(request, 'partials/applications.html', context)
+
+
+
+@login_required
+def students_verifications_list(request):
+	academic_sessions = AcademicSession.objects.all()
+	context = {'academic_sessions': academic_sessions}
+	print("User Role:", request.user.role)
+	return render(request, 'institutions/academic_session_verifications.html', context)
+
+@login_required
+def verifications_list(request):
+	academic_session = request.GET.get('academic_session')
+	user = request.user
+	verifications = StudentIndexing.objects.filter(academic_session=academic_session, institution=user.get_indexing_officer_profile.institution, verification_status=2)
+	context = {'verifications': verifications}
+	return render(request, 'partials/verifications.html', context)
+
+
+
+@login_required
+def institutions_payments_list(request):
+	academic_sessions = AcademicSession.objects.all()
+	context = {'academic_sessions': academic_sessions}
+	return render(request, 'institutions/academic_session_payments.html', context)
+
+@login_required
+def payments_list(request):
+	academic_session = request.GET.get('academic_session')
+	user = request.user
+	payments = InstitutionPayment.objects.filter(academic_session=academic_session, institution = user.get_indexing_officer_profile.institution)
+	context = {'payments': payments}
+	return render(request, 'partials/payments.html', context)
+
+
+@login_required
+def indexed_students_list(request):
+	academic_sessions = AcademicSession.objects.all()
+	context = {'academic_sessions': academic_sessions}
+	return render(request, 'institutions/academic_session_indexing_list.html', context)
+
+@login_required
+def indexed_list(request):
+	academic_session = request.GET.get('academic_session')
+	user = request.user
+	institutions = InstitutionProfile.objects.filter(name = user.get_indexing_officer_profile.institution)
+	indexing_list = IssueIndexing.objects.filter(academic_session=academic_session, institution__in=institutions)
+	context = {
+	    'institutions':institutions,
+	    'indexing_list':indexing_list,
+	    }
+	return render(request, 'partials/indexed_students_list.html', context)
+
+
+@login_required
+def student_profiles_list(request):
+	academic_sessions = AcademicSession.objects.all()
+	context = {'academic_sessions': academic_sessions}
+	return render(request, 'institutions/academic_session_students_list.html', context)
+
+@login_required
+def student_list(request):
+	academic_session = request.GET.get('academic_session')
+	user = request.user
+	qs = InstitutionProfile.objects.filter(name=user.get_indexing_officer_profile.institution)
+	students_list = qs.first().studentprofile_set.all()
+	context = {
+	    'students_list':students_list,
+	    }
+	return render(request, 'partials/students_list.html', context)
+
+
+class StudentProfilesListView(StaffRequiredMixin, ListView):
+	template_name = "institutions/students_profiles_list.html"
+
+	def get_queryset(self):
+		# qs = InstitutionProfile.objects.filter(slug=self.kwargs.get('slug'))
+		user = self.request.user
+		
+		# print ("qs1:", qs1)
+		try:
+			qs1 = InstitutionProfile.objects.filter(name=user.get_indexing_officer_profile.institution)
+			obj = qs1.first().studentprofile_set.all()
+			# print ("obj:", obj)
+			if obj.exists():
+				return obj
+		except:
+			raise Http404
+		
+
+	def get_context_data(self, **kwargs):
+	    context = super(StudentProfilesListView, self).get_context_data(**kwargs)
+	    user = self.request.user
+	    qs1 = InstitutionProfile.objects.filter(name=user.get_indexing_officer_profile.institution)
+	    obj = qs1.first().studentprofile_set.all()
+	    context['obj'] = obj
+	    return context
+
+class IndexedStudentsListView(StaffRequiredMixin, ListView):
+	template_name = "institutions/indexed_students_list.html"
+	def get_queryset(self):
+		user = self.request.user
+		qs = IssueIndexing.objects.filter(institution = user.get_indexing_officer_profile.institution)
+		query = self.request.GET.get('q')
+		if query:
+			qs = qs.filter(name__icontains=query)
+		return qs 
+
+	def get_context_data(self, **kwargs):
+	    context = super(IndexedStudentsListView, self).get_context_data(**kwargs)
+	    user = self.request.user
+	    institutions = InstitutionProfile.objects.filter(name = user.get_indexing_officer_profile.institution)
+	    students = IssueIndexing.objects.filter(institution__in=institutions)
+	    context = {
+	    'institutions':institutions,
+	    'students':students,
+	    }
+	    print ("context:", context)
+	    return context
+	    print ("context:", context)
 
 class StudentIndexingApplicationsListView(StaffRequiredMixin, ListView):
 	template_name = "institutions/student_indexing_applications_list.html"
@@ -638,33 +810,6 @@ class InstitutionsPaymentsListView(StaffRequiredMixin, ListView):
 				return obj
 		except:
 			raise Http404
-
-
-
-class IndexedStudentsListView(StaffRequiredMixin, ListView):
-	template_name = "institutions/indexed_students_list.html"
-	def get_queryset(self):
-		user = self.request.user
-		qs = IssueIndexing.objects.filter(institution = user.get_indexing_officer_profile.institution)
-		query = self.request.GET.get('q')
-		if query:
-			qs = qs.filter(name__icontains=query)
-		return qs 
-
-	def get_context_data(self, **kwargs):
-	    context = super(IndexedStudentsListView, self).get_context_data(**kwargs)
-	    user = self.request.user
-	    institutions = InstitutionProfile.objects.filter(name = user.get_indexing_officer_profile.institution)
-	    students = IssueIndexing.objects.filter(institution__in=institutions)
-	    context = {
-	    'institutions':institutions,
-	    'students':students,
-	    }
-	    print ("context:", context)
-	    return context
-	    print ("context:", context)
-
-
 
 
 

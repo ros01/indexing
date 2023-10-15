@@ -74,10 +74,16 @@
         <li>Payment Amount: <span class="text-dark font-weight-bold ms-sm-2">{{object.payment_amount}}</span></li>
         <li>Payment Method: <span class="text-dark font-weight-bold ms-sm-2">{{object.payment_method}}</span></li>
         <li>Payment Date: <span class="text-dark font-weight-bold ms-sm-2">{{object.payment_date}}</span></li>
+
+        {% if object.payment_receipt %}
         <li>Payment Receipt:   <span class="text-dark font-weight-bold ms-sm-2">
         <i class="fa fa-eye text-primary"></i>
         <a class="text-primary" href="{{object.payment_receipt.url}}" target="_blank">&nbsp; View Receipt</a>
         </span></li>
+
+        {% endif %}
+
+
         </ul>
         </div>
 

@@ -15,16 +15,16 @@ User = get_user_model()
 
 
 
-class UtmeGradeModelForm(PopRequestMixin, CreateUpdateAjaxMixin, forms.ModelForm):
+class UtmeGradeModelForm1(PopRequestMixin, CreateUpdateAjaxMixin, forms.ModelForm):
       
     class Meta:
          model = UtmeGrade
          # fields = ('examination_body', 'course_1', 'course_1_grade', 'course_2', 'course_2_grade', 'course_3', 'course_3_grade', 'course_4', 'course_4_grade', 'course_5', 'course_5_grade')
-         fields = ('matric_no', 'examination_body', 'physics_score', 'chemistry_score', 'biology_score', 'english_score', 'mathematics_score', 'utme_grade_result', 'student_profile')     
+         fields = ('examination_body', 'physics_score', 'chemistry_score', 'biology_score', 'english_score', 'mathematics_score', 'utme_grade_result')     
          widgets = {
          'matric_no': forms.TextInput(attrs={'readonly': True}),
          'examination_body': forms.TextInput(attrs={'readonly': True}),
-         'student_profile': forms.HiddenInput(),
+         # 'student_profile': forms.HiddenInput(),
 
             }
 
@@ -35,10 +35,10 @@ class UtmeGradeModelForm(PopRequestMixin, CreateUpdateAjaxMixin, forms.ModelForm
             self.fields[name].widget.attrs.update({
                 'class': 'form-control',
             })
-       self.fields['student_profile'].label = ""
+       # self.fields['student_profile'].label = ""
        self.fields['utme_grade_result'].label = "Upload Result in PDF or Jpeg format"
        self.fields['utme_grade_result'].widget.attrs['placeholder'] = "PDF or Jpeg format"
-       self.fields['matric_no'].label = "Matric Number"
+       # self.fields['matric_no'].label = "Matric Number"
        self.fields['examination_body'].label = "Exam Body"
        self.fields['physics_score'].label = "Physics Score"
        self.fields['chemistry_score'].label = "Chemistry Score"
@@ -60,17 +60,17 @@ class UtmeGradeModelForm(PopRequestMixin, CreateUpdateAjaxMixin, forms.ModelForm
       return instance
 
 
-class GceAlevelsModelForm(PopRequestMixin, CreateUpdateAjaxMixin, forms.ModelForm):
+class GceAlevelsModelForm1(PopRequestMixin, CreateUpdateAjaxMixin, forms.ModelForm):
       
     class Meta:
          model = GceAlevels
          # fields = ('examination_body', 'course_1', 'course_1_grade', 'course_2', 'course_2_grade', 'course_3', 'course_3_grade', 'course_4', 'course_4_grade', 'course_5', 'course_5_grade')
-         fields = ('matric_no', 'examination_body', 'physics_score', 'chemistry_score', 'biology_score', 'gce_alevels_result', 'student_profile')
+         fields = ('examination_body', 'physics_score', 'chemistry_score', 'biology_score', 'gce_alevels_result')
          
 
          widgets = {
-         'matric_no': forms.TextInput(attrs={'readonly': True}),
-         'student_profile': forms.HiddenInput(),
+         # 'matric_no': forms.TextInput(attrs={'readonly': True}),
+         # 'student_profile': forms.HiddenInput(),
 
             }
 
@@ -81,14 +81,14 @@ class GceAlevelsModelForm(PopRequestMixin, CreateUpdateAjaxMixin, forms.ModelFor
             self.fields[name].widget.attrs.update({
                 'class': 'form-control',
             })
-       self.fields['student_profile'].label = ""
+       # self.fields['student_profile'].label = ""
        self.fields['gce_alevels_result'].label = "Upload Result in PDF or Jpeg format"
        self.fields['gce_alevels_result'].widget.attrs['placeholder'] = "PDF or Jpeg format"
        self.fields['examination_body'].label = "Exam Body"
        self.fields['physics_score'].label = "Physics Score"
        self.fields['chemistry_score'].label = "Chemistry Score"
        self.fields['biology_score'].label = "Biology Score"
-       self.fields['matric_no'].label = "Matric Number"
+       # self.fields['matric_no'].label = "Matric Number"
        # self.fields['room_design_score'].widget.attrs['placeholder'] = "(Max Score = 10)"
        
 
@@ -104,16 +104,16 @@ class GceAlevelsModelForm(PopRequestMixin, CreateUpdateAjaxMixin, forms.ModelFor
 
 
 
-class DegreeResultModelForm(PopRequestMixin, CreateUpdateAjaxMixin, forms.ModelForm):
+class DegreeResultModelForm1(PopRequestMixin, CreateUpdateAjaxMixin, forms.ModelForm):
       
     class Meta:
          model = DegreeResults
-         fields = ('matric_no', 'degree_type', 'course', 'course_grade', 'degree_result', 'student_profile')
+         fields = ('degree_type', 'course', 'course_grade', 'degree_result')
          
 
          widgets = {
-         'matric_no': forms.TextInput(attrs={'readonly': True}),
-         'student_profile': forms.HiddenInput(),
+         # 'matric_no': forms.TextInput(attrs={'readonly': True}),
+         # 'student_profile': forms.HiddenInput(),
 
             }
 
@@ -124,7 +124,7 @@ class DegreeResultModelForm(PopRequestMixin, CreateUpdateAjaxMixin, forms.ModelF
             self.fields[name].widget.attrs.update({
                 'class': 'form-control',
             })
-       self.fields['student_profile'].label = ""
+       # self.fields['student_profile'].label = ""
        self.fields['degree_result'].label = "Upload Result in PDF or Jpeg format"
        self.fields['degree_result'].widget.attrs['placeholder'] = "PDF or Jpeg format"
        self.fields['degree_type'].label = "Degree Type"
@@ -175,6 +175,107 @@ class DegreeResultModelForm(PopRequestMixin, CreateUpdateAjaxMixin, forms.ModelF
 #        super(TransferGradeModelForm, self).__init__(*args, **kwargs)
 
 
+
+class GceAlevelsModelForm(forms.ModelForm):
+      
+    class Meta:
+         model = GceAlevels
+         # fields = ('examination_body', 'course_1', 'course_1_grade', 'course_2', 'course_2_grade', 'course_3', 'course_3_grade', 'course_4', 'course_4_grade', 'course_5', 'course_5_grade')
+         fields = ('examination_body', 'physics_score', 'chemistry_score', 'biology_score', 'gce_alevels_result')
+         
+
+         widgets = {
+         # 'matric_no': forms.TextInput(attrs={'readonly': True}),
+         # 'student_profile': forms.HiddenInput(),
+
+            }
+
+    def __init__(self, *args, **kwargs):                                  
+       super(GceAlevelsModelForm, self).__init__(*args, **kwargs)
+
+       for name in self.fields.keys():
+            self.fields[name].widget.attrs.update({
+                'class': 'form-control',
+            })
+       # self.fields['student_profile'].label = ""
+       self.fields['gce_alevels_result'].label = "Upload Result in PDF or Jpeg format"
+       self.fields['gce_alevels_result'].widget.attrs['placeholder'] = "PDF or Jpeg format"
+       self.fields['examination_body'].label = "Exam Body"
+       self.fields['physics_score'].label = "Physics Score"
+       self.fields['chemistry_score'].label = "Chemistry Score"
+       self.fields['biology_score'].label = "Biology Score"
+       # self.fields['matric_no'].label = "Matric Number"
+       # self.fields['room_design_score'].widget.attrs['placeholder'] = "(Max Score = 10)"
+       
+
+
+
+class DegreeResultModelForm(forms.ModelForm):
+      
+    class Meta:
+         model = DegreeResults
+         fields = ('degree_type', 'course', 'institution', 'course_grade', 'degree_result')
+         
+
+         widgets = {
+         # 'matric_no': forms.TextInput(attrs={'readonly': True}),
+         # 'student_profile': forms.HiddenInput(),
+
+            }
+
+    def __init__(self, *args, **kwargs):                                  
+       super(DegreeResultModelForm, self).__init__(*args, **kwargs)
+
+       for name in self.fields.keys():
+            self.fields[name].widget.attrs.update({
+                'class': 'form-control',
+            })
+       # self.fields['student_profile'].label = ""
+       self.fields['degree_result'].label = "Upload Result in PDF or Jpeg format"
+       self.fields['degree_result'].widget.attrs['placeholder'] = "PDF or Jpeg format"
+       self.fields['institution'].label = "Institution of Study"
+       self.fields['degree_type'].label = "Degree Type"
+       self.fields['course_grade'].label = "Course Grade"
+       # self.fields['matric_no'].label = "Matric Number"
+       # self.fields['room_design_score'].widget.attrs['placeholder'] = "(Max Score = 10)"
+       
+
+
+
+class TransferGradeModelForm(forms.ModelForm):
+      
+    class Meta:
+         model = TransferGrade
+         fields = ('course', 'institution', 'degree_type', 'year_of_study', 'course_grade', 'academic_transcript')
+         
+
+         widgets = {
+         # 'matric_no': forms.TextInput(attrs={'readonly': True}),
+         # 'student_profile': forms.HiddenInput(),
+
+            }
+
+    def __init__(self, *args, **kwargs):                                  
+       super(TransferGradeModelForm, self).__init__(*args, **kwargs)
+
+       for name in self.fields.keys():
+            self.fields[name].widget.attrs.update({
+                'class': 'form-control',
+            })
+       # self.fields['student_profile'].label = ""
+       self.fields['academic_transcript'].label = "Upload Academic Transcript in PDF format"
+       self.fields['academic_transcript'].widget.attrs['placeholder'] = "PDF format"
+       self.fields['institution'].label = "Institution of Study"
+       self.fields['degree_type'].label = "Degree Type"
+       self.fields['year_of_study'].label = "Year of Study"
+       self.fields['course_grade'].label = "Course Grade"
+       # self.fields['matric_no'].label = "Matric Number"
+       # self.fields['room_design_score'].widget.attrs['placeholder'] = "(Max Score = 10)"
+       
+
+
+
+
 class StudentIndexingModelForm(forms.ModelForm):
       
     class Meta:
@@ -205,22 +306,73 @@ class StudentIndexingModelForm(forms.ModelForm):
     #     # Always return cleaned_data
     #     return cleaned_data
 
-    
+
+
+class UtmeGradeModelForm(forms.ModelForm):
+    ADMISSION_TYPE = (
+    (False, 'No'),
+    ('2', 'GCE A Levels'),
+    ('3', 'Degree'),
+    ('4', 'Transfer'),
+    )
+
+    # direct_entry = forms.CheckboxSelectMultiple(choices = ADMISSION_TYPE)
+
+    # [(False, 'No'),(True, 'GCE A Levels'), (True, 'Degree'), (False, 'Transfer')]
+    direct_entry = forms.CharField(
+        widget=forms.RadioSelect(choices=ADMISSION_TYPE),
+        required=False
+        )
+   
+      
+    class Meta:
+         model = UtmeGrade
+         fields = ('examination_body', 'physics_score', 'chemistry_score', 'biology_score', 'english_score', 'mathematics_score', 'utme_grade_result')     
+         widgets = {
+         # 'matric_no': forms.TextInput(attrs={'readonly': True}),
+         # 'examination_body': forms.TextInput(attrs={'readonly': True}),
+         # 'student_profile': forms.HiddenInput(),
+
+            }
+
+    def __init__(self, *args, **kwargs):                                  
+       super(UtmeGradeModelForm, self).__init__(*args, **kwargs)
+
+       for name in self.fields.keys():
+            self.fields[name].widget.attrs.update({
+                'class': 'form-control',
+            })
+       # self.fields['student_profile'].label = ""
+       self.fields['utme_grade_result'].label = "Upload Result in PDF or Jpeg format"
+       self.fields['utme_grade_result'].widget.attrs['placeholder'] = "PDF or Jpeg format"
+       # self.fields['matric_no'].label = "Matric Number"
+       self.fields['examination_body'].label = "Exam Body"
+       self.fields['physics_score'].label = "Physics Score"
+       self.fields['chemistry_score'].label = "Chemistry Score"
+       self.fields['biology_score'].label = "Biology Score"
+       self.fields['english_score'].label = "English Score"
+       self.fields['mathematics_score'].label = "Mathematics Score"
+       self.fields['direct_entry'].label = "Direct Entry Admission?"
+       
+
+
 class IndexingModelForm(forms.ModelForm):
     # order   = forms.IntegerField(widget=forms.TextInput())
     # admission_type = forms.ChoiceField(choices = ADMISSION_TYPE, widget=forms.Select(), required=True)
     # admission_type = forms.RadioSelect(choices = ADMISSION_TYPE, widget=forms.CheckboxSelectMultiple())
+    
+   
 
 
     class Meta:
         model = StudentIndexing
         fields = [
-            'institution',
-            'student_profile',
-            'utme_grade',
-            'gce_alevels',
-            'degree_result',
-            'matric_no',
+            # 'institution',
+            # 'student_profile',
+            # 'utme_grade',
+            # 'gce_alevels',
+            # 'degree_result',
+            # 'matric_no',
             'academic_session',
             
                 ]
@@ -229,12 +381,12 @@ class IndexingModelForm(forms.ModelForm):
          # 'student_profile': forms.HiddenInput(),
          # 'academic_session': forms.HiddenInput(),
          # 'admission_type': forms.SelectMultiple(),
-         'matric_no': forms.TextInput(attrs={'readonly': True}), 
-         'institution': forms.HiddenInput(),
-         'student_profile': forms.HiddenInput(),
-         'utme_grade': forms.HiddenInput(),
-         'gce_alevels': forms.HiddenInput(),
-         'degree_result': forms.HiddenInput(),
+         # 'matric_no': forms.TextInput(attrs={'readonly': True}), 
+         # 'institution': forms.HiddenInput(),
+         # 'student_profile': forms.TextInput(attrs={'readonly': True}),
+         # 'utme_grade': forms.HiddenInput(),
+         # 'gce_alevels': forms.HiddenInput(),
+         # 'degree_result': forms.HiddenInput(),
          
          
          } 
@@ -247,8 +399,9 @@ class IndexingModelForm(forms.ModelForm):
                 
             })
        #
-       self.fields['matric_no'].label = "Matric Number"
+       # self.fields['matric_no'].label = "Matric Number"
        self.fields['academic_session'].label = "Academic Session"
+      
 
     def clean_matric_no(self):  
         matric_no = self.cleaned_data.get("matric_no")

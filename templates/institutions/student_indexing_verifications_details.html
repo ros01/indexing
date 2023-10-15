@@ -48,7 +48,7 @@
 
 </div>
 <div class="col-md-12 alert alert-primary mt-1 mb-3 py-2" role="alert">
-    <h4 class="alert-heading font-18">Indexing Application Verifications for {{object.student_profile.student.last_name}} {{object.student_profile.student.first_name}} {{object.student_profile.student.middle_name}} Successful. Kindly proceed to Submit Student's Details for Indexing by the Board</h4>
+    <h4 class="alert-heading font-18">{{object.student_profile.student.last_name}} {{object.student_profile.student.first_name}} {{object.student_profile.student.middle_name}} Indexing Application Verified</h4>
     </div>
 </div>
 
@@ -163,7 +163,7 @@
 
     {% if payment_object.payment_status == 1 %}
     <h5 class="mb-1"> <span class="badge badge-warning">Pending</span></h5> 
-    {% elif  payment_object.payment_status == 2 %}
+    {% elif  payment_object.payment_status >= 2 %}
     <h5 class="mb-1"> <span class="badge badge-primary">Verified</span></h5>
     {% else %} 
     <h5 class="mb-1"> <span class="badge badge-primary"></span></h5>
@@ -173,7 +173,7 @@
 
     </div>
     <div class="col-md-12 alert alert-primary mt-1 mb-3 py-2" role="alert">
-    <h4 class="alert-heading font-18">Indexing Payment Verifications for {{object.student_profile.student.last_name}} {{object.student_profile.student.first_name}} {{object.student_profile.student.middle_name}} Successful. Kindly proceed to Submit Student's Details for Indexing by the Board</h4>
+    <h4 class="alert-heading font-18">{{object.student_profile.student.last_name}} {{object.student_profile.student.first_name}} {{object.student_profile.student.middle_name}} Indexing Payment Verified</h4>
     </div>
     </div>
 
@@ -199,10 +199,12 @@
         <li>Payment Amount: <span class="text-dark font-weight-bold ms-sm-2">{{payment_object.payment_amount}}</span></li>
         <li>Payment Method: <span class="text-dark font-weight-bold ms-sm-2">{{payment_object.payment_method}}</span></li>
         <li>Payment Date: <span class="text-dark font-weight-bold ms-sm-2">{{payment_object.payment_date}}</span></li>
+        {% if payment_object.payment_receipt %}
         <li>Payment Receipt:   <span class="text-dark font-weight-bold ms-sm-2">
         <i class="fa fa-eye text-primary"></i>
         <a class="text-primary" href="{{payment_object.payment_receipt.url}}" target="_blank">&nbsp; View Receipt</a>
         </span></li>
+        {% endif %}
         </ul>
         </div>
 
@@ -218,7 +220,7 @@
 <hr>
 
 <div class="d-flex justify-content-end mr-3">  
-<a href="{% url 'institutions:dashboard' %}" class="btn btn-outline-success py-0 mr-3 mt-1"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Return to Dashboard</a>  
+<a href="{% url 'institutions:student_indexing_verifications_list' %}" class="btn btn-outline-primary py-0 mr-3 mt-1"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Return to Verified Applications List</a>  
 </div>
 
 

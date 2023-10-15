@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'accounts',
+    'formtools',
     'crispy_forms',
     'crispy_bootstrap5',
     'indexing_unit',
@@ -67,6 +68,7 @@ INSTALLED_APPS = [
     'students',
     'registration',
     'pages',
+    'django_htmx',
 ]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
@@ -77,9 +79,11 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'django_htmx.middleware.HtmxMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 'django_htmx.middleware.HtmxMiddleware',
 ]
 
 ROOT_URLCONF = 'rrbnindexing.urls'
@@ -116,7 +120,7 @@ WSGI_APPLICATION = 'rrbnindexing.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'rrbnindexingdb',
+        'NAME': 'rrbnindexingdb1',
         'USER': 'postgres',
         'PASSWORD': 'blackstone1',
         'HOST': 'localhost',

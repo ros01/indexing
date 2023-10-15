@@ -1,0 +1,84 @@
+{% extends 'indexing_unit/dashboard_base1.html'%}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block title%}| Welcome {% endblock %}
+{% block styles %}
+{% endblock %}
+
+{% block content %}
+
+<div class="row ml-3 mb-4 pb-4">
+<div class="col-lg-11 col-xl-9">
+<div class="card m-b-30">
+<div class="card-header profile-tabs pb-0">
+<ul class="nav nav-tabs">
+<li class="nav-item">
+<a class="nav-link active" href="#about" data-toggle="tab" aria-expanded="false"><i class="ti-user mr-2"></i>Academic Session Creation</a>
+</li>
+</ul>
+</div>
+<div class="card-body">
+<div class="">
+<div class="tab-content">
+<div class="tab-pane active" id="about">
+<div class="row justify-content-center">
+<div class="col-md-12  profile-detail">
+<div class="">
+<h5 class="mb-3"> <i class="fa fa-graduation-cap text-primary"></i> Create Academic Session</h5>
+{% for message in messages %}
+    <div class="alert {{ message.tags }} alert-dismissible shadow fade show" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        {{ message | safe }}
+    </div>
+{% endfor %}
+</div>
+</div>
+
+<div>
+<p class="detail-text mb-3">Kindly note that only institutions with valid Board Accreditation can be registered on this platform.
+</p>
+</div>
+
+
+<div class="">
+<form class="form-horizontal form-material" method="post" enctype="multipart/form-data" id="register-institution">
+{% csrf_token %}
+
+
+   
+
+
+<div class="form-group row">
+    <div class="col-md-6">
+    <div class= "form-control-alternative my-0 py-0">
+    {{ form.name|as_crispy_field }}
+    </div>
+    </div>
+    <div class="col-md-6">
+    <div class= "form-control-alternative my-0 py-0">
+    
+    </div>
+    </div>
+</div>
+
+
+
+<div class="form-group">
+<input type="submit" class="btn btn-primary btn-sm text-light px-4 mt-2 float-right" value="Create Academic Session" onclick="return confirm('Are you sure you want to create this academic session?')">
+</div>
+</form>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+</div>
+</div>
+
+{% endblock %}

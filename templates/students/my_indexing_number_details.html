@@ -96,7 +96,7 @@
                     <td>{{object.index_number}}</td>
                    
                    
-                    <td><a href="{{ object.student_indexing.get_absolute_url }}"> <i class="fas fa-search text-primary"></i> <span class="badge badge-boxed  badge-primary">View Student Details </span></a></td> 
+                    <td><a href="{{ object.student_indexing.get_absolute_url }}"><span class="badge badge-boxed  badge-primary"><i class="fas fa-search"></i> View Admission and Payment Details </span></a></td> 
                 </tr>
                
                 </tbody>
@@ -111,7 +111,7 @@
 <div class="d-flex justify-content-end mr-2 mb-2">   
 <!-- <a href="javascript:{document.getElementById('verify_payment{{object.id }}').submit()}"><button class="btn btn-success py-0 mr-2 mt-1 mb-1"> Verify Payment<i class="fa fa-check" aria-hidden="true"></i></button> </a>
 <a href="javascript:{document.getElementById('reject_payment{{object.id }}').submit()}"><button class="btn btn-danger py-0 mr-2 mt-1 mb-1"> Reject Payment<i class="fa fa-reply" aria-hidden="true"></i></button></a>  -->
-<a href="{% url 'students:my_indexing_complete_view' %}" class="btn btn-outline-success text-success py-0 mr-2 mt-1 mb-1"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Students Indexing List</a>  
+<a href="{% url 'students:my_indexing_complete_view' %}" class="btn btn-outline-primary py-0 mr-2 mt-1 mb-1"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Students Indexing List</a>  
 </div>
 
 </div>

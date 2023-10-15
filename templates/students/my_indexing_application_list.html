@@ -9,8 +9,8 @@
 <div class="col-md-12">
     <div class="card m-b-30">
         <div class="card-body">
-            <h4 class="mt-0 header-title text-primary">My Indexing Application History</h4>
-            <p class="text-muted font-14">Students can view their indexing application from the list below.
+            <h4 class="mt-0 header-title text-primary">My Indexing Application Submission</h4>
+            <p class="text-muted font-14">Student can view his/her indexing application submission below
             </p>
             <table id="datatable-buttons" class="table table-bordered dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                 <thead>
@@ -32,7 +32,7 @@
                     <td>{{object.institution.course_type}}</td>
                     <td>{{object.academic_session}}</td>
                     <td>{{object.timestamp}}</td>
-                    <td><h6 class="mb-1 text-center"><a href="{{ object.get_student_application_details_url }}"><span class="badge badge-pill badge-primary">View Indexing Details </span></a></h6> </td>
+                    <td><h6 class="mb-1 text-center"><a href="{{ object.get_student_application_details_url }}"><span class="badge badge-pill badge-primary"><i class="fas fa-search"></i>  View Indexing Submission Details </span></a></h6> </td>
                 </tr>
                 {% endfor %}
                 </tbody>

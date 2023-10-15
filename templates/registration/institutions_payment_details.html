@@ -142,7 +142,7 @@
 </div>
 {% else %}
 <div class="d-flex justify-content-end mr-2 mb-2">   
-<a href="{% url 'registration:institutions_payments_list' %}" class="btn btn-outline-success py-0 mr-2 mt-1 mb-1"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Payments List</a>  
+<a href="{% url 'registration:institutions_verified_payments_list' %}" class="btn btn-outline-success py-0 mr-2 mt-1 mb-1"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Verified Payments List</a>  
 </div>
 {% endif %}
 
@@ -228,9 +228,21 @@
 </div>
 </div>
 <hr>
+
+{% if object.payment_status == 1 %}
 <div class="d-flex justify-content-end mr-2 mb-2">   
 <a href="{% url 'registration:institutions_payments_list' %}" class="btn btn-outline-success py-0 mt-1 mb-1"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Payments List</a>  
 </div> 
+
+{% else %}
+
+<div class="d-flex justify-content-end mr-2 mb-2">   
+<a href="{% url 'registration:institutions_verified_payments_list' %}" class="btn btn-outline-success py-0 mt-1 mb-1"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Verified Payments List</a>  
+</div> 
+
+{% endif %}
+
+
 </div>
 </div>
 </div>

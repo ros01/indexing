@@ -38,7 +38,21 @@ class IndexingOfficerProfileForm(forms.ModelForm):
        #
        # self.fields['accreditation_type'].label = "Accreditation Type"
 
+class AcademicSessionModelForm(forms.ModelForm):
+      
+    class Meta:
+         model = AcademicSession
+         fields = ('name',)
+         
+         widgets = {
+            # 'contact_address': forms.Textarea(attrs={'rows':2, 'cols':3}),    
+            }
 
+    def __init__(self, *args, **kwargs):
+       super(AcademicSessionModelForm, self).__init__(*args, **kwargs)
+
+
+       
 class InstitutionProfileForm(forms.ModelForm):
     
     

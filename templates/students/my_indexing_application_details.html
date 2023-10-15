@@ -43,7 +43,7 @@
 
 {% if object.verification_status == 1 %}
  <h5 class="mb-1"> <span class="badge badge-warning">Pending</span></h5> 
-{% elif  object.verification_status == 2 %}
+{% elif  object.verification_status >= 2 %}
 <h5 class="mb-1"> <span class="badge badge-primary">Verified</span></h5>
 {% else %} 
 <h5 class="mb-1"> <span class="badge badge-primary"></span></h5>
@@ -167,6 +167,30 @@
         {% endif %}
 
 
+        {% if object.transfer_grade %}
+        <h5 class="mb-1"> <i class="fas fa-desktop text-primary"></i> DE Results</h5>
+        <div>  
+        <p class="text-sm mb-0">
+        <ul class="list-unstyled">                           
+        <li>Course of study: <span class="text-dark font-weight-bold ms-sm-2">{{object.transfer_grade.course}}</span></li>
+        <li>Institution Attended:   <span class="text-dark font-weight-bold ms-sm-2">{{object.transfer_grade.institution}}</span></li>
+        <li>Class of Degree:   <span class="text-dark font-weight-bold ms-sm-2">{{object.transfer_grade.degree_type}}</span></li>
+        <li>Year of Study:   <span class="text-dark font-weight-bold ms-sm-2">
+        {{object.transfer_grade.year_of_study}}</span></li>
+        <li>Grade:   <span class="text-dark font-weight-bold ms-sm-2">
+        {{object.transfer_grade.course_grade}}</span></li>
+
+        {% if object.transfer_grade.academic_transcript %}
+        <li>Academic Transcript:   <span class="text-dark font-weight-bold ms-sm-2">
+        <i class="fa fa-eye text-primary"></i>
+        <a class="text-primary" href="{{object.transfer_grade.academic_transcript.url}}" target="_blank">&nbsp; View Result</a>
+        </span></li>
+        {% endif %}
+        </ul>
+        </div>
+        {% endif %}
+
+
 
 
         </div>
@@ -191,7 +215,7 @@
 
     {% if payment_object.payment_status == 1 %}
     <h5 class="mb-1"> <span class="badge badge-warning">Pending</span></h5> 
-    {% elif  payment_object.payment_status == 2 %}
+    {% elif  payment_object.payment_status >= 2 %}
     <h5 class="mb-1"> <span class="badge badge-primary">Verified</span></h5>
     {% else %} 
     <h5 class="mb-1"> <span class="badge badge-primary"></span></h5>
@@ -227,10 +251,15 @@
         <li>Payment Amount: <span class="text-dark font-weight-bold ms-sm-2">{{payment_object.payment_amount}}</span></li>
         <li>Payment Method: <span class="text-dark font-weight-bold ms-sm-2">{{payment_object.payment_method}}</span></li>
         <li>Payment Date: <span class="text-dark font-weight-bold ms-sm-2">{{payment_object.payment_date}}</span></li>
+
+        {% if payment_object.payment_receipt %}
         <li>Payment Receipt:   <span class="text-dark font-weight-bold ms-sm-2">
         <i class="fa fa-eye text-primary"></i>
         <a class="text-primary" href="{{payment_object.payment_receipt.url}}" target="_blank">&nbsp; View Receipt</a>
         </span></li>
+        {% endif %}
+
+
         </ul>
         </div>
 
@@ -252,7 +281,9 @@
 {% if object.indexing_status == 3 %}
 
 <div class="d-flex justify-content-end">   
-<a href="{% url 'students:my_indexing_application_list' %}" class="btn btn-outline-primary py-0 mr-3 mt-1 mb-3"><i class="fa fa-angle-double-left" aria-hidden="true"></i></i> Return to Applications List </a>
+<!-- <a href="{% url 'students:my_indexing_application_list' %}" class="btn btn-outline-primary py-0 mr-3 mt-1 mb-3"><i class="fa fa-angle-double-left" aria-hidden="true"></i></i> Return to Application Submission List</a> -->
+
+<a href="{{request.META.HTTP_REFERER}}" class="btn btn-outline-primary py-0"><i class="fas fa-angle-double-left" aria-hidden="true"></i> Go Back </a>
 
 
 {% else %}

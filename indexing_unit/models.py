@@ -18,7 +18,8 @@ class IssueIndexing(models.Model):
     matric_no = models.CharField(max_length=200, unique=True)
     institution = models.ForeignKey(InstitutionProfile, related_name = "issue_indexing", on_delete=models.DO_NOTHING)
     slug  = models.SlugField(blank=True)
-    academic_session = models.CharField(max_length=200, choices = ACADEMIC_SESSION,  null=True, blank=True)
+    # academic_session = models.CharField(max_length=200, choices = ACADEMIC_SESSION,  null=True, blank=True)
+    academic_session = models.ForeignKey(AcademicSession,  on_delete=models.CASCADE)
     student_indexing = models.ForeignKey(StudentIndexing, null=True, on_delete=models.CASCADE)
     indexing_payment = models.ForeignKey(IndexingPayment, null=True, on_delete=models.CASCADE)
     index_number = models.CharField(max_length=200, unique=True)
@@ -49,7 +50,8 @@ class IssueIndexing(models.Model):
 
     def save(self, *args, **kwargs):
         super(IssueIndexing, self).save(*args, **kwargs)
-        self.student_indexing.indexing_status = 5
+        # self.student_indexing.verification_status = 4
+        self.student_indexing.indexing_status = 4
         self.indexing_payment.payment_status = 4
         self.student_indexing.save()  
         self.indexing_payment.save()   

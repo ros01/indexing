@@ -23,18 +23,20 @@
                     <th>Academic Session</th>
                     <th>Matric Number</th>
                     <th>Indexing Number</th>
+                    <th>Stage</th>
                     <th>Actions</th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for object in students %}
                 <tr>
-                    <td>{{object.institution}}</td>
                     <td>{{object.student_profile.student.last_name}} {{object.student_profile.student.first_name}}</td>
+                    <td>{{object.institution}}</td>
                     <td>{{object.academic_session}}</td>
                     <td>{{object.matric_no}}</td>
                     <td>{{object.index_number}}</td>
-                    <td><a href="{{ object.get_student_absolute_url }}"><span class="badge badge-boxed  badge-primary">View Students Details </span> <i class="fas fa-list-ol text-primary"></i></a></td> 
+                    <td>Complete</td>
+                    <td><a href="{{ object.get_student_absolute_url }}"><span class="badge badge-boxed  badge-primary"><i class="fas fa-list-ol"></i> View Students Details </span></a></td> 
                 </tr>
                 {% endfor %}
                 </tbody>

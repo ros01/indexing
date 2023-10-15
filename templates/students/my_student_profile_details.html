@@ -37,6 +37,7 @@
 <ul class="list-unstyled">                        
 <li><b>Student Name:</b> {{object.student.last_name}} {{object.student.first_name}} {{object.student.middle_name}}</li>
 <li><b>Institution:</b> {{object.institution}}</li>
+<li><b>Academic Session:</b> {{object.academic_session}}</li>
 <li><b>Course of Study:</b> {{object.institution.course_type}}</li>
 <li><b>Matric No: </b> {{object.student.matric_no}}</li>
 </ul>
@@ -108,9 +109,11 @@
 <div class="d-flex justify-content-end mr-2 mb-2">  
 <!-- <h5 class="mb-1 mr-3"><a href="{% url 'students:my_student_profile_list' %}" class="badge badge-success text-light px-3 py-2">My Profile List</a></h5>   -->
 
-<a href="{% url 'students:dashboard' %}" class="btn btn-outline-primary py-0 mr-2 mt-1 mb-3"><i class="fas fa-backward" aria-hidden="true"></i> Dashboard</a>  
+<a href="{% url 'students:application_history' %}" class="btn btn-outline-primary py-0 mr-2 mt-1 mb-3"><i class="fas fa-backward" aria-hidden="true"></i> Go Back</a>  
 
-<a href="{{ object.update_student_profile_details_url }}" class="btn btn-outline-danger py-0 mx-2 mt-1 mb-3"><i class="fab fa-magento" aria-hidden="true"></i> Update Profile</a>  
+
+
+<a href="{{ object.update_student_profile_details_url }}" class="btn btn-outline-primary py-0 mx-2 mt-1 mb-3"><i class="far fa-edit" aria-hidden="true"></i> Update Profile</a>  
 
 <!-- <h5 class="mb-1"><a href="{{ object.update_student_profile_details_url }}" class="badge badge-warning text-light px-3 py-2 mr-3 mb-3">Update Profile</a></h5>  -->
 

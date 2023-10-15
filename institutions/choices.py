@@ -290,6 +290,7 @@ COURSE = (
         ('MIPT', 'MIPT'),
         )
 
+
 EXAMINATION_BODY = (
         ('WAEC', 'WAEC'),
         ('NECO', 'NECO'),
@@ -391,6 +392,24 @@ TRANSFER_COURSES = (
         ('DCR', 'DCR'),
         )
 
+
+UNIVERSITY_COURSES = (
+        ('Medical_Radiography', 'Medical Radiography' ),
+        ('MIPT', 'MIPT'),
+        )
+
+YEAR_OF_STUDY = (
+        ('1st Year', '1st Year' ),
+        ('2nd Year', '2nd Year'),
+        ('3rd Year', '3rd Year'),
+        ('4th Year', '4th Year'),
+        ('5th Year', '5th Year'),
+        )
+
+INSTITUTIONS = (
+        ('University of Nigeria', 'University of Nigeria' ),
+        ('Nnamdi Azikiwe University', 'Nnamdi Azikiwe University'),
+        )
 
 TRANSFER_COURSE_GRADES = (
         ('1st Class', '1st Class'),

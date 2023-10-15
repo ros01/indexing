@@ -1,0 +1,7 @@
+<select class="custom-select mb-4" name="course">
+
+    <option selected>Select Institution</option>
+    {% for institution in institutions %}
+        <option value="{{institution.pk}}">{{ institution.name }}</option>
+    {% endfor %}
+</select>

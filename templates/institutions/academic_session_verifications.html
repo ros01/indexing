@@ -1,0 +1,37 @@
+{% extends 'institutions/dashboard_base2.html'%}
+
+{% block title %}Institution | {{ block.super }}{% endblock title %}
+
+
+{% block content %}
+<div class="row mx-2">
+<div class="col-md-12 mt-4 mx-1">
+<div class="row">
+<div class="col-md-12">
+    <div class="card">   
+        <div class="card-body">
+            <h4 class="mt-0 header-title text-primary">Students Indexing Applications List</h4>
+            <p class="text-muted  font-14">Please select academic session to view Students Indexing Applications for selected Academic Session.
+            </p>
+            <select class="custom-select mb-4 col-md-2" 
+            name="academic_session" 
+            hx-get="{% url 'institutions:verifications_list' %}"
+            hx-trigger="change"
+            hx-target="#verifications">
+
+                <option selected>Select Academic Session</option>
+                {% for academic_session in academic_sessions %}
+                    <option value="{{academic_session.pk}}"> {{academic_session.name}}</option>
+                {% endfor %}
+            </select>
+
+            <div id="verifications">
+                {% include 'partials/verifications.html' %}
+            </div>
+        </div>
+    </div>
+</div> <!-- end col -->
+</div> <!-- end row -->
+</div>
+</div>
+{% endblock content %}

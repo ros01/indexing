@@ -34,6 +34,9 @@
         <link href="{% static 'd_assets/css/icons.css' %}" rel="stylesheet" type="text/css">
         <link href="{% static 'd_assets/css/style.css' %}" rel="stylesheet" type="text/css">
 
+        <!-- HTMX -->
+        <script src="https://unpkg.com/htmx.org@1.6.0"></script>
+
     </head>
 
 
@@ -94,7 +97,7 @@
     <li class="has_sub">
         <a href="javascript:void(0);" class="waves-effect"><i class="fas fa-calendar"></i><span> Indexing </span> <span class="float-right"><i class="mdi mdi-chevron-right"></i></span></a>
         <ul class="list-unstyled">
-            
+                    
             <li><a href="{% url 'institutions:student_indexing_applications_list' %}">Applications</a></li> 
             <li><a href="{% url 'institutions:student_indexing_verifications_list' %}">Verifications</a></li>   
             <li><a href="{% url 'institutions:institutions_payments_list' %}">Institution Payments</a></li> 

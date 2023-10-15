@@ -1,0 +1,81 @@
+{% extends 'indexing_unit/dashboard_base1.html'%}
+{% load widget_tweaks %}
+{% load crispy_forms_tags %}
+
+{% block title %}Institution | {{ block.super }}{% endblock title %}
+
+
+{% block content %}
+
+<div class="row mx-2">
+<div class="col-md-12 mt-4 mx-1">
+<div class="row">
+<div class="col-md-11">
+    <div class="card">
+        <div class="card-body">
+            <h4 class="mt-0 ml-3 header-title text-primary">Students Indexing List by Academic Session and Institution</h4>
+            <p class="ml-3 text-muted  font-14">Please Select desired Academic Session and Institution to Retrieve Indexed Students List.
+            </p>
+
+
+            <div class="mb-4 col-md-4">
+
+            <form class="form-horizontal form-material" method="get" action="{% url 'indexing_unit:institutions_indexed_students_list' %}">
+
+         
+            {{ form.academic_session.label_tag }}
+            {% render_field form.academic_session class='custom-select mb-4' %}
+            
+
+            {{ form.institution.label_tag }}
+            {% render_field form.institution class='custom-select mb-4' autocomplete="off" %}
+            
+
+
+            <button type="submit" class="btn btn-primary">Search</button>
+
+
+            </form>
+
+        </div>
+
+        <!-- <div class="ml-3">
+           {% if indexing %}
+            <table id="datatable-buttons" class="table table-striped table-bordered dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                <thead>
+                <tr>
+                    <th>Institution</th>
+                    <th>Student Name</th>
+                    <th>Academic Session</th>
+                    <th>Matric Number</th>
+                    <th>Indexing Number</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for object in indexing %}
+                <tr>
+                    <td>{{object.institution}}</td>
+                    <td>{{object.student_profile.student.last_name}} {{object.student_profile.student.first_name}}</td>
+                    <td>{{object.academic_session}}</td>
+                    <td>{{object.matric_no}}</td>
+                    <td>{{object.index_number}}</td>
+                    <td><a href="{{ object.get_absolute_url }}"><span class="badge badge-boxed  badge-primary"><i class="fas fa-list-ol"></i> View Student Details </span></a></td> 
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% endif %} 
+            </div> -->
+        </div>
+
+<div class="d-flex justify-content-end mr-2 mb-2">   
+<a href="{% url 'indexing_unit:dashboard' %}" class="btn btn-outline-primary py-0 mr-2 mt-1 mb-1"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Return to Dashboard</a>  
+</div>
+
+</div>
+</div> <!-- end col -->
+</div> <!-- end row -->
+</div>
+</div>
+{% endblock content %}

@@ -218,10 +218,13 @@
 <li>Payment Amount: <span class="text-dark font-weight-bold ms-sm-2">{{payment_object.payment_amount}}</span></li>
 <li>Payment Method: <span class="text-dark font-weight-bold ms-sm-2">{{payment_object.payment_method}}</span></li>
 <li>Payment Date: <span class="text-dark font-weight-bold ms-sm-2">{{payment_object.payment_date}}</span></li>
+
+{% if payment_object.payment_receipt %}
 <li>Payment Receipt:   <span class="text-dark font-weight-bold ms-sm-2">
 <i class="fa fa-eye text-primary"></i>
 <a class="text-primary" href="{{payment_object.payment_receipt.url}}" target="_blank">&nbsp; View Receipt</a>
 </span></li>
+{% endif %}
 </ul>
 </div>
 
@@ -230,17 +233,17 @@
 </div>
 </div>
 <hr>
-{% if object.verification_status == 3 %}
+{% if object.verification_status <= 3 %}
 <div class="d-flex justify-content-end">  
 
-<a href="{% url 'registration:students_index_number_list' %}" class="btn btn-outline-success py-0 mr-3 mt-1 mb-3"><i class="fa fa-times" aria-hidden="true"></i> Return to Index Numbering List </a>
+<a href="{% url 'registration:students_index_number_list' %}" class="btn btn-outline-primary py-0 mr-3 mt-1 mb-3"><i class="fas fa-angle-double-left" aria-hidden="true"></i> Return to Index Numbering List </a>
 
-<a href="{% url 'registration:issue_indexing_number' object.slug %}"><button class="btn btn-outline-primary py-0 mr-2 mt-1"><i class="fa fa-check" aria-hidden="true"></i> Issue Indexing Number</button> </a>
+<a href="{% url 'registration:issue_indexing_number' object.slug %}"><button class="btn btn-outline-primary py-0 mr-2 mt-1"><i class="fas fa-angle-double-left" aria-hidden="true"></i> Issue Indexing Number</button> </a>
 </div>
 
 {% else %}
 <div class="d-flex justify-content-end">   
-<a href="{% url 'registration:institutions_indexed_students_list' %}" class="btn btn-outline-success py-0 mr-3 mt-1 mb-3"><i class="fa fa-times" aria-hidden="true"></i> Issued Indexing List </a>
+<a href="{% url 'registration:indexed_students_list' %}" class="btn btn-outline-primary py-0 mr-3 mt-1 mb-3"><i class="fas fa-angle-double-left" aria-hidden="true"></i> Issued Indexing List </a>
 </div>
 {% endif %}
 </div>

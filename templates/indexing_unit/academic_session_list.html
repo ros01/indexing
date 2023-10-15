@@ -1,0 +1,57 @@
+{% extends 'indexing_unit/dashboard_base1.html'%}
+
+{% block title %}Institution | {{ block.super }}{% endblock title %}
+
+
+{% block content %}
+
+<div class="row mx-2">
+<div class="col-md-12 mt-4 mx-1">
+<div class="row">
+<div class="col-md-12">
+    {% include 'partials/_alerts.html' %} 
+    <div class="card"> 
+        <div class="card-body">
+        <div class="d-flex justify-content-end mr-0 mb-2">   
+        <a href="{% url 'indexing_unit:create_academic_session' %}" class="btn btn-primary"><i class="fa fa-list text-white"></i> Add Academic Session</a>
+        </div>
+
+
+        <h4 class="mt-0 header-title text-primary">Institutions Academic Session List</h4>
+        <p class="text-muted font-14">Note: RRBN Indexing Unit should make sure that Academic Sessions defined before the next academic year</p>
+        
+
+            <table id="datatable-buttons" class="table table-striped table-bordered dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">    
+                
+                <thead>
+
+                <tr>
+                     
+                    <th>Academic Session</th>
+                    <th>Date Created</th>
+                    <th>Last Updated</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                  {% for object in object_list %}
+                    <tr>
+                    <td>{{object.name}}</td>
+                    <td>{{object.timestamp}}</td>
+                    <td>{{object.updated}}</td>
+                    <td><a href="{{object.get_absolute_url}}"><span class="badge badge-boxed  badge-primary">View Details <i class="fas fa-podcast"></i>  </span> </a></td>
+                </tr>
+                {% endfor %}
+                           
+                </tbody>
+            </table>
+           
+
+        </div>
+    </div>
+</div> <!-- end col -->
+</div> <!-- end row -->
+</div>
+</div>
+{% endblock content %}
+

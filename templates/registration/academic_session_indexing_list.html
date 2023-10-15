@@ -1,0 +1,59 @@
+{% extends 'registration/dashboard_base2.html'%}
+{% load widget_tweaks %}
+
+{% block title %}Institution | {{ block.super }}{% endblock title %}
+
+
+{% block content %}
+<div class="row mx-2">
+<div class="col-md-12 mt-4 mx-1">
+<div class="row">
+<div class="col-md-10">
+    <div class="card">   
+        <div class="card-body">
+            <h4 class="mt-0 header-title text-primary">Students Indexing Issuance List</h4>
+            <!-- <p class="text-muted  font-14">Select academic session.
+            </p> -->
+            
+
+            {{ form.academic_session.label_tag }}
+            {% render_field form.academic_session class='custom-select mb-4' autocomplete="off" hx-get="/registration/indexing_numbers_list" hx-target="#indexing"%}
+
+            {{ form.institution.label_tag }}
+            {% render_field form.institution class='custom-select mb-4' autocomplete="off" hx-get="/registration/indexing_numbers_list" hx-target="#indexing"%}
+
+          
+            <!-- <select class="custom-select mb-4 col-md-2" 
+            name="academic_session" 
+            hx-get="{% url 'registration:indexing_numbers_list' %}"
+            hx-trigger="change"
+            hx-target="#indexing">
+
+            <option selected>Select Academic Session</option>
+            {% for academic_session in academic_sessions %}
+            <option value="{{academic_session.pk}}"> {{academic_session.name}}</option>
+            {% endfor %}
+            </select>
+
+            
+
+            <div id="institutions">
+            {% include 'partials/indexing_numbers_pre_list.html' %}
+            </div> -->
+
+             <div id="indexing" hx-swap-oob="true">
+            {% include 'partials/indexing_numbers_pre_issue_list.html' %}
+            </div>
+
+            
+           
+
+          
+        </div>
+    </div>
+</div>
+<!-- end col -->
+</div> <!-- end row -->
+</div>
+</div>
+{% endblock content %}

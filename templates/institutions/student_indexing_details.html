@@ -241,7 +241,7 @@
             <li>Student Name: <span class="text-dark font-weight-bold ms-sm-2">{{payment_object.student_profile.student.last_name}} {{payment_object.student_profile.student.first_name}} {{payment_object.student_profile.student.middle_name}}</span></li>
             <li>Institution: <span class="text-dark font-weight-bold ms-sm-2">{{payment_object.student_profile.institution}}</span></li>
             <li>Course of Study:  <span class="text-dark font-weight-bold ms-sm-2">{{payment_object.student_profile.institution.course_type}}</span></li>
-            <li>Registration No: <span class="text-dark font-weight-bold ms-sm-2">{{payment_object.student_profile.student.reg_no}}</span></li>
+            <li>Matric No: <span class="text-dark font-weight-bold ms-sm-2">{{payment_object.student_profile.student.matric_no}}</span></li>
         </ul>
          </div>
 
@@ -255,10 +255,15 @@
         <li>Payment Amount: <span class="text-dark font-weight-bold ms-sm-2">{{payment_object.payment_amount}}</span></li>
         <li>Payment Method: <span class="text-dark font-weight-bold ms-sm-2">{{payment_object.payment_method}}</span></li>
         <li>Payment Date: <span class="text-dark font-weight-bold ms-sm-2">{{payment_object.payment_date}}</span></li>
+
+        {% if payment_object.payment_receipt %}
         <li>Payment Receipt:   <span class="text-dark font-weight-bold ms-sm-2">
         <i class="fa fa-eye text-primary"></i>
         <a class="text-primary" href="{{payment_object.payment_receipt.url}}" target="_blank">&nbsp; View Receipt</a>
         </span></li>
+        {% endif %}
+
+
         </ul>
         </div>
 

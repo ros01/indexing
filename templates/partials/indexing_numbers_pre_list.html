@@ -1,0 +1,25 @@
+
+
+            <p class="text-muted  font-14">Select Institution
+            </p>
+            <select class="custom-select mb-4 col-md-2" 
+            name="institution" 
+            hx-get="{% url 'registration:indexing_numbers_list' %}"
+            hx-trigger="change"
+            hx-target="#indexing">
+
+            <option selected>Select Institution</option>
+            {% for institution in institutions %}
+            <option value="{{institution.pk}}">{{ institution.name }}</option>
+            {% endfor %}
+            </select>
+
+
+
+            {% if is_htmx %}
+            <div id="indexing" class="my-4" hx-swap-oob="true">
+            {% include 'partials/indexing_numbers_pre_issue_list.html' %}
+            </div>
+            {% endif %}
+    
+

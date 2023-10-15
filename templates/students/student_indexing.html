@@ -1,0 +1,68 @@
+{% extends 'students/dashboard_base1.html'%}
+{% load static %}
+{% load widget_tweaks %}
+{% load crispy_forms_tags %}
+{% load i18n %}
+
+{% block head %}
+{{ wizard.form.media }}
+{% endblock %}
+
+{% block content %}
+
+<div class="row ml-3 mb-4 pb-4">
+<div class="col-lg-12 col-xl-10">
+<div class="card m-b-30">
+
+<div class="card-header profile-tabs pb-0">
+<ul class="nav nav-tabs">
+<li class="nav-item">
+<a class="nav-link active" href="#about" data-toggle="tab" aria-expanded="false"><i class="ti-user mr-2"></i>Indexing Profile Application</a>
+</li>
+</ul>
+</div>
+
+<div class="card-body">
+{% include 'partials/_alerts.html' %}
+<div class="">
+<div class="tab-content">
+<div class="tab-pane active" id="about">
+<div class="row justify-content-center">
+<div class="col-md-12  profile-detail">
+<div class="">
+<h5 class="mb-3"> <i class="fa fa-graduation-cap text-primary"></i> Apply for Student Indexing</h5>
+</div>
+</div>
+
+
+
+<p>Step {{ wizard.steps.step1 }} of {{ wizard.steps.count }}</p>
+<form action="" method="post" enctype="multipart/form-data">{% csrf_token %}
+<table>
+{{ wizard.management_form }}
+{% if wizard.form.forms %}
+    {{ wizard.form.management_form }}
+    {% for form in wizard.form.forms %}
+        {{ form|crispy }}
+    {% endfor %}
+{% else %}
+    {{ wizard.form|crispy }}
+
+{% endif %}
+</table>
+{% if wizard.steps.prev %}
+<button name="wizard_goto_step" type="submit" value="{{ wizard.steps.first }}">{% translate "First Step" %}</button>
+<button name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}">{% translate "Prev Step" %}</button>
+{% endif %}
+<input type="submit" value="{% translate "Proceed" %}"/>
+</form>
+
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+{% endblock %}
