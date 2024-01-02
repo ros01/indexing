@@ -111,7 +111,7 @@ pre_save.connect(pre_save_institution_receiver, sender=InstitutionProfile)
 
 
 class AdmissionQuota(models.Model):
-    institution  = models.ForeignKey(InstitutionProfile, on_delete=models.SET_NULL, null=True)
+    institution  = models.ForeignKey(InstitutionProfile, on_delete=models.CASCADE, null=True)
     # academic_session = models.CharField(max_length=100, choices = ACADEMIC_SESSION, blank=True)
     academic_session = models.ForeignKey(AcademicSession,  on_delete=models.CASCADE)
     admission_quota  = models.IntegerField(blank=True, null=True)
@@ -121,7 +121,7 @@ class AdmissionQuota(models.Model):
 
    
     def __str__(self):
-        return self.academic_session
+        return str(self.academic_session)
 
     
     def get_admission_quota_url(self):
