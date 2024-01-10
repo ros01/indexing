@@ -533,9 +533,10 @@ class StudentIndexingWizardView(SessionWizardView):
         indexing = indexing_form.save(commit=False)
         utme = form_list[1]
         utme_grade = utme.save()
-        gce_alevels = form_list[2]
-        degree_result = form_list[-2]
-        transfer_admission = form_list[-1]
+        # gce_alevels = form_list[2]
+        # degree_result = form_list[-2]
+        # transfer_admission = form_list[-1]
+
 
         if utme.cleaned_data['direct_entry'] == '2':
             gce_alevels = form_list[2].save()
