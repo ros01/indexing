@@ -285,7 +285,7 @@ class StudentProfileCreateView(StaffRequiredMixin, SuccessMessageMixin, CreateVi
 		# print("Academic Session:", academic_session)
 		quota = AdmissionQuota.objects.filter(institution = institution, academic_session = academic_session).first()
 		admission_quota = quota.admission_quota
-		# print("Admission Quota:", admission_quota)
+		print("Admission Quota:", admission_quota)
 		students_qs = institution.studentprofile_set.all()
 		# print("Queryset object:", admission_quota )
 	
