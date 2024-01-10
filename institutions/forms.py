@@ -28,12 +28,38 @@ User = get_user_model()
 #        self.fields['email'].widget.attrs['placeholder'] = "enter email that will serve as your username"
 #        #self.fields['application_type'].label = "Application Type"
 #        #self.fields['application_type'].widget.attrs['placeholder'] = "Select Application Type"
-       
-class StudentProfileModelForm(forms.ModelForm):
+
+
+class StudentProfileUpdateModelForm(forms.ModelForm):
       
     class Meta:
          model = StudentProfile
          fields = ('sex', 'dob', 'marital_status', 'nationality', 'state_of_origin', 'lga', 'contact_address')
+         
+
+         widgets = {
+            'contact_address': forms.Textarea(attrs={'rows':2, 'cols':3}),
+            'dob': DatePickerInput(),
+            
+         }
+
+    def __init__(self, *args, **kwargs):
+       super(StudentProfileUpdateModelForm, self).__init__(*args, **kwargs)
+       self.fields['marital_status'].label = "Marital Status"
+       self.fields['state_of_origin'].label = "State of Origin"
+       self.fields['lga'].label = "Local Government Area"
+       self.fields['dob'].label = "Date of Birth"
+       self.fields['contact_address'].label = "Contact Address"
+       
+
+
+
+
+class StudentProfileModelForm(forms.ModelForm):
+      
+    class Meta:
+         model = StudentProfile
+         fields = ('academic_session', 'sex', 'dob', 'marital_status', 'nationality', 'state_of_origin', 'lga', 'contact_address')
          
 
          widgets = {
@@ -49,6 +75,7 @@ class StudentProfileModelForm(forms.ModelForm):
        self.fields['lga'].label = "Local Government Area"
        self.fields['dob'].label = "Date of Birth"
        self.fields['contact_address'].label = "Contact Address"
+       self.fields['academic_session'].label = "Select Academic Session"
 
 
 class IndexingPaymentModelForm(forms.ModelForm):
@@ -115,6 +142,8 @@ class InstitutionPaymentModelForm(forms.ModelForm):
        self.request = kwargs.pop('request')
        super(InstitutionPaymentModelForm, self).__init__(*args, **kwargs)
        user = self.request.user
+       academic_session = self.request.GET.get('academic_session')
+       # self.fields['students_payments'].queryset = IndexingPayment.objects.filter(institution = user.get_indexing_officer_profile.institution, student_indexing__verification_status = 2, payment_verification_status=1, academic_session = academic_session)
        self.fields['students_payments'].queryset = IndexingPayment.objects.filter(institution = user.get_indexing_officer_profile.institution, student_indexing__verification_status = 2, payment_verification_status=1)
        self.fields['academic_session'].label = "Academic Session"
        self.fields['rrr_number'].label = "RRR Number"

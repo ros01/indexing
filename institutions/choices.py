@@ -409,6 +409,13 @@ YEAR_OF_STUDY = (
 INSTITUTIONS = (
         ('University of Nigeria', 'University of Nigeria' ),
         ('Nnamdi Azikiwe University', 'Nnamdi Azikiwe University'),
+        ('University of Maiduguri', 'University of Maiduguri'),
+        ('Ahmadu Bello University Zaria', 'Ahmadu Bello University Zaria'),
+        ('University of Uyo', 'University of Uyo'),
+        ('University of Calabar', 'University of Calabar'),
+        ('Bayero University Kano', 'Bayero University Kano'),
+        ('University of Lagos', 'University of Lagos'),
+        ('Usman Danfodio University', 'Usman Danfodio University'),
         )
 
 TRANSFER_COURSE_GRADES = (

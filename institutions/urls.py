@@ -4,6 +4,7 @@ from .views import (
     DashboardView,
     StudentProfileCreateView,
     StudentProfileDetailView,
+    StudentProfileUpdateView,
     # InstitutionCreateView,
     # InstitutionDetailView,
     # StudentProfilesListView,
@@ -18,6 +19,7 @@ from .views import (
     IndexingPaymentsDetails,
     # CreateAcademicSession,
     InstitutionPaymentCreateView,
+    InstitutionPaymentsCreateView,
     SubmittedPaymentsListView,
     VerifiedPaymentsListView,
     StudentIndexingPaymentDetailView,
@@ -62,6 +64,9 @@ urlpatterns = [
     path('<slug:slug>/admission_quota_detail',  AdmissionQuotaDetailView.as_view(), name='admission_quota_detail'),
     
     path('create_student_profile',  StudentProfileCreateView.as_view(), name='create_student_profile'),
+    path('<int:pk>/student_profile_update',  StudentProfileUpdateView.as_view(), name='student_profile_update'),
+
+
     path('downloadfile', views.downloadfile, name='downloadfile'),
     # path('create_academic_session/', CreateAcademicSession.as_view(), name='create_academic_session'),
     path('student_profile_details/<slug:islug>/<slug:sslug>',  StudentProfileDetailView.as_view(), name='student_profile_details'),
@@ -77,7 +82,9 @@ urlpatterns = [
     path('<slug:slug>/reject_application/', views.reject_application, name='reject_application'),
     path('<int:id>/verify_payment/', views.verify_payment, name='verify_payment'),
     path('<int:id>/reject_payment/', views.reject_payment, name='reject_payment'),
-    path('institutions_indexing_payment',  InstitutionPaymentCreateView.as_view(), name='institutions_indexing_payment'),
+    path('pay_institutions_indexing_fee',  InstitutionPaymentCreateView.as_view(), name='pay_institutions_indexing_fee'),
+    path('pay_institution_indexing_fee',  InstitutionPaymentsCreateView.as_view(), name='pay_institution_indexing_fee'),
+    path('select_payment_session',  views.select_payment_session, name='select_payment_session'),
     
     path('generate_payment_invoice', GenerateInvoiceView.as_view(), name='generate_payment_invoice'),
     path('student_indexing_payments_list', IndexingPaymentsListView.as_view(), name='student_indexing_payments_list'),

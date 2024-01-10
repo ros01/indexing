@@ -17,7 +17,7 @@ class SignupForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ('email', 'first_name', 'last_name', 'middle_name', 'phone_no', 'password1', 'password2','role')
+        fields = ['email', 'first_name', 'last_name', 'middle_name', 'phone_no', 'password1', 'password2', 'role']
 
 
     def send_activation_email(self, request, user):

@@ -224,10 +224,44 @@ class IndexingOfficerDetailView(StaffRequiredMixin, DetailView):
 	# 	obj = self.get_object()
 	# 	context['payment_object'] = obj.indexingpayment_set.first()
 	# 	return context
-
-
-
 # qs = User.objects.filter(role='Indexing Officer')
+
+
+
+class IndexingOfficerUpdateView (StaffRequiredMixin, SuccessMessageMixin, UpdateView):
+    form_class = SignupForm
+    template_name = "indexing_unit/update_indexing_officer.html"
+    # success_message = "Student Profile Update Successful"
+
+    success_message = "%(indexing_officer)s  Update Successful"
+    def get_object(self, queryset=None):
+    	pk = self.kwargs.get("pk")
+    	user = User.objects.get(id=pk)
+    	return user
+
+    def get_success_message(self, cleaned_data):
+      return self.success_message % dict(
+            cleaned_data,
+            indexing_officer=self.object.get_full_name,
+        )
+
+    # def get(self, request, id = None, *args, **kwargs):
+    # 	context = {}
+    # 	pk = self.kwargs.get("pk")
+    # 	obj = User.objects.get(id = pk)
+    # 	if obj is not None:
+    #     	# user_form = self.user_form(instance=obj)
+    #     	form  = self.form(instance=obj)
+    # 	return render(request, self.template_name, {'form':form})
+
+ 
+    def get_success_url(self):
+        # obj = self.get_object()
+        # return reverse("indexing_unit:indexing_officer_detail" object.pk)
+        return reverse("indexing_unit:indexing_officers_list") 
+
+       
+
 
 def activate_user(request, slug):
   if request.method == 'POST':

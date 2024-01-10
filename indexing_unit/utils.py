@@ -6,6 +6,7 @@ from django.utils.text import slugify
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
+from django.utils.http import urlsafe_base64_decode
 from django.template import loader
 from rrbnindexing.settings import EMAIL_HOST_PASSWORD
 from django.http import HttpResponse
@@ -174,6 +175,27 @@ def reset_password(user, request):
     except Exception as e:
         print(e)
 
+
+def reset_user_password(user, request):
+    context = {}
+    context['email'] = user.email 
+    context['domain'] = request.META['HTTP_HOST'] 
+    context['site_name'] = 'indexing' 
+    context['uid'] = urlsafe_base64_encode(force_bytes(user.pk))
+    context['user'] = user 
+    context['token'] = default_token_generator.make_token(user)
+    context["protocol"] = 'https' if request.is_secure() else 'http'
+    subject = 'Password Change Request'
+    html_template = 'accounts/password_reset_email3.html'
+    html_message = render_to_string(html_template, context)
+    try:        
+        from_email ="institute@rrbn.gov.ng"
+        to_email = [user.email]
+        message = EmailMessage(subject, html_message, from_email, to_email)
+        message.content_subtype = 'html'
+        message.send()
+    except Exception as e:
+        print(e)
 
 
 

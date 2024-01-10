@@ -16,11 +16,10 @@ class IndexingOfficerProfileForm(forms.ModelForm):
     
     class Meta:
         model = IndexingOfficerProfile
-        fields = ('__all__')
-        # fields = [
-        #     'indexing_officer',
-        #     'institution',
-        #         ]
+        # fields = "__all__"
+        fields = ('indexing_officer', 'institution')
+            
+            
        
         # widgets = {
 

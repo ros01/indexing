@@ -77,6 +77,8 @@
 
 <div class="d-flex justify-content-end mr-2 mb-2"> 
 
+<a href="{% url 'indexing_unit:indexing_officer_update' object.indexing_officer.pk  %}" class="btn btn-outline-primary py-0 mr-2 mt-1 mb-3"><i class="fa fa-toggle-on" aria-hidden="true"></i> Update Indexing Officer </a>  
+
 
 {% if object.indexing_officer.is_active == False %} 
 <a href="javascript:{document.getElementById('activate{{object.slug }}').submit()}">
@@ -86,7 +88,7 @@
 {% else %}
 
 <a href="javascript:{document.getElementById('deactivate{{object.slug }}').submit()}">
-<input type="submit" class="btn btn-outline-primary py-0 mr-3 mt-1" value="Deactivate User" onclick="return confirm('Are you sure you want to de-activate this Indexing Officer?')" >
+<input type="submit" class="btn btn-outline-primary py-0 mr-3 mt-1" value="Deactivate User"  onclick="return confirm('Are you sure you want to de-activate this Indexing Officer?')" >
 </a>
 {% endif %}
 

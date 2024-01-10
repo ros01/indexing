@@ -389,6 +389,7 @@ def approve_application(request, slug):
   if request.method == 'POST':
      object = get_object_or_404(StudentIndexing, slug=slug)
      payment_object = object.indexingpayment_set.first()
+     object.verification_status = 3
      object.board_verification_status = 2
      payment_object.payment_status = 3
      object.save()

@@ -176,7 +176,7 @@ class MyStudentProfileDetailView(StaffRequiredMixin, DetailView):
 
 class UpdateProfile(StaffRequiredMixin, SuccessMessageMixin, UpdateView):
     model = StudentProfile
-    form_class = StudentProfileModelForm
+    form_class = StudentProfileUpdateModelForm
     template_name = "students/update_profile.html"
     # success_message = "Student Profile Update Successful"
 

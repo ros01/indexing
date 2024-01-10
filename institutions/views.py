@@ -262,6 +262,189 @@ class InstitutionObjectMixin(object):
 
 
 class StudentProfileCreateView(StaffRequiredMixin, SuccessMessageMixin, CreateView):
+	form = StudentProfileModelForm
+	def get(self, request, *args, **kwargs):
+		form = StudentProfileModelForm()
+		template_name = 'institutions/bulk_create_students.html'
+		return render(request, template_name, {'form':form})
+
+	def get_context_data(self, request, *args, **kwarg):
+		user = self.request.user
+		form = StudentProfileModelForm()
+		qs1 = InstitutionProfile.objects.filter(name=user.get_indexing_officer_profile.institution)
+		obj = qs1.first().studentprofile_set.all()
+		context['object'] = obj
+		context['form'] = form
+			
+	def post(self, request, *args, **kwargs):
+		user = self.request.user
+		institution = InstitutionProfile.objects.filter(name=user.get_indexing_officer_profile.institution).first()
+		# print("Institution:", institution)
+		session = request.POST.get('academic_session')
+		academic_session = AcademicSession.objects.filter(id = session).first()
+		# print("Academic Session:", academic_session)
+		quota = AdmissionQuota.objects.filter(institution = institution, academic_session = academic_session).first()
+		admission_quota = quota.admission_quota
+		# print("Admission Quota:", admission_quota)
+		students_qs = institution.studentprofile_set.all()
+		# print("Queryset object:", admission_quota )
+	
+				
+		# quota = AdmissionQuota.objects.filter(institution = user.get_indexing_officer_profile.institution)
+		# admission_quota = quota.first()
+		# academic_session = admission_quota.academic_session
+		
+
+		students_list = students_qs.filter(academic_session = academic_session)
+		paramFile = io.TextIOWrapper(request.FILES['students_list'].file)
+		portfolio1 = csv.DictReader(paramFile)
+		list_of_dict = list(portfolio1)
+
+		try:
+			context = {}
+
+			
+			if len(students_list) >= int(admission_quota):
+				messages.error(request, "Admission Quota exceeded!")				
+				print("Admission Quota exceeded")
+				return redirect("institutions:create_student_profile")
+    		
+			for row in list_of_dict:
+				data = row['email']
+				students_list = User.objects.filter(email = data)
+				# print("Students:", students_list)
+				try:
+					if students_list.exists():
+						for student in students_list:
+							messages.error(request, f'This User: {student} and possibly other students on this list exit already exist')
+						return redirect("institutions:create_student_profile")
+					else:
+						student = User.objects.create(email=row['email'], last_name=row['last_name'], first_name=row['first_name'], middle_name=row['middle_name'], phone_no=row['phone_no'], matric_no=row['matric_no'], password = make_password('Rebelspy1%'),)
+						
+				except Exception as e:
+					messages.error(request, e)
+
+			objs = [
+	            StudentProfile(
+	            	student = User.objects.get(email=row['email']),
+	            	institution=institution,
+	            	academic_session = academic_session,
+	            )
+	            for row in list_of_dict   	
+	         ]
+			for obj in objs:
+				obj.slug = create_slug3(instance=obj)
+			nmsg = StudentProfile.objects.bulk_create(objs)
+			messages.success(request, "Bulk Create of Students successful!")
+			returnmsg = {"status_code": 200}
+			for obj in objs:
+				user = obj.student
+				reset_password(user, request)
+			# return redirect(institution.first().get_student_profiles_list())
+			return redirect("institutions:create_student_profile")			
+		except Exception as e:
+			print('Error While Importing Data: ', e)
+			returnmsg = {"status_code": 500}
+		return JsonResponse(returnmsg)
+		
+
+
+
+
+class StudentProfileUpdateView (StaffRequiredMixin, SuccessMessageMixin, UpdateView):
+    form_class = SignupForm
+    template_name = "institutions/update_student_profile.html"
+    # success_message = "Student Profile Update Successful"
+
+    success_message = "%(student)s  Student Profile Update Successful"
+    def get_object(self, queryset=None):
+    	pk = self.kwargs.get("pk")
+    	user = User.objects.get(id=pk)
+    	return user
+
+    def get_success_message(self, cleaned_data):
+      return self.success_message % dict(
+            cleaned_data,
+            student=self.object.get_full_name,
+        )
+
+
+
+    def get_success_url(self):
+        # obj = self.get_object()
+        # return reverse("indexing_unit:indexing_officer_detail" object.pk)
+        return reverse("institutions:student_profiles_list") 
+
+    # def form_valid(self, form):
+    #     student_profile = form.save()
+        # student = StudentProfile.objects.get(student__email= form.cleaned_data["email"]).student.email
+        # user = student_profile
+        # print ("User:", student)
+        # user = student.student.email
+        # print ("User Email:", user)
+        # reset_user_password(user, self.request)
+        # return super(StudentProfileUpdateView, self).form_valid(form)
+    
+
+    # def post(self, request, *args, **kwargs):
+    # 	user = User(
+    #         email=request.POST.get('email'),
+    #         last_name=request.POST.get('last_name'),
+    #         first_name=request.POST.get('first_name'),
+    #         middle_name=request.POST.get('middle_name'),
+    #         phone_no=request.POST.get('phone_no'),
+    #         password=request.POST.get('password1'),
+    #         role=request.POST.get('role'),
+    #         )
+    # 	user.save()
+    # 	reset_user_password(user, self.request)
+
+    def post(self, request, *args, **kwargs):
+    	email = request.POST['email']
+    	obj = get_object_or_404(User, email=email)
+    	# obj = StudentProfile.objects.get(student__email= form.cleaned_data["email"]).student.email
+    	form = self.form_class(request.POST or None, instance = obj)
+    	if form.is_valid():
+        	student_profile = form.save()
+        	user = student_profile
+        	reset_user_password(user, self.request)
+    	return super(StudentProfileUpdateView, self).form_valid(form)
+    	
+
+
+            
+    
+        #     current_site = get_current_site(request)
+        #     subject = 'Activate Your RRBN Portal Account'
+        #     from_email = settings.DEFAULT_FROM_EMAIL
+        #     to_email = [form.cleaned_data.get('email')]
+        #     message = render_to_string('accounts/activation_request.html', {
+        #         'user': user,
+        #         'domain': current_site.domain,
+        #         'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+        #         'token': account_activation_token.make_token(user),
+        #     })
+        #     send_mail(subject, message, from_email, to_email, fail_silently=True)
+
+        #     messages.success(
+        #         request, ('Please Confirm your email to complete registration.'))
+
+        #     return render(request, self.template_name1)
+
+        # return render(request, self.template_name, {'form': form})
+        # return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        # obj = self.get_object()
+        # return reverse("indexing_unit:indexing_officer_detail" object.pk)
+        return reverse("institutions:student_profiles_list") 
+        # return HttpResponseRedirect("/"+id)
+
+    
+
+
+
+class StudentProfileCreateView1(StaffRequiredMixin, SuccessMessageMixin, CreateView):
 	def get(self, request, *args, **kwargs):
 		template_name = 'institutions/bulk_create_students.html'
 		return render(request, template_name)
@@ -329,9 +512,10 @@ class StudentProfileCreateView(StaffRequiredMixin, SuccessMessageMixin, CreateVi
 			print('Error While Importing Data: ', e)
 			returnmsg = {"status_code": 500}
 		return JsonResponse(returnmsg)
-		
 
-class StudentProfileCreateView1(StaffRequiredMixin, SuccessMessageMixin, CreateView):
+
+
+class StudentProfileCreateView2(StaffRequiredMixin, SuccessMessageMixin, CreateView):
 	# success_message = "Bulk Create of %(student)s Students successful"
 
 	# def get_success_message(self, cleaned_data):
@@ -446,72 +630,6 @@ class StudentProfileDetailView(StaffRequiredMixin, DetailView):
 		return obj
 
 # @user_passes_test(staff_required)
-@login_required
-def students_applications_list(request):
-	academic_sessions = AcademicSession.objects.all()
-	context = {'academic_sessions': academic_sessions}
-	print("User Role:", request.user.role)
-	return render(request, 'institutions/academic_sessions.html', context)
-
-@login_required
-def applications_list(request):
-	academic_session = request.GET.get('academic_session')
-	user = request.user
-	applications = StudentIndexing.objects.filter(academic_session=academic_session, institution=user.get_indexing_officer_profile.institution, verification_status=1)
-	context = {'applications': applications}
-	return render(request, 'partials/applications.html', context)
-
-
-
-@login_required
-def students_verifications_list(request):
-	academic_sessions = AcademicSession.objects.all()
-	context = {'academic_sessions': academic_sessions}
-	print("User Role:", request.user.role)
-	return render(request, 'institutions/academic_session_verifications.html', context)
-
-@login_required
-def verifications_list(request):
-	academic_session = request.GET.get('academic_session')
-	user = request.user
-	verifications = StudentIndexing.objects.filter(academic_session=academic_session, institution=user.get_indexing_officer_profile.institution, verification_status=2)
-	context = {'verifications': verifications}
-	return render(request, 'partials/verifications.html', context)
-
-
-
-@login_required
-def institutions_payments_list(request):
-	academic_sessions = AcademicSession.objects.all()
-	context = {'academic_sessions': academic_sessions}
-	return render(request, 'institutions/academic_session_payments.html', context)
-
-@login_required
-def payments_list(request):
-	academic_session = request.GET.get('academic_session')
-	user = request.user
-	payments = InstitutionPayment.objects.filter(academic_session=academic_session, institution = user.get_indexing_officer_profile.institution)
-	context = {'payments': payments}
-	return render(request, 'partials/payments.html', context)
-
-
-@login_required
-def indexed_students_list(request):
-	academic_sessions = AcademicSession.objects.all()
-	context = {'academic_sessions': academic_sessions}
-	return render(request, 'institutions/academic_session_indexing_list.html', context)
-
-@login_required
-def indexed_list(request):
-	academic_session = request.GET.get('academic_session')
-	user = request.user
-	institutions = InstitutionProfile.objects.filter(name = user.get_indexing_officer_profile.institution)
-	indexing_list = IssueIndexing.objects.filter(academic_session=academic_session, institution__in=institutions)
-	context = {
-	    'institutions':institutions,
-	    'indexing_list':indexing_list,
-	    }
-	return render(request, 'partials/indexed_students_list.html', context)
 
 
 @login_required
@@ -524,8 +642,11 @@ def student_profiles_list(request):
 def student_list(request):
 	academic_session = request.GET.get('academic_session')
 	user = request.user
-	qs = InstitutionProfile.objects.filter(name=user.get_indexing_officer_profile.institution)
-	students_list = qs.first().studentprofile_set.all()
+	# qs = InstitutionProfile.objects.filter(name=user.get_indexing_officer_profile.institution)
+	# print ("Institution:", qs)
+	# students_list = qs.first().studentprofile_set.all()
+	students_list = StudentProfile.objects.filter(institution=user.get_indexing_officer_profile.institution, academic_session = academic_session)
+	print ("studens list:", students_list)
 	context = {
 	    'students_list':students_list,
 	    }
@@ -826,6 +947,194 @@ class IndexingPaymentsDetails(StaffRequiredMixin, TemplateView):
         context['object'] = IndexingPayment.objects.all()
         context['obj'] = InstitutionProfile.objects.filter(indexing_status=1)
         return context
+
+@login_required
+def students_applications_list(request):
+	academic_sessions = AcademicSession.objects.all()
+	context = {'academic_sessions': academic_sessions}
+	print("User Role:", request.user.role)
+	return render(request, 'institutions/academic_sessions.html', context)
+
+@login_required
+def applications_list(request):
+	academic_session = request.GET.get('academic_session')
+	user = request.user
+	applications = StudentIndexing.objects.filter(academic_session=academic_session, institution=user.get_indexing_officer_profile.institution, verification_status=1)
+	context = {'applications': applications}
+	return render(request, 'partials/applications.html', context)
+
+
+
+@login_required
+def students_verifications_list(request):
+	academic_sessions = AcademicSession.objects.all()
+	context = {'academic_sessions': academic_sessions}
+	print("User Role:", request.user.role)
+	return render(request, 'institutions/academic_session_verifications.html', context)
+
+@login_required
+def verifications_list(request):
+	academic_session = request.GET.get('academic_session')
+	user = request.user
+	verifications = StudentIndexing.objects.filter(academic_session=academic_session, institution=user.get_indexing_officer_profile.institution, verification_status=2)
+	context = {'verifications': verifications}
+	return render(request, 'partials/verifications.html', context)
+
+
+
+
+
+
+@login_required
+def indexed_students_list(request):
+	academic_sessions = AcademicSession.objects.all()
+	context = {'academic_sessions': academic_sessions}
+	return render(request, 'institutions/academic_session_indexing_list.html', context)
+
+@login_required
+def indexed_list(request):
+	academic_session = request.GET.get('academic_session')
+	user = request.user
+	institutions = InstitutionProfile.objects.filter(name = user.get_indexing_officer_profile.institution)
+	indexing_list = IssueIndexing.objects.filter(academic_session=academic_session, institution__in=institutions)
+	context = {
+	    'institutions':institutions,
+	    'indexing_list':indexing_list,
+	    }
+	return render(request, 'partials/indexed_students_list.html', context)
+
+@login_required
+def institutions_payments_list(request):
+	academic_sessions = AcademicSession.objects.all()
+	context = {'academic_sessions': academic_sessions}
+	return render(request, 'institutions/academic_session_payments.html', context)
+
+@login_required
+def payments_list(request):
+	academic_session = request.GET.get('academic_session')
+	user = request.user
+	payments = InstitutionPayment.objects.filter(academic_session=academic_session, institution = user.get_indexing_officer_profile.institution)
+	context = {'payments': payments}
+	return render(request, 'partials/payments.html', context)
+
+def select_payment_session(request):
+	academic_sessions = AcademicSession.objects.all()
+	academic_session = request.GET.get('academic_session')
+	print("Academic Session:", academic_session)
+	form = InstitutionPaymentModelForm(request.POST or None, request = request)
+	context = {'academic_sessions': academic_sessions, 'form':form}
+
+	if request.method == 'POST':
+		institutions_payment = InstitutionPayment.objects.create(
+            students_payments=request.POST.get('students_payments'),
+            academic_session=request.POST.get('academic_session'), 
+            rrr_number=request.POST.get('rrr_number'),
+            payment_amount=request.POST.get('payment_amount'),
+            payment_method=request.POST.get('payment_method'),
+            payment_receipt=request.FILES.get('payment_receipt'),
+        )
+        
+
+		return redirect(request.META.get('HTTP_REFERER'))
+		print(instiutions_payment)
+	
+	return render(request, 'partials/institutions_payment_partial.html', context)
+
+
+def add_film(request):
+    name = request.POST.get('name')
+    
+    # add film
+    film = Film.objects.create(name=name)
+    
+    # add the film to the user's list
+    request.user.films.add(film)
+
+    # return template fragment with all the user's films
+    films = request.user.films.all()
+    return render(request, 'partials/film-list.html', {'films': films})
+
+class InstitutionPaymentCreateView1(StaffRequiredMixin, SuccessMessageMixin, CreateView):
+    model = InstitutionPayment
+    template_name = "institutions/pay_institutions_indexing_fee.html"
+    form_class = InstitutionPaymentModelForm
+    success_message = "%(institution)s Institution Indexing Payment Submission Successful"
+    academic_sessions = AcademicSession.objects.all()
+
+
+    # def get(self, request, *args, **kwargs):
+    # 	form = InstitutionPaymentModelForm
+    # 	academic_sessions = AcademicSession.objects.all()
+    # 	template_name = "institutions/pay_institutions_indexing_fee.html"
+    # 	return render(request, template_name, {'form':form})
+
+    def get_success_message(self, cleaned_data):
+      return self.success_message % dict(
+            cleaned_data,
+            institution=self.object.institution.name,
+        )
+
+    def get_context_data(self, **kwargs):
+    	context = super().get_context_data(**kwargs)
+    	context['academic_sessions'] = AcademicSession.objects.all()
+    	context['is_htmx'] = True
+    	return context
+
+
+
+    def get_form_kwargs(self):
+        """ Passes the request object to the form class.
+         This is necessary to only display members that belong to a given user"""
+
+        kwargs = super(InstitutionPaymentCreateView, self).get_form_kwargs()
+        kwargs['request'] = self.request
+        return kwargs
+
+    def form_valid(self, form):
+        payment = form.save(commit=False)
+        user = self.request.user
+        institution = InstitutionProfile.objects.get(name=user.get_indexing_officer_profile.institution)
+        # form.instance.institution = institution
+        payment.institution = institution
+        payment.save()
+        return super(InstitutionPaymentCreateView, self).form_valid(form)
+
+
+class InstitutionPaymentsCreateView(StaffRequiredMixin, SuccessMessageMixin, CreateView):
+    model = InstitutionPayment
+    template_name = "institutions/pay_institutions_indexing_fee.html"
+    form_class = InstitutionPaymentModelForm
+    success_message = "%(institution)s Institution Indexing Payment Submission Successful"
+    academic_sessions = AcademicSession.objects.all()
+
+    def get_success_message(self, cleaned_data):
+      return self.success_message % dict(
+            cleaned_data,
+            institution=self.object.institution.name,
+        )
+
+    def get_context_data(self, **kwargs):
+    	context = super().get_context_data(**kwargs)
+    	context['academic_sessions'] = AcademicSession.objects.all()
+    	return context
+
+
+
+    def get_form_kwargs(self):
+        kwargs = super(InstitutionPaymentsCreateView, self).get_form_kwargs()
+        kwargs['request'] = self.request
+        return kwargs
+
+    def form_valid(self, form):
+        payment = form.save(commit=False)
+        user = self.request.user
+        institution = InstitutionProfile.objects.get(name=user.get_indexing_officer_profile.institution)
+        payment.institution = institution
+        payment.save()
+        print(request.POST)
+        return super(InstitutionPaymentsCreateView, self).form_valid(form)
+
+
 
 class InstitutionPaymentCreateView(StaffRequiredMixin, SuccessMessageMixin, CreateView):
     model = InstitutionPayment

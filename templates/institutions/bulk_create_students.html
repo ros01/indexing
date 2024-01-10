@@ -1,5 +1,6 @@
 {% extends 'institutions/dashboard_base1.html'%}
 {% load static %}
+{% load widget_tweaks %}
 {% load crispy_forms_tags %}
 {% block title%}| Welcome {% endblock %}
 
@@ -54,15 +55,16 @@
 
 </div>
 
-
-
-
+<!-- <form class="form-horizontal form-material" method="get">
+{{ form.media }}
+{{ form.academic_session | as_crispy_field }}
+</form> -->
 
 
 
 <!-- <div class="col-md-12 col-lg-8 align-self-left"> -->
 <div>
-<p class="detail-text mb-3">Batch create student profiles from csv file.
+<p class="lead text-primary ">Batch create student profiles from csv file.
 </p>
 
 
@@ -81,11 +83,21 @@
 <form class="form-horizontal form-material" method="post" enctype="multipart/form-data">
 {% csrf_token %}
 <div class="form-group row">
-<div class="col-md-4">
+
+
+<div class="col-md-6">
+{{ form.academic_session | as_crispy_field }}
+</div>
+</div>
+
+<div class="form-group row">
+<div class="col-md-6 mt-2">
+<label for="id_students_list">Upload Students List:</label>
 <input type="file" name="students_list"  class="form-control">
 </div>
 
 </div>
+
 
 <div class="form-group">
 <input type="submit" class="btn btn-outline-primary btn-sm px-4 mt-2 float-right" value="Create Student Profiles" onclick="return confirm('Are you sure you want to submit this form?')">

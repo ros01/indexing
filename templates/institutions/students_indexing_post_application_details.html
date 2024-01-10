@@ -157,6 +157,29 @@
 </div>
 {% endif %}
 
+{% if object.transfer_grade %}
+<h5 class="mb-1"> <i class="fas fa-desktop text-primary"></i> DE Results</h5>
+<div>  
+<p class="text-sm mb-0">
+<ul class="list-unstyled">                           
+<li>Course of study: <span class="text-dark font-weight-bold ms-sm-2">{{object.transfer_grade.course}}</span></li>
+<li>Institution Attended:   <span class="text-dark font-weight-bold ms-sm-2">{{object.transfer_grade.institution}}</span></li>
+<li>Class of Degree:   <span class="text-dark font-weight-bold ms-sm-2">{{object.transfer_grade.degree_type}}</span></li>
+<li>Year of Study:   <span class="text-dark font-weight-bold ms-sm-2">
+{{object.transfer_grade.year_of_study}}</span></li>
+<li>Grade:   <span class="text-dark font-weight-bold ms-sm-2">
+{{object.transfer_grade.course_grade}}</span></li>
+
+{% if object.transfer_grade.academic_transcript %}
+<li>Academic Transcript:   <span class="text-dark font-weight-bold ms-sm-2">
+<i class="fa fa-eye text-primary"></i>
+<a class="text-primary" href="{{object.transfer_grade.academic_transcript.url}}" target="_blank">&nbsp; View Result</a>
+</span></li>
+{% endif %}
+</ul>
+</div>
+{% endif %}
+
         
 </div>
 </div>

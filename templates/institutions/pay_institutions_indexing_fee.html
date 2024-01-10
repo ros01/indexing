@@ -1,0 +1,78 @@
+{% extends 'institutions/dashboard_base2.html'%}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block title%}| Welcome {% endblock %}
+
+{% block styles %}
+
+
+{% endblock %}
+
+
+
+{% block content %}
+
+<div class="row ml-3 mb-4 pb-4">
+<div class="col-lg-10 col-xl-9">
+<div class="card m-b-30">
+<div class="card-header profile-tabs pb-0">
+<ul class="nav nav-tabs">
+<li class="nav-item">
+<a class="nav-link active" href="#about" data-toggle="tab" aria-expanded="false"><i class="ti-user mr-2"></i>Institutions Indexing Payment</a>
+</li>
+</ul>
+</div>
+<div class="card-body">
+<div class="">
+<div class="tab-content">
+<div class="tab-pane active" id="about">
+<div class="row justify-content">
+<div class="col-md-12  profile-detail">
+<div class="">
+<h5 class="mb-3"> <i class="fa fa-graduation-cap text-primary"></i> Pay for Student Indexing</h5>
+{% for message in messages %}
+    <div class="alert {{ message.tags }} alert-dismissible shadow fade show" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        {{ message | safe }}
+    </div>
+{% endfor %}
+</div>
+</div>
+
+<div>
+<p class="detail-text mb-3">Kindly note that only students whose indexing application and payment details have been approved by the indexing officer can be included here.
+</p>
+</div>
+
+<select class="custom-select mb-4 col-md-5 ml-2" 
+            name="academic_session" 
+            hx-get="{% url 'institutions:select_payment_session' %}"
+            hx-trigger="change"
+            hx-target="#session-list">
+<option selected>Select Academic Session</option>
+{% for academic_session in academic_sessions %}
+<option value="{{academic_session.pk}}"> {{academic_session.name}}</option>
+{% endfor %}
+</select>
+
+
+
+ <div id="session-list">
+{% include 'partials/institutions_payment_partial.html' %}
+</div>
+
+
+
+
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+{% endblock %}
