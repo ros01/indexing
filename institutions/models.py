@@ -109,10 +109,20 @@ def pre_save_institution_receiver(sender, instance, *args, **kwargs):
 pre_save.connect(pre_save_institution_receiver, sender=InstitutionProfile)
 
 
+class GetOrNoneManager(models.Manager):
+    """Adds get_or_none method to objects
+    """
+    def get_or_none(self, **kwargs):
+        try:
+            return self.get(**kwargs)
+        except self.model.DoesNotExist:
+            return None
+
 
 class AdmissionQuota(models.Model):
     institution  = models.ForeignKey(InstitutionProfile, on_delete=models.CASCADE, null=True)
     # academic_session = models.CharField(max_length=100, choices = ACADEMIC_SESSION, blank=True)
+    objects = GetOrNoneManager()
     academic_session = models.ForeignKey(AcademicSession,  on_delete=models.CASCADE)
     admission_quota  = models.IntegerField(blank=True, null=True)
     slug      = models.SlugField(blank=True)
@@ -326,7 +336,7 @@ class StudentIndexing(models.Model):
     student_profile = models.ForeignKey(StudentProfile,  null=True, blank=True, on_delete=models.CASCADE)
     institution = models.ForeignKey(InstitutionProfile,  on_delete=models.DO_NOTHING)
     slug  = models.SlugField(blank=True)
-    matric_no = models.CharField(max_length=200, unique=True)
+    matric_no = models.CharField(max_length=200)
     # academic_session = models.CharField(max_length=200, choices = ACADEMIC_SESSION)
     academic_session = models.ForeignKey(AcademicSession,  on_delete=models.CASCADE)
     admission_type = models.CharField(max_length=200, null=True, blank=True)
@@ -474,7 +484,7 @@ class IndexingPayment(models.Model):
     student_indexing = models.ForeignKey(StudentIndexing,  null=True, blank=True, on_delete=models.CASCADE)
     # institution_payment = models.ForeignKey("InstitutionPayment", null=True, blank=True, on_delete=models.DO_NOTHING)
     slug  = models.SlugField(blank=True)
-    matric_no = models.CharField(max_length=200, unique=True)
+    matric_no = models.CharField(max_length=200)
     # academic_session = models.CharField(max_length=200, choices = ACADEMIC_SESSION)
     academic_session = models.ForeignKey(AcademicSession,  on_delete=models.CASCADE)
     payment_status = models.IntegerField(default=1)

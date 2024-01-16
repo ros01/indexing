@@ -50,7 +50,7 @@ class IssueIndexing(models.Model):
 
     def save(self, *args, **kwargs):
         super(IssueIndexing, self).save(*args, **kwargs)
-        # self.student_indexing.verification_status = 4
+        self.student_indexing.verification_status = 4
         self.student_indexing.indexing_status = 4
         self.indexing_payment.payment_status = 4
         self.student_indexing.save()  

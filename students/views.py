@@ -89,8 +89,8 @@ def status(request):
         return IndexingPaymentCreateListView.as_view()(request)
     elif StudentIndexing.objects.filter(student_profile__student = user, indexing_status=2):
         return MyIndexingApplicationListView.as_view()(request)
-    # elif StudentIndexing.objects.filter(student_profile__student = user, indexing_status=3):
-    #     return MyIndexingApplicationListView.as_view()(request)
+    # elif IndexingPayment.objects.filter(student_profile__student = user, payment_verification_status=2):
+    #      return MyIndexingPaymentListView.as_view()(request)
     elif IssueIndexing.objects.filter(student_profile__student = user):
         return MyIndexingCompleteListView.as_view()(request)
     else:
@@ -792,6 +792,34 @@ class MyIndexingCompleteListView(StaffRequiredMixin, ListView):
 class MyIndexingNumberDetailView(StaffRequiredMixin, DetailView):
     queryset = IssueIndexing.objects.all()
     template_name = "students/my_indexing_number_details.html"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # class IndexingApplicationCreateView(CreateView):

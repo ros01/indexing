@@ -143,8 +143,8 @@ class InstitutionPaymentModelForm(forms.ModelForm):
        super(InstitutionPaymentModelForm, self).__init__(*args, **kwargs)
        user = self.request.user
        academic_session = self.request.GET.get('academic_session')
-       # self.fields['students_payments'].queryset = IndexingPayment.objects.filter(institution = user.get_indexing_officer_profile.institution, student_indexing__verification_status = 2, payment_verification_status=1, academic_session = academic_session)
-       self.fields['students_payments'].queryset = IndexingPayment.objects.filter(institution = user.get_indexing_officer_profile.institution, student_indexing__verification_status = 2, payment_verification_status=1)
+       self.fields['students_payments'].queryset = IndexingPayment.objects.filter(institution = user.get_indexing_officer_profile.institution, student_indexing__verification_status = 2, payment_verification_status=1, academic_session = academic_session)
+       # self.fields['students_payments'].queryset = IndexingPayment.objects.filter(institution = user.get_indexing_officer_profile.institution, student_indexing__verification_status = 2, payment_verification_status=1)
        self.fields['academic_session'].label = "Academic Session"
        self.fields['rrr_number'].label = "RRR Number"
        self.fields['payment_amount'].label = "Payment Amount"

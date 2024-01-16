@@ -48,7 +48,7 @@
 
 <select class="custom-select mb-4 col-md-5 ml-2" 
             name="academic_session" 
-            hx-get="{% url 'institutions:select_payment_session' %}"
+            hx-get="{% url 'institutions:pay_session_indexing_fee' %}"
             hx-trigger="change"
             hx-target="#session-list">
 <option selected>Select Academic Session</option>
@@ -59,7 +59,7 @@
 
 
 
- <div id="session-list">
+<div id="session-list">
 {% include 'partials/institutions_payment_partial.html' %}
 </div>
 
