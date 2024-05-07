@@ -13,6 +13,7 @@ from .views import (
     IndexingOfficerListView,
     InstitutionDetailView,
     InstitutionListView,
+    InstitutionSearchView,
     AdmissionQuotaCreateView,
     AdmissionQuotaDetailView,
     AdmissionQuotaUpdateView,
@@ -50,6 +51,10 @@ app_name = 'indexing_unit'
 urlpatterns = [
 	path('dashboard', DashboardView.as_view(), name='dashboard'),
     path('institutions_list', InstitutionListView.as_view(), name='institutions_list'),
+    path('institutions_search_results', InstitutionSearchView.as_view(), name='institutions_search_results'),
+    # path('institutions_list', views.institutions_list, name='institutions_list'),
+    path('universities_list', views.universities_list, name='universities_list'),
+    # path('university_list', views.university_list, name='university_list'),
     path('academic_session_list',  AcademicSessionListView.as_view(), name='academic_session_list'),
     path('create_academic_session',  AcademicSessionCreateView.as_view(), name='create_academic_session'),
     path('create_institution',  InstitutionCreateView.as_view(), name='create_institution'),

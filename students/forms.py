@@ -198,7 +198,8 @@ class GceAlevelsModelForm(forms.ModelForm):
                 'class': 'form-control',
             })
        # self.fields['student_profile'].label = ""
-       self.fields['gce_alevels_result'].label = "Upload Result in PDF or Jpeg format"
+       # self.fields['admission_letter'].label = "Upload Admission Letter in PDF or Jpeg format"
+       self.fields['gce_alevels_result'].label = "Upload GCE A'Levels Result in PDF or Jpeg format"
        self.fields['gce_alevels_result'].widget.attrs['placeholder'] = "PDF or Jpeg format"
        self.fields['examination_body'].label = "Exam Body"
        self.fields['physics_score'].label = "Physics Score"
@@ -231,7 +232,8 @@ class DegreeResultModelForm(forms.ModelForm):
                 'class': 'form-control',
             })
        # self.fields['student_profile'].label = ""
-       self.fields['degree_result'].label = "Upload Result in PDF or Jpeg format"
+       # self.fields['admission_letter'].label = "Upload Admission Letter in PDF or Jpeg format"
+       self.fields['degree_result'].label = "Upload Degree Result in PDF or Jpeg format"
        self.fields['degree_result'].widget.attrs['placeholder'] = "PDF or Jpeg format"
        self.fields['institution'].label = "Institution of Study"
        self.fields['degree_type'].label = "Degree Type"
@@ -263,6 +265,7 @@ class TransferGradeModelForm(forms.ModelForm):
                 'class': 'form-control',
             })
        # self.fields['student_profile'].label = ""
+       # self.fields['admission_letter'].label = "Upload Admission Letter in PDF or Jpeg format"
        self.fields['academic_transcript'].label = "Upload Academic Transcript in PDF format"
        self.fields['academic_transcript'].widget.attrs['placeholder'] = "PDF format"
        self.fields['institution'].label = "Institution of Study"
@@ -343,7 +346,8 @@ class UtmeGradeModelForm(forms.ModelForm):
                 'class': 'form-control',
             })
        # self.fields['student_profile'].label = ""
-       self.fields['utme_grade_result'].label = "Upload Result in PDF or Jpeg format"
+       # self.fields['admission_letter'].label = "Upload Admission Letter in PDF or Jpeg format"
+       self.fields['utme_grade_result'].label = "Upload UTME Result in PDF or Jpeg format"
        self.fields['utme_grade_result'].widget.attrs['placeholder'] = "PDF or Jpeg format"
        # self.fields['matric_no'].label = "Matric Number"
        self.fields['examination_body'].label = "Exam Body"
@@ -372,8 +376,8 @@ class IndexingModelForm(forms.ModelForm):
             # 'utme_grade',
             # 'gce_alevels',
             # 'degree_result',
-            # 'matric_no',
             'academic_session',
+            'admission_letter',
             
                 ]
         widgets = {
@@ -400,6 +404,7 @@ class IndexingModelForm(forms.ModelForm):
             })
        #
        # self.fields['matric_no'].label = "Matric Number"
+       self.fields['admission_letter'].label = "Upload Admission Letter in PDF or Jpeg format"
        self.fields['academic_session'].label = "Academic Session"
       
 

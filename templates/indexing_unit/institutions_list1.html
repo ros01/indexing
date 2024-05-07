@@ -1,6 +1,8 @@
 {% extends 'indexing_unit/dashboard_base1.html'%}
+{% load widget_tweaks %}
+{% load crispy_forms_tags %}
 
-{% block title %}Institutions List | {{ block.super }}{% endblock title %}
+{% block title %}Institution | {{ block.super }}{% endblock title %}
 
 
 {% block content %}
@@ -9,52 +11,71 @@
 <div class="col-md-12 mt-4 mx-1">
 <div class="row">
 <div class="col-md-12">
-<div class="card">   
- <div class="card-body">
-<div class="d-flex justify-content-end mr-0 mb-2">   
-<a href="{% url 'indexing_unit:create_institution' %}" class="btn btn-primary"><i class="fa fa-list text-white"></i> Add Institution</a>
-</div>
-<h4 class="mt-0 header-title text-primary">List of Institutions with Valid Accreditations for Radiography and MIPT Practice</h4>
-<p class="text-muted  font-14">Download the printable version of the list of Institutions with Valid Accreditations for Radiography and MIPT Practice in any of the available formats below.
-</p>
-<table id="datatable-buttons" class="table table-striped table-bordered dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
-<thead>
-<tr>
-<th>Name</th>
-<th>Address</th>
-<th>Phone</th>
-<th>Email</th>
-<th></th>
+<div class="card">
+<div class="card-body">
 
-</tr>
-</thead>
-<tbody>
-{% for object in object_list %}
-<tr>
-<td>{{object.name}}</td>
-<td>{{object.address}}</td>
-<td>{{object.phone_no}}</td>
-<td>{{object.email}}</td>
-<td><a href="{{ object.get_absolute_url }}"> <i class="fas fa-search text-primary"></i> <span class="badge badge-boxed  badge-primary">View Details </span></a></td> 
-<span class="text-primary">
-<i class="fas fa-search-plus"></i>
-</span>
-</a></td>
 
-</tr>
-{% endfor %}
-</tbody>
-</table>
+<h4 class="mt-0 ml-3 header-title text-primary">Please Select Institution Type to Retrieve List.</h4>
+
+
+<div class="mb-4 col-md-4">
+
+<form class="form-horizontal form-material" method="get" action="{% url 'indexing_unit:institutions_search_results' %}">
+
+
+{{ form.institution_type.label_tag }}
+{% render_field form.institution_type class='custom-select mb-4' %}
+
+
+
+<button type="submit" class="btn btn-primary">Retrieve</button>
+
+
+</form>
 
 </div>
+
+
+
+<!-- <h4 class="mt-0 ml-3 header-title text-primary">List of Institutions with Valid Accreditations for Radiography Practice</h4>  -->
+
+
+        <div class="ml-3">
+            <table id="datatable-buttons" class="table table-striped table-bordered dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                <thead>
+				<tr>
+				<th width="3%">S/N</th>
+				<th>Name</th>
+				<th>Institution Type</th>
+				<th>Address</th>
+				<th>Phone</th>
+				<th>View</th>
+				</tr>
+				</thead>
+                <tbody>
+				 {% for object in institution %}
+				<tr> 
+				<td width="3%">{{forloop.counter}}</td>
+				<td>{{object.name}}</td>
+				<td>{{object.institution_type}}</td>
+				<td>{{object.address}}</td>
+				<td>{{object.phone_no}}</td>
+				<td><a href="{{ object.get_absolute_url }}"> <span class="badge badge-boxed  badge-primary"><i class="fas fa-search"></i> View Details </span></a></td> 
+				</tr>
+				{% endfor %}
+				</tbody>
+				</table>
+            </div>
+        </div>
+
+<div class="d-flex justify-content-end mr-2 mb-2"> 
+<a href="{% url 'indexing_unit:dashboard' %}" class="btn btn-outline-primary py-0 mr-2 mt-1 mb-1"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Back to Dashboard</a>  
 </div>
+
+
 </div> <!-- end col -->
+</div>    
 </div> <!-- end row -->
 </div>
 </div>
-
-
-
-
-
 {% endblock content %}

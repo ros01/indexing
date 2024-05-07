@@ -88,6 +88,20 @@
 <div class="form-group row">
     <div class="col-md-6">
     <div class= "form-control-alternative my-0 py-0">
+    {{ form.lga_identification|as_crispy_field }}
+    </div>
+    </div>
+    <div class="col-md-6">
+    <div class= "form-control-alternative my-0 py-0">
+    {{ form.passport_photo|as_crispy_field }}
+  
+    </div>
+    </div>
+</div>
+
+<div class="form-group row">
+    <div class="col-md-6">
+    <div class= "form-control-alternative my-0 py-0">
     {{ form.contact_address|as_crispy_field }}
     </div>
     </div>
@@ -97,6 +111,8 @@
     </div>
     </div>
 </div>
+
+
 
 <div class="form-group">
 <input type="submit" class="btn btn-primary btn-sm text-light px-4 mt-2 float-right" value="Save" onclick="return confirm('Are you sure you want to submit this form?')">

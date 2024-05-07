@@ -164,7 +164,7 @@ def reset_password(user, request):
     context['token'] = default_token_generator.make_token(user)
     context["protocol"] = 'https' if request.is_secure() else 'http'
     subject = 'Password Change Request'
-    html_template = 'accounts/password_reset_email.html'
+    html_template = 'accounts/password_reset_email1.html'
     html_message = render_to_string(html_template, context)
     try:        
         from_email ="institute@rrbn.gov.ng"

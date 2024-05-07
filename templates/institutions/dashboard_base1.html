@@ -21,6 +21,7 @@
         <link rel="shortcut icon" href="{% static 'd_assets/images/favicon.ico' %}">
 
         <link rel="stylesheet" href="{% static 'd_assets/plugins/metro/MetroJs.min.css' %}">
+        
         <link rel="stylesheet" href="{% static 'd_assets/plugins/morris/morris.css' %}">
         <link href="{% static 'd_assets/plugins/jvectormap/jquery-jvectormap-2.0.2.css' %}" rel="stylesheet">
         <link href="{% static 'd_assets/plugins/datatables/dataTables.bootstrap4.min.css' %}" rel="stylesheet" type="text/css" />
@@ -99,7 +100,8 @@
         <ul class="list-unstyled">
                     
             <li><a href="{% url 'institutions:student_indexing_applications_list' %}">Applications</a></li> 
-            <li><a href="{% url 'institutions:student_indexing_verifications_list' %}">Verifications</a></li>   
+            <li><a href="{% url 'institutions:student_indexing_verifications_list' %}">Verifications</a></li>  
+            <li><a href="{% url 'institutions:student_indexing_rejections_list' %}">Rejections</a></li>  
             <li><a href="{% url 'institutions:institutions_payments_list' %}">Institution Payments</a></li> 
             <li><a href="{% url 'institutions:indexed_students_list' %}">Indexed Students List</a></li>  
    

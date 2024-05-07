@@ -64,138 +64,156 @@
 
 <div>  
 
-        
+<p class="text-sm mb-0">
+<ul class="list-unstyled">
+<li>Student Name: <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.student.last_name}} {{object.student_profile.student.first_name}} {{object.student_profile.student.middle_name}}</span></li>
+<li>Institution: <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.institution}}</span></li>
+<li>Course of Study:  <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.institution.course_type}}</span></li>
+<li>Matric No: <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.student.matric_no}}</span></li>
+</ul>
+</div>
 
 
-        <p class="text-sm mb-0">
-        <ul class="list-unstyled">
-            <li>Student Name: <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.student.last_name}} {{object.student_profile.student.first_name}} {{object.student_profile.student.middle_name}}</span></li>
-            <li>Institution: <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.institution}}</span></li>
-            <li>Course of Study:  <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.institution.course_type}}</span></li>
-            <li>Matric No: <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.student.matric_no}}</span></li>
-        </ul>
-         </div>
+<h5 class="mb-1"> <i class="fab fa-accusoft text-primary"></i> Personal Details</h5> 
+<div>  
+<p class="text-sm mb-0">
+<ul class="list-unstyled">                           
+<li>Sex: <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.sex}}</span></li>
+<li>Date of Birth: <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.dob}}</span></li>
+<li>Marital Status: <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.marital_status}}</span></li>
+{% if object.student_profile.passport_photo %}
+<li>Passport Photo: <span class="text-dark font-weight-bold ms-sm-2">
+<i class="fa fa-eye text-primary"></i>
+<a class="text-primary" href="{{object.student_profile.passport_photo.url}}" target="_blank">&nbsp; View Passport Photo</a>
+</span></li>
+{% endif %}
+</ul>
+</div>
+
+<h5 class="mb-1"> <i class="fab fa-asymmetrik text-primary"></i> Contact Details</h5>
+<div>  
+<p class="text-sm mb-0">
+<ul class="list-unstyled">
+<li>Contact Address:  <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.contact_address}}</span></li>  <li>Nationality: <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.nationality}}</span></li>
+<li>State of Origin: <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.state_of_origin}}</span></li>
+<li>LGA of Origin:  <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.lga}}</span></li>
+
+{% if object.student_profile.lga_identification %}
+<li>LGA Certificate: <span class="text-dark font-weight-bold ms-sm-2">
+<i class="fa fa-eye text-primary"></i>
+<a class="text-primary" href="{{object.student_profile.lga_identification.url}}" target="_blank">&nbsp; View LGA Certificateo</a>
+</span></li>
+{% endif %}
+</ul>
+</div>
+
+<h5 class="mb-1"> <i class="mdi mdi-book-open-page-variant text-primary"></i> Admission Details</h5>
+<div>  
+<p class="text-sm mb-0">
+<ul class="list-unstyled">                           
+<li>Academic Session: <span class="text-dark font-weight-bold ms-sm-2">{{object.academic_session}}</span></li>
+<li>Admission Type:  <span class="text-dark font-weight-bold ms-sm-2">{{object.admission_type}}</span></li>
+{% if object.admission_letter %}
+<li>Admission Letter: <span class="text-dark font-weight-bold ms-sm-2">
+<i class="fa fa-eye text-primary"></i>
+<a class="text-primary" href="{{object.admission_letter.url}}" target="_blank">&nbsp; View Admission Letter</a>
+</span></li>
+{% endif %}
+
+</ul>
+</div>
+</div>
 
 
-        <h5 class="mb-1"> <i class="fab fa-accusoft text-primary"></i> Personal Details</h5> 
-        <div>  
-        <p class="text-sm mb-0">
-        <ul class="list-unstyled">                           
-        <li>Sex: <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.sex}}</span></li>
-        <li>Date of Birth: <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.dob}}</span></li>
-        <li>Marital Status: <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.marital_status}}</span></li>
-        </ul>
-         </div>
+<div class="col-md-5 mt-0">
+<h5 class="mb-1"> <i class="fas fa-desktop text-primary"></i> O'level Results</h5>
+<p class="text-sm mb-0">
+<ul class="list-unstyled">                           
+<li>Examination Body: <span class="text-dark font-weight-bold ms-sm-2">{{object.utme_grade.examination_body}}</span></li>
+<li>Physics Score:   <span class="text-dark font-weight-bold ms-sm-2">{{object.utme_grade.physics_score}}</span></li>
+<li>Chemistry Score:   <span class="text-dark font-weight-bold ms-sm-2">{{object.utme_grade.chemistry_score}}</span></li>
+<li>Biology Score:   <span class="text-dark font-weight-bold ms-sm-2">{{object.utme_grade.biology_score}}</span></li>
+<li>English Score:   <span class="text-dark font-weight-bold ms-sm-2">{{object.utme_grade.english_score}}</span></li>
+<li>Mathematics Score:   <span class="text-dark font-weight-bold ms-sm-2">{{object.utme_grade.mathematics_score}}</span></li>
+{% if object.utme_grade.utme_grade_result %}
+<li>O'Levels Certificate:   <span class="text-dark font-weight-bold ms-sm-2">
+<i class="fa fa-eye text-primary"></i>
+<a class="text-primary" href="{{object.utme_grade.utme_grade_result.url}}" target="_blank">&nbsp; View Result</a>
+</span></li>
+{% endif %}
+</ul>
 
-        <h5 class="mb-1"> <i class="fab fa-asymmetrik text-primary"></i> Contact Details</h5>
-        <div>  
-        <p class="text-sm mb-0">
-        <ul class="list-unstyled">                           
-        <li>Nationality: <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.nationality}}</span></li>
-        <li>State of Origin: <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.state_of_origin}}</span></li>
-        <li>LGA of Origin:  <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.lga}}</span></li>
-        <li>Contact Address:  <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.contact_address}}</span></li>
-        </ul>
-        </div>
-
-        <h5 class="mb-1"> <i class="mdi mdi-book-open-page-variant text-primary"></i> Admission Details</h5>
-        <div>  
-        <p class="text-sm mb-0">
-        <ul class="list-unstyled">                           
-        <li>Academic Session: <span class="text-dark font-weight-bold ms-sm-2">{{object.academic_session}}</span></li>
-        <li>Admission Type:  <span class="text-dark font-weight-bold ms-sm-2">{{object.admission_type}}</span></li>
-        </ul>
-        </div>
-        </div>
-
-
-        <div class="col-md-5 mt-0">
-        <h5 class="mb-1"> <i class="fas fa-desktop text-primary"></i> O'level Results</h5>
-        <p class="text-sm mb-0">
-        <ul class="list-unstyled">                           
-        <li>Examination Body: <span class="text-dark font-weight-bold ms-sm-2">{{object.utme_grade.examination_body}}</span></li>
-        <li>Physics Score:   <span class="text-dark font-weight-bold ms-sm-2">{{object.utme_grade.physics_score}}</span></li>
-        <li>Chemistry Score:   <span class="text-dark font-weight-bold ms-sm-2">{{object.utme_grade.chemistry_score}}</span></li>
-        <li>Biology Score:   <span class="text-dark font-weight-bold ms-sm-2">{{object.utme_grade.biology_score}}</span></li>
-        <li>English Score:   <span class="text-dark font-weight-bold ms-sm-2">{{object.utme_grade.english_score}}</span></li>
-        <li>Mathematics Score:   <span class="text-dark font-weight-bold ms-sm-2">{{object.utme_grade.mathematics_score}}</span></li>
-        {% if object.utme_grade.utme_grade_result %}
-        <li>O'Levels Certificate:   <span class="text-dark font-weight-bold ms-sm-2">
-        <i class="fa fa-eye text-primary"></i>
-        <a class="text-primary" href="{{object.utme_grade.utme_grade_result.url}}" target="_blank">&nbsp; View Result</a>
-        </span></li>
-        {% endif %}
-        </ul>
-
-        {% if object.degree_result %}
-        <h5 class="mb-1"> <i class="fas fa-desktop text-primary"></i> DE Results</h5>
-        <div>  
-        <p class="text-sm mb-0">
-        <ul class="list-unstyled">                           
-        <li>Degree Type: <span class="text-dark font-weight-bold ms-sm-2">{{object.degree_result.degree_type}}</span></li>
-        <li>Course:   <span class="text-dark font-weight-bold ms-sm-2">{{object.degree_result.course}}</span></li>
-        <li>Course Grade:   <span class="text-dark font-weight-bold ms-sm-2">{{object.degree_result.course_grade}}</span></li>
-        {% if object.degree_result.degree_result %}
-        <li>Degree Certificate:   <span class="text-dark font-weight-bold ms-sm-2">
-        <i class="fa fa-eye text-primary"></i>
-        <a class="text-primary" href="{{object.degree_result.degree_result.url}}" target="_blank">&nbsp; View Result</a>
-        </span></li>
-        {% endif %}
-        </ul>
-        </div>
-        {% endif %}
+{% if object.degree_result %}
+<h5 class="mb-1"> <i class="fas fa-desktop text-primary"></i> DE Results</h5>
+<div>  
+<p class="text-sm mb-0">
+<ul class="list-unstyled">                           
+<li>Degree Type: <span class="text-dark font-weight-bold ms-sm-2">{{object.degree_result.degree_type}}</span></li>
+<li>Course:   <span class="text-dark font-weight-bold ms-sm-2">{{object.degree_result.course}}</span></li>
+<li>Course Grade:   <span class="text-dark font-weight-bold ms-sm-2">{{object.degree_result.course_grade}}</span></li>
+{% if object.degree_result.degree_result %}
+<li>Degree Certificate:   <span class="text-dark font-weight-bold ms-sm-2">
+<i class="fa fa-eye text-primary"></i>
+<a class="text-primary" href="{{object.degree_result.degree_result.url}}" target="_blank">&nbsp; View Result</a>
+</span></li>
+{% endif %}
+</ul>
+</div>
+{% endif %}
 
 
-        {% if object.gce_alevels %}
-        <h5 class="mb-1"> <i class="fas fa-desktop text-primary"></i> DE Results</h5>
-        <div>  
-        <p class="text-sm mb-0">
-        <ul class="list-unstyled">                           
-        <li>Examination Body: <span class="text-dark font-weight-bold ms-sm-2">{{object.gce_alevels.examination_body}}</span></li>
-        <li>Physics Score:   <span class="text-dark font-weight-bold ms-sm-2">{{object.gce_alevels.physics_score}}</span></li>
-        <li>Chemistry Score:   <span class="text-dark font-weight-bold ms-sm-2">{{object.gce_alevels.chemistry_score}}</span></li>
-        <li>Biology Score:   <span class="text-dark font-weight-bold ms-sm-2">
-        {{object.gce_alevels.biology_score}}</span></li>
-        {% if object.gce_alevels.gce_alevels_result %}
-        <li>GCE A Levels Certificate:   <span class="text-dark font-weight-bold ms-sm-2">
-        <i class="fa fa-eye text-primary"></i>
-        <a class="text-primary" href="{{object.gce_alevels.gce_alevels_result.url}}" target="_blank">&nbsp; View Result</a>
-        </span></li>
-        {% endif %}
-        </ul>
-        </div>
-        {% endif %}
+{% if object.gce_alevels %}
+<h5 class="mb-1"> <i class="fas fa-desktop text-primary"></i> DE Results</h5>
+<div>  
+<p class="text-sm mb-0">
+<ul class="list-unstyled">                           
+<li>Examination Body: <span class="text-dark font-weight-bold ms-sm-2">{{object.gce_alevels.examination_body}}</span></li>
+<li>Physics Score:   <span class="text-dark font-weight-bold ms-sm-2">{{object.gce_alevels.physics_score}}</span></li>
+<li>Chemistry Score:   <span class="text-dark font-weight-bold ms-sm-2">{{object.gce_alevels.chemistry_score}}</span></li>
+<li>Biology Score:   <span class="text-dark font-weight-bold ms-sm-2">
+{{object.gce_alevels.biology_score}}</span></li>
+{% if object.gce_alevels.gce_alevels_result %}
+<li>GCE A Levels Certificate:   <span class="text-dark font-weight-bold ms-sm-2">
+<i class="fa fa-eye text-primary"></i>
+<a class="text-primary" href="{{object.gce_alevels.gce_alevels_result.url}}" target="_blank">&nbsp; View Result</a>
+</span></li>
+{% endif %}
+</ul>
+</div>
+{% endif %}
 
 
-        {% if object.transfer_grade %}
-        <h5 class="mb-1"> <i class="fas fa-desktop text-primary"></i> DE Results</h5>
-        <div>  
-        <p class="text-sm mb-0">
-        <ul class="list-unstyled">                           
-        <li>Course of study: <span class="text-dark font-weight-bold ms-sm-2">{{object.transfer_grade.course}}</span></li>
-        <li>Institution Attended:   <span class="text-dark font-weight-bold ms-sm-2">{{object.transfer_grade.institution}}</span></li>
-        <li>Class of Degree:   <span class="text-dark font-weight-bold ms-sm-2">{{object.transfer_grade.degree_type}}</span></li>
-        <li>Year of Study:   <span class="text-dark font-weight-bold ms-sm-2">
-        {{object.transfer_grade.year_of_study}}</span></li>
-        <li>Grade:   <span class="text-dark font-weight-bold ms-sm-2">
-        {{object.transfer_grade.course_grade}}</span></li>
+{% if object.transfer_grade %}
+<h5 class="mb-1"> <i class="fas fa-desktop text-primary"></i> DE Results</h5>
+<div>  
+<p class="text-sm mb-0">
+<ul class="list-unstyled">                           
+<li>Course of study: <span class="text-dark font-weight-bold ms-sm-2">{{object.transfer_grade.course}}</span></li>
+<li>Institution Attended:   <span class="text-dark font-weight-bold ms-sm-2">{{object.transfer_grade.institution}}</span></li>
+<li>Class of Degree:   <span class="text-dark font-weight-bold ms-sm-2">{{object.transfer_grade.degree_type}}</span></li>
+<li>Year of Study:   <span class="text-dark font-weight-bold ms-sm-2">
+{{object.transfer_grade.year_of_study}}</span></li>
+<li>Grade:   <span class="text-dark font-weight-bold ms-sm-2">
+{{object.transfer_grade.course_grade}}</span></li>
 
-        {% if object.transfer_grade.academic_transcript %}
-        <li>Academic Transcript:   <span class="text-dark font-weight-bold ms-sm-2">
-        <i class="fa fa-eye text-primary"></i>
-        <a class="text-primary" href="{{object.transfer_grade.academic_transcript.url}}" target="_blank">&nbsp; View Result</a>
-        </span></li>
-        {% endif %}
-        </ul>
-        </div>
-        {% endif %}
+{% if object.transfer_grade.academic_transcript %}
+<li>Academic Transcript:   <span class="text-dark font-weight-bold ms-sm-2">
+<i class="fa fa-eye text-primary"></i>
+<a class="text-primary" href="{{object.transfer_grade.academic_transcript.url}}" target="_blank">&nbsp; View Result</a>
+</span></li>
+{% endif %}
+</ul>
+</div>
+{% endif %}
+
+</div>
 
 
 
 
-        </div>
-        </div>
-        </div>
+
+</div>
+</div>
 
 {% if payment_object %}
 <div class="tab-pane" id="payment">

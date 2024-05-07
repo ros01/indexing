@@ -22,6 +22,7 @@
                     <th>Course</th>
                     <th>Matric No</th>
                     <th>Payment Amount</th>
+                    <th>Status</th>
                     <th>Actions</th>
                 </tr>
                 </thead>
@@ -35,6 +36,7 @@
                     <td>{{object.institution.course_type}}</td>
                     <td>{{object.matric_no}}</td>
                     <td>N{{object.payment_amount}}</td>
+                    <td class="text-warning">Pending Verifications</td>
                     <td><h6 class="mb-1 text-center"><a href="{% url 'students:my_indexing_payment_details' object.slug %}"><span class="badge badge-pill badge-primary">View Indexing Payment</span></a></h6> </td>
 
 

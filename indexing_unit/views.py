@@ -288,15 +288,41 @@ def deactivate_user(request, slug):
 
 
 
-class InstitutionListView(StaffRequiredMixin, ListView):
+
+
+
+
+class UniversitiesListView(StaffRequiredMixin, ListView):
 	template_name = "indexing_unit/institutions_list1.html"
 	def get_queryset(self):
 		request = self.request
-		qs = InstitutionProfile.objects.all()
+		qs = InstitutionProfile.objects.filter(institution_type='University')
 		query = request.GET.get('q')
 		if query:
 			qs = qs.filter(name__icontains=query)
-		return qs  #.filter(title__icontains='vid') 
+		return qs  #.filter(title__icontains='vid')
+
+class CollegesListView(StaffRequiredMixin, ListView):
+	template_name = "indexing_unit/institutions_list1.html"
+	def get_queryset(self):
+		request = self.request
+		qs = InstitutionProfile.objects.filter(institution_type='College of Health')
+		query = request.GET.get('q')
+		if query:
+			qs = qs.filter(name__icontains=query)
+		return qs  #.filter(title__icontains='vid')
+
+
+
+# class InstitutionList1View(StaffRequiredMixin, ListView):
+# 	template_name = "indexing_unit/institutions_list1.html"
+# 	def get_queryset(self):
+# 		request = self.request
+# 		qs = InstitutionProfile.objects.filter(institution_type='University')
+# 		query = request.GET.get('q')
+# 		if query:
+# 			qs = qs.filter(name__icontains=query)
+# 		return qs  #.filter(title__icontains='vid') 
 
  
 class IndexingOfficerListView(StaffRequiredMixin, ListView):
@@ -377,6 +403,11 @@ class AdmissionQuotaCreateView(StaffRequiredMixin, CreateView):
     form_class = AdmissionQuotaForm
 
 
+    # def form_invalid(self, form):
+    # 	print(form.errors)
+    # 	return self.render_to_response(self.get_context_data(form=form))
+
+
 
 class AdmissionQuotaDetailView(StaffRequiredMixin, DetailView):
 	queryset = AdmissionQuota.objects.all()
@@ -432,6 +463,64 @@ class IndexNumberIssuanceList(StaffRequiredMixin, ListView):
 			qs = qs.filter(name__icontains=query)
 		return qs.filter(payment_status=2) 
 
+@login_required
+def institutions_list(request):
+	form = SelectInstitutionModelForm()
+	context = {'form': form}
+	return render(request, 'indexing_unit/select_institution.html', context)
+
+@login_required
+def universities_list(request):
+	
+	context = {
+	    'universities_list':universities_list,
+	    }
+	return render(request, 'partials/universities_list.html', context)
+
+
+class InstitutionListView(StaffRequiredMixin, ListView):
+	template_name = "indexing_unit/select_institution.html"
+	def get_queryset(self):
+		institutions = InstitutionProfile.objects.all() 
+		return institutions
+
+	def get_context_data(self, **kwargs):
+		context = super(InstitutionListView, self).get_context_data(**kwargs)
+		filter_set = self.get_queryset()
+		form = SelectInstitutionForm()
+		institution_type = form['institution_type'].value()
+		if self.request.GET.get('institution_type'):
+			institution_type = self.request.GET.get('institution_type')
+			if institution_type == "University":
+				filter_set = filter_set.filter(institution_type=institution_type)
+			elif institution_type == "College of Health":
+				filter_set = filter_set.filter(institution_type=institution_type)
+		context['form'] = SelectInstitutionForm()	
+		context['institution'] = filter_set
+		return context
+
+
+class InstitutionSearchView(ListView):
+	template_name = "indexing_unit/institutions_list1.html"
+	def get_queryset(self):
+		institutions = InstitutionProfile.objects.all() 
+		return institutions
+
+	def get_context_data(self, **kwargs):
+		context = super(InstitutionSearchView, self).get_context_data(**kwargs)
+		filter_set = self.get_queryset()
+		form = SelectInstitutionForm()
+		institution_type = form['institution_type'].value()
+		if self.request.GET.get('institution_type'):
+			institution_type = self.request.GET.get('institution_type')
+			if institution_type == "University":
+				filter_set = filter_set.filter(institution_type=institution_type)
+			elif institution_type == "College of Health":
+				filter_set = filter_set.filter(institution_type=institution_type)
+		context['form'] = SelectInstitutionForm()	
+		context['institution'] = filter_set
+		return context
+
 
 class InstitutionsIndexedStudentsList(ListView):
 	template_name = "indexing_unit/indexed_students_list.html"
@@ -454,6 +543,7 @@ class InstitutionsIndexedStudentsList(ListView):
 		context['form'] = InstitutionPaymentForm()	
 		context['indexing'] = filter_set
 		return context
+
 
 class InstitutionsIndexedStudentsListView(ListView):
 	template_name = "indexing_unit/institutions_indexed_students_list.html"

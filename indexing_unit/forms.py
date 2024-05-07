@@ -50,8 +50,34 @@ class AcademicSessionModelForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
        super(AcademicSessionModelForm, self).__init__(*args, **kwargs)
 
+# class SelectInstitutionModelForm(forms.ModelForm):
+      
+#     class Meta:
+#          model = InstitutionProfile
+#          fields = ('institution_type',)
 
-       
+#          INSTITUTION_TYPE = (
+#                 ('University', 'University' ),
+#                 ('College of Health', 'College of Health'),
+#          )
+         
+#          widgets = {
+#                 'institution_type': forms.Select(choices=INSTITUTION_TYPE,)
+#             }
+
+#     def __init__(self,  *args, **kwargs):
+#        super(SelectInstitutionModelForm, self).__init__(*args, **kwargs)
+#        self.initial['institution_type'] = 'University'
+#        self.fields['institution_type'].empty_label = '---Please select your color---'
+
+class SelectInstitutionForm(forms.Form):
+    INSTITUTION_TYPE = (
+                ('University', 'University' ),
+                ('College of Health', 'College of Health'),
+         )
+
+    institution_type = forms.ChoiceField(choices=INSTITUTION_TYPE)
+
 class InstitutionProfileForm(forms.ModelForm):
     
     

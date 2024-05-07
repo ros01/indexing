@@ -34,7 +34,7 @@ class StudentProfileUpdateModelForm(forms.ModelForm):
       
     class Meta:
          model = StudentProfile
-         fields = ('sex', 'dob', 'marital_status', 'nationality', 'state_of_origin', 'lga', 'contact_address')
+         fields = ('sex', 'dob', 'marital_status', 'nationality', 'state_of_origin', 'lga', 'lga_identification', 'passport_photo', 'contact_address')
          
 
          widgets = {
@@ -48,8 +48,11 @@ class StudentProfileUpdateModelForm(forms.ModelForm):
        self.fields['marital_status'].label = "Marital Status"
        self.fields['state_of_origin'].label = "State of Origin"
        self.fields['lga'].label = "Local Government Area"
+       self.fields['lga_identification'].label = "Upload LGA Certificate"
+       self.fields['passport_photo'].label = "Upload Passport Photograph"
        self.fields['dob'].label = "Date of Birth"
        self.fields['contact_address'].label = "Contact Address"
+
        
 
 

@@ -668,7 +668,7 @@ def student_list(request):
 	# print ("Institution:", qs)
 	# students_list = qs.first().studentprofile_set.all()
 	students_list = StudentProfile.objects.filter(institution=user.get_indexing_officer_profile.institution, academic_session = academic_session)
-	print ("studens list:", students_list)
+	# print ("studens list:", students_list)
 	context = {
 	    'students_list':students_list,
 	    }
@@ -799,11 +799,13 @@ def verify_application(request, slug):
      # return render(request, 'institutions/verification_successful.html',context)
 
 
+
 def reject_application(request, slug):
   if request.method == 'POST':
      object = get_object_or_404(StudentIndexing, slug=slug)
      payment_object = object.indexingpayment_set.first()
-     object.verification_status = 1
+     object.rejection_reason = request.POST.get('rejection_reason')
+     object.rejection_status = 2
      payment_object.payment_status = 1
      object.save()
      payment_object.save()
@@ -812,6 +814,12 @@ def reject_application(request, slug):
      messages.error(request, ('Indexing Application Rejected'))
      return HttpResponseRedirect(reverse("institutions:student_indexing_application_details", kwargs={'islug': object.institution.slug,
             'sslug': object.slug,}))
+
+
+
+
+
+
 
 
 def verify_payment(request, id):
@@ -855,6 +863,17 @@ class IndexingVerificationsListView(StaffRequiredMixin, ListView):
 		return qs.filter(verification_status=2) 
 
 
+class IndexingRejectionsListView(StaffRequiredMixin, ListView):
+	template_name = "institutions/student_indexing_rejections_list.html"
+	def get_queryset(self):
+		request = self.request
+		user = request.user
+		qs = StudentIndexing.objects.filter(institution=user.get_indexing_officer_profile.institution)
+		query = request.GET.get('q')
+		if query:
+			qs = qs.filter(name__icontains=query)
+		return qs.filter(verification_status=3) 
+
 
 class IndexingVerificationsDetailView(StaffRequiredMixin, DetailView):
 	queryset = StudentIndexing.objects.all()
@@ -872,6 +891,24 @@ class IndexingVerificationsDetailView(StaffRequiredMixin, DetailView):
 		context['payment_object'] = obj.indexingpayment_set.first()
 		return context
 
+
+
+
+class IndexingRejectionsDetailView(StaffRequiredMixin, DetailView):
+	queryset = StudentIndexing.objects.all()
+	template_name = "institutions/student_indexing_rejections_details.html"
+
+	def get_object(self):
+		institutionprofile_slug = self.kwargs.get("islug")
+		studentindexing_slug = self.kwargs.get("sslug")
+		obj = get_object_or_404(StudentIndexing, institution__slug = institutionprofile_slug, slug = studentindexing_slug)
+		return obj
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		obj = self.get_object()
+		context['payment_object'] = obj.indexingpayment_set.first()
+		return context
 
 
 class GenerateInvoiceView(StaffRequiredMixin, ListView):
@@ -991,7 +1028,7 @@ def applications_list(request):
 def students_verifications_list(request):
 	academic_sessions = AcademicSession.objects.all()
 	context = {'academic_sessions': academic_sessions}
-	print("User Role:", request.user.role)
+	# print("User Role:", request.user.role)
 	return render(request, 'institutions/academic_session_verifications.html', context)
 
 @login_required
@@ -1003,7 +1040,20 @@ def verifications_list(request):
 	return render(request, 'partials/verifications.html', context)
 
 
+@login_required
+def students_rejections_list(request):
+	academic_sessions = AcademicSession.objects.all()
+	context = {'academic_sessions': academic_sessions}
+	# print("User Role:", request.user.role)
+	return render(request, 'institutions/academic_session_rejections.html', context)
 
+@login_required
+def rejections_list(request):
+	academic_session = request.GET.get('academic_session')
+	user = request.user
+	rejections = StudentIndexing.objects.filter(academic_session=academic_session, institution=user.get_indexing_officer_profile.institution, rejection_status=2)
+	context = {'rejections': rejections}
+	return render(request, 'partials/rejections.html', context)
 
 
 
@@ -1240,6 +1290,11 @@ class InstitutionsIndexingPaymentDetailView(StaffRequiredMixin, DetailView):
 class StudentIndexingNumberDetailView(StaffRequiredMixin, DetailView):
     queryset = IssueIndexing.objects.all()
     template_name = "institutions/students_indexing_number_details.html"
+
+
+
+
+
 
 
 # class InstitutionPaymentCreateView(LoginRequiredMixin, CreateView):

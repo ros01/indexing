@@ -86,18 +86,36 @@
 <div class="row justify-content-center">
 <div class="col-md-12  profile-detail">
 <div class="">
-<h5 class="mb-1"> <i class="fab fa-asymmetrik text-primary"></i> Contact Details</h5>
+<h5 class="mb-1"> <i class="fab fa-asymmetrik text-primary"></i> Other Details</h5>
 </div>
 </div>
 <div>  
 <p class="text-sm mb-0">
-<ul class="list-unstyled">                           
+<ul class="list-unstyled"> 
+<li><b>Phone No:</b>  {{object.student.phone_no}}</li>
+<li><b>Email: </b>  {{object.student.email}}</li>                          
 <li><b>Nationality:</b>  {{object.nationality}}</li>
 <li><b>State of Origin: </b>  {{object.state_of_origin}}</li>
 <li><b>LGA of Origin:</b>  {{object.lga}}</li>
 <li><b>Contact Address: </b>  {{object.contact_address}}</li>
-<li><b>Phone No:</b>  {{object.student.phone_no}}</li>
-<li><b>Email: </b>  {{object.student.email}}</li>
+
+{% if object.passport_photo %}
+<li><b>Passport Photo:  </b><span class="text-dark font-weight-bold ms-sm-2">
+<i class="fa fa-eye text-primary"></i>
+<a class="text-primary" href="{{object.passport_photo.url}}" target="_blank">&nbsp; View Passport Photo</a>
+</span></li>
+{% endif %}
+
+{% if object.lga_identification %}
+<li><b>LGA Certificate:  </b><span class="text-dark font-weight-bold ms-sm-2">
+<i class="fa fa-eye text-primary"></i>
+<a class="text-primary" href="{{object.lga_identification.url}}" target="_blank">&nbsp; View LGA Certificate</a>
+</span></li>
+{% endif %}
+
+
+
+
 </ul>
 </div>
 </div>

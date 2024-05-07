@@ -56,7 +56,7 @@ class InstitutionProfile(models.Model):
     name           = models.CharField(max_length=120)
     slug            = models.SlugField(blank=True)
     course_type = models.CharField(max_length=100, blank=True)
-    institution_type = models.CharField(max_length=100, choices = INSTITUTION_TYPE, blank=True)
+    institution_type = models.CharField(max_length=100, choices = INSTITUTION_TYPE, blank=False, null=False)
     # description     = models.TextField()
     email = models.EmailField(unique=True, null=False, blank=False)
     phone_no = models.CharField(max_length=100, blank=True) 
@@ -124,10 +124,13 @@ class AdmissionQuota(models.Model):
     # academic_session = models.CharField(max_length=100, choices = ACADEMIC_SESSION, blank=True)
     objects = GetOrNoneManager()
     academic_session = models.ForeignKey(AcademicSession,  on_delete=models.CASCADE)
-    admission_quota  = models.IntegerField(blank=True, null=True)
+    admission_quota  = models.IntegerField()
     slug      = models.SlugField(blank=True)
     updated = models.DateTimeField(auto_now=True)
     timestamp       = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+       unique_together = ('institution', 'academic_session',)
 
    
     def __str__(self):
@@ -175,12 +178,14 @@ class StudentProfile(models.Model):
     # academic_session = models.CharField(max_length=200, null=True, blank=True)
     academic_session = models.ForeignKey(AcademicSession,  on_delete=models.CASCADE)
     indexing_status = models.IntegerField(default=1)
+    passport_photo = models.FileField(upload_to='%Y/%m/%d/')
     sex = models.CharField(max_length=200, choices = SEX, null=True, blank=True)
     dob = models.DateField(null=True, blank=True)
     marital_status = models.CharField(max_length=200, choices = MARRITAL_STATUS,  null=True, blank=True)
     nationality = models.CharField(max_length=200, choices = NATIONALITY,  null=True, blank=True)
     state_of_origin = models.CharField(max_length=200, choices = STATES,  null=True, blank=True)
     lga = models.CharField(max_length=200, null=True, blank=True)
+    lga_identification = models.FileField(upload_to='%Y/%m/%d/')
     contact_address = models.CharField(max_length=200, null=True, blank=True)
     profile_creation_date = models.DateTimeField(default=datetime.now, blank=True)
 
@@ -270,6 +275,7 @@ class UtmeGrade(models.Model):
     english_score = models.CharField(max_length=200, choices = UTME_SCORES,  null=True)
     mathematics_score = models.CharField(max_length=200, choices = UTME_SCORES,  null=True)
     utme_grade_result = models.FileField(upload_to='%Y/%m/%d/')
+    # admission_letter = models.FileField(upload_to='%Y/%m/%d/')
     updated         = models.DateTimeField(auto_now=True)
     timestamp       = models.DateTimeField(auto_now_add=True)
 
@@ -288,6 +294,7 @@ class GceAlevels(models.Model):
     biology_score = models.CharField(max_length=200, choices = GCE_A_LEVELS_SCORES,  null=True)
     physics_score = models.CharField(max_length=200, choices = GCE_A_LEVELS_SCORES,  null=True)
     gce_alevels_result = models.FileField(upload_to='%Y/%m/%d/')
+    # admission_letter = models.FileField(upload_to='%Y/%m/%d/')
     updated         = models.DateTimeField(auto_now=True)
     timestamp       = models.DateTimeField(auto_now_add=True)
 
@@ -306,6 +313,7 @@ class DegreeResults(models.Model):
     course = models.CharField(max_length=200, choices = DEGREE_COURSES,  null=True)
     course_grade = models.CharField(max_length=200, choices = DEGREE_COURSE_GRADES,  null=True)
     degree_result = models.FileField(upload_to='%Y/%m/%d/')
+    # admission_letter = models.FileField(upload_to='%Y/%m/%d/')
     updated         = models.DateTimeField(auto_now=True)
     timestamp       = models.DateTimeField(auto_now_add=True)
 
@@ -325,6 +333,7 @@ class TransferGrade(models.Model):
     year_of_study = models.CharField(max_length=200, choices = YEAR_OF_STUDY,  null=True) 
     course_grade = models.CharField(max_length=200, choices = DEGREE_COURSE_GRADES,  null=True)
     academic_transcript = models.FileField(upload_to='%Y/%m/%d/')
+    # admission_letter = models.FileField(upload_to='%Y/%m/%d/')
     updated         = models.DateTimeField(auto_now=True)
     timestamp       = models.DateTimeField(auto_now_add=True)
 
@@ -340,13 +349,16 @@ class StudentIndexing(models.Model):
     # academic_session = models.CharField(max_length=200, choices = ACADEMIC_SESSION)
     academic_session = models.ForeignKey(AcademicSession,  on_delete=models.CASCADE)
     admission_type = models.CharField(max_length=200, null=True, blank=True)
-    utme_grade = models.ForeignKey(UtmeGrade, on_delete=models.CASCADE, null=True) 
-    gce_alevels = models.ForeignKey(GceAlevels, on_delete=models.CASCADE, null=True)
-    degree_result = models.ForeignKey(DegreeResults, on_delete=models.CASCADE, null=True)
-    transfer_grade = models.ForeignKey(TransferGrade, on_delete=models.CASCADE, null=True) 
+    utme_grade = models.ForeignKey(UtmeGrade, on_delete=models.CASCADE, null=True, blank=True) 
+    gce_alevels = models.ForeignKey(GceAlevels, on_delete=models.CASCADE, null=True, blank=True)
+    degree_result = models.ForeignKey(DegreeResults, on_delete=models.CASCADE, null=True, blank=True)
+    transfer_grade = models.ForeignKey(TransferGrade, on_delete=models.CASCADE, null=True, blank=True) 
+    admission_letter = models.FileField(upload_to='%Y/%m/%d/')
     # utme_grade_result = models.FileField(null=True, blank=True, upload_to='%Y/%m/%d/')
     indexing_status = models.IntegerField(default=1)
     verification_status = models.IntegerField(default=1)
+    rejection_status = models.IntegerField(default=1)
+    rejection_reason = models.CharField(max_length=200, null=True, blank=True)
     board_verification_status = models.IntegerField(default=1)
     updated         = models.DateTimeField(auto_now=True)
     timestamp       = models.DateTimeField(auto_now_add=True)
@@ -395,6 +407,14 @@ class StudentIndexing(models.Model):
             'sslug': self.slug,
         }
         return reverse('institutions:student_indexing_verification_details', kwargs=url_kwargs)
+
+
+    def get_rejection_details_url(self):
+        url_kwargs={
+            'islug': self.institution.slug,
+            'sslug': self.slug,
+        }
+        return reverse('institutions:student_indexing_rejection_details', kwargs=url_kwargs)
 
     # def get_institution_indexing_url(self):
     #     return reverse('institutions:student_indexing_application_details', kwargs={"slug": self.slug})
@@ -534,6 +554,7 @@ class InstitutionPayment(models.Model):
     # student_profile = models.ForeignKey(StudentProfile,  null=True, blank=True, on_delete=models.DO_NOTHING)
     # student_indexing = models.ForeignKey(StudentIndexing,  null=True, blank=True, on_delete=models.DO_NOTHING)
     students_payments = models.ManyToManyField(IndexingPayment)
+    # students_payments = models.ManyToManyField(IndexingPayment, related_name='institutionpayments') #students_payment.institutionpayments.all()
     slug  = models.SlugField(blank=True)
     # academic_session = models.CharField(max_length=200, choices = ACADEMIC_SESSION,  null=True, blank=True)
     academic_session = models.ForeignKey(AcademicSession,  on_delete=models.CASCADE)

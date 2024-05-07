@@ -89,8 +89,8 @@ def status(request):
         return IndexingPaymentCreateListView.as_view()(request)
     elif StudentIndexing.objects.filter(student_profile__student = user, indexing_status=2):
         return MyIndexingApplicationListView.as_view()(request)
-    # elif IndexingPayment.objects.filter(student_profile__student = user, payment_verification_status=2):
-    #      return MyIndexingPaymentListView.as_view()(request)
+    elif IndexingPayment.objects.filter(student_profile__student = user, payment_verification_status=1):
+        return MyIndexingPaymentListView.as_view()(request)
     elif IssueIndexing.objects.filter(student_profile__student = user):
         return MyIndexingCompleteListView.as_view()(request)
     else:

@@ -86,17 +86,34 @@
 <li>Sex: <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.sex}}</span></li>
 <li>Date of Birth: <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.dob}}</span></li>
 <li>Marital Status: <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.marital_status}}</span></li>
+
+{% if object.student_profile.passport_photo %}
+<li>Passport Photo: <span class="text-dark font-weight-bold ms-sm-2">
+<i class="fa fa-eye text-primary"></i>
+<a class="text-primary" href="{{object.student_profile.passport_photo.url}}" target="_blank">&nbsp; View Passport Photo</a>
+</span></li>
+{% endif %}
+
+
+
+
 </ul>
  </div>
 
 <h5 class="mb-1"> <i class="fab fa-asymmetrik text-primary"></i> Contact Details</h5>
 <div>  
 <p class="text-sm mb-0">
-<ul class="list-unstyled">                           
+<ul class="list-unstyled"> 
+<li>Contact Address:  <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.contact_address}}</span></li>                          
 <li>Nationality: <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.nationality}}</span></li>
 <li>State of Origin: <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.state_of_origin}}</span></li>
 <li>LGA of Origin:  <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.lga}}</span></li>
-<li>Contact Address:  <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.contact_address}}</span></li>
+{% if object.student_profile.lga_identification %}
+<li>LGA Certificate: <span class="text-dark font-weight-bold ms-sm-2">
+<i class="fa fa-eye text-primary"></i>
+<a class="text-primary" href="{{object.student_profile.lga_identification.url}}" target="_blank">&nbsp; View LGA Certificate</a>
+</span></li>
+{% endif %}
 </ul>
 </div>
 
@@ -106,6 +123,12 @@
 <ul class="list-unstyled">                           
 <li>Academic Session: <span class="text-dark font-weight-bold ms-sm-2">{{object.academic_session}}</span></li>
 <li>Admission Type:  <span class="text-dark font-weight-bold ms-sm-2">{{object.admission_type}}</span></li>
+{% if object.admission_letter %}
+<li>Admission Letter: <span class="text-dark font-weight-bold ms-sm-2">
+<i class="fa fa-eye text-primary"></i>
+<a class="text-primary" href="{{object.admission_letter.url}}" target="_blank">&nbsp; View Admission Letter</a>
+</span></li>
+{% endif %}
 </ul>
 </div>
 </div>
