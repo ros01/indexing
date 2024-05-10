@@ -177,9 +177,22 @@ class InstitutionsVerifiedPaymentsList(StaffRequiredMixin, ListView):
 		return qs.filter(payment_status=2)
 
 
-class InstitutionsIndexingPaymentDetailView(StaffRequiredMixin, DetailView):
+class InstitutionsIndexingPaymentDetailView(DetailView):
 	queryset = InstitutionPayment.objects.all()
 	template_name = "registration/institutions_payment_details.html"
+
+
+	# def get_queryset(self):
+	# 	# students_payments = IndexingPayment.objects.filter(payment_status= 2)
+	# 	qs = InstitutionPayment.objects.all()
+	# 	qs1 = qs.filter(students_payments__payment_status = 2)
+	# 	print("qs1:", qs1)
+	# 	return qs1
+
+class InstitutionsIndexingPaymentVerifiedDetailView(DetailView):
+	queryset = InstitutionPayment.objects.all()
+	template_name = "registration/institutions_payment_verified_details.html"
+
 
 
 @login_required

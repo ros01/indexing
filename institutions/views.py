@@ -806,9 +806,9 @@ def reject_application(request, slug):
      payment_object = object.indexingpayment_set.first()
      object.rejection_reason = request.POST.get('rejection_reason')
      object.rejection_status = 2
-     payment_object.payment_status = 1
+     # payment_object.payment_status = 1
      object.save()
-     payment_object.save()
+     # payment_object.save()
      context = {}
      context['object'] = object
      messages.error(request, ('Indexing Application Rejected'))
@@ -1018,7 +1018,7 @@ def students_applications_list(request):
 def applications_list(request):
 	academic_session = request.GET.get('academic_session')
 	user = request.user
-	applications = StudentIndexing.objects.filter(academic_session=academic_session, institution=user.get_indexing_officer_profile.institution, verification_status=1)
+	applications = StudentIndexing.objects.filter(academic_session=academic_session, institution=user.get_indexing_officer_profile.institution, verification_status=1, rejection_status = 1)
 	context = {'applications': applications}
 	return render(request, 'partials/applications.html', context)
 

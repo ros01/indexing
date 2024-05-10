@@ -21,6 +21,7 @@ from .views import (
     StudentIndexingNumberDetailView,
     StudentIndexingApplicationDetailView,
     InstitutionsIndexingPaymentDetailView,
+    InstitutionsIndexingPaymentVerifiedDetailView,
            
 )
 
@@ -62,6 +63,7 @@ urlpatterns = [
     path('<slug:slug>/verify_payment/', views.verify_payment, name='verify_payment'),
     path('<slug:slug>/reject_payment/', views.reject_payment, name='reject_payment'),
     path('institutions_indexing_payment_details/<slug:slug>',  InstitutionsIndexingPaymentDetailView.as_view(), name='institutions_indexing_payment_details'),
+    path('institutions_indexing_payment_verified_details/<slug:slug>',  InstitutionsIndexingPaymentVerifiedDetailView.as_view(), name='institutions_indexing_payment_verified_details'),
 
     ]
 

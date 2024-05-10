@@ -43,16 +43,14 @@
 {% elif  object.verification_status == 3 %}
 <h5 class="mb-1"> <span class="badge badge-primary">Rejected</span></h5>
 {% else %} 
-<h5 class="mb-1"> <span class="badge badge-primary"></span></h5>
+<h5 class="mb-1"> <span class="badge badge-primary"></span>Verified</h5>
 {% endif %}
 
 </div>
 <div class="col-md-12 alert alert-primary mt-1 mb-3 py-2" role="alert">
-    <h4 class="alert-heading font-18">{{object.student_profile.student.last_name}} {{object.student_profile.student.first_name}} {{object.student_profile.student.middle_name}} Indexing Application Rejected</h4>
-    </div>
+<h4 class="alert-heading font-18">{{object.student_profile.student.last_name}} {{object.student_profile.student.first_name}} {{object.student_profile.student.middle_name}} Indexing Application Rejected</h4>
 </div>
-
-
+</div>
 
 
 
@@ -62,8 +60,6 @@
 <div>  
 
         
-
-
 <p class="text-sm mb-0">
 <ul class="list-unstyled">
 <li>Student Name: <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.student.last_name}} {{object.student_profile.student.first_name}} {{object.student_profile.student.middle_name}}</span></li>
@@ -89,7 +85,6 @@
 </span></li>
 {% endif %}
 </ul>
-
 </div>
 
 <h5 class="mb-1"> <i class="fab fa-asymmetrik text-primary"></i> Contact Details</h5>
@@ -229,6 +224,7 @@
 <div class="tab-pane" id="payment">
 
 
+{% if payment_object %}
 <div class="row justify-content-center">
 {% include 'partials/_alerts.html' %} 
     
@@ -291,16 +287,47 @@
        </div>
 
 
-        <div class="col-md-5 mt-0">
+        <!-- <div class="col-md-5 mt-0">
       
+        </div> -->
         </div>
-        </div>
+
+
+{% else %}
+
+
+
+
+<div class="row justify-content">
+{% include 'partials/_alerts.html' %} 
+<div class="col-md-12  profile-detail">
+<div class="d-flex justify-content-between align-items-center">
+<div class="w-50">
+
+<h5 class="mb-0 pb-2"> <i class="fab fa-accusoft text-primary"></i> Student Indexing Payment Details </h5>
+</div> 
+</div>
+
+<div class="col-md-12 alert alert-primary mt-1 mb-3 py-2" role="alert">
+<h4 class="alert-heading font-18">No payments found for this applicant</h4>
+</div>
+
+
+</div>
+
+
+</div>
+
+{% endif %}
+
+
+
 </div>
 
 <hr>
 
 <div class="d-flex justify-content-end mr-3">  
-<a href="{% url 'institutions:student_indexing_verifications_list' %}" class="btn btn-outline-primary py-0 mr-3 mt-1"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Return to Verified Applications List</a>  
+<a href="{% url 'institutions:student_indexing_rejections_list' %}" class="btn btn-outline-primary py-0 mr-3 mt-1"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Return to Rejected Applications List</a>  
 </div>
 
 

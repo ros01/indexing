@@ -132,7 +132,7 @@ class CustomModelMultipleChoiceField(forms.ModelMultipleChoiceField):
 
 
 class InstitutionPaymentModelForm(forms.ModelForm):
-    students_payments = forms.ModelMultipleChoiceField(queryset=None, widget=forms.CheckboxSelectMultiple())
+    students_payments = forms.ModelMultipleChoiceField(queryset=None, widget=forms.CheckboxSelectMultiple(attrs={"checked":""}))
     
     class Meta:
          model = InstitutionPayment

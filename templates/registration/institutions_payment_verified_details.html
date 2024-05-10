@@ -214,7 +214,7 @@
 <tbody>
 {% for student in object.students_payments.all %}
 
-{% if student.payment_status == 2 %}
+{% if student.payment_status == 3 %}
 <tr>
 <td>{{student.student_profile.student.last_name}} {{student.student_profile.student.first_name}}</td>
 <td>{{student.institution.course_type}}</td>

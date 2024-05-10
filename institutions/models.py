@@ -577,6 +577,10 @@ class InstitutionPayment(models.Model):
         return reverse('indexing_unit:institutions_indexing_payment_details', kwargs={"slug": self.slug})
 
 
+    def get_verified_url(self):
+        return reverse('registration:institutions_indexing_payment_verified_details', kwargs={"slug": self.slug})
+
+
     def get_reg_indexing_url(self):
         return reverse('registration:institutions_indexing_payment_details', kwargs={"slug": self.slug})
 

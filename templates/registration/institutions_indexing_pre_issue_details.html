@@ -117,7 +117,7 @@
                 <tbody>
 
                 {% for student in object.students_payments.all %}
-
+                {% if student.payment_status == 3 %}
                 <tr>
                     <td> {{student.student_profile.student.last_name}} {{student.student_profile.student.first_name}}</td>
                     <td>{{student.institution.course_type}}</td>
@@ -127,11 +127,13 @@
                    
                     
                     <td><a href="{{ student.student_indexing.get_reg_indexing_number_url }}"> <i class="fas fa-search text-primary"></i> <span class="badge badge-boxed  badge-primary">View Details </span></a></td> 
-
                 </tr>
+                {% else %}
+                <p>  </p>
+                {% endif %}
                 {% endfor %}
                 </tbody>
-            </table>
+                </table>
 </div>
 </div>
 </div>

@@ -43,9 +43,8 @@
 
 {% if object.verification_status == 1 %}
  <h5 class="mb-1"> <span class="badge badge-warning">Pending</span></h5> 
+
 {% elif  object.verification_status == 2 %}
-<h5 class="mb-1"> <span class="badge badge-primary">VERFIED BY INSTITUTION</span></h5>
-{% elif  object.verification_status == 3 %}
 <h5 class="mb-1"> <span class="badge badge-primary">VERFIED BY RRBN REGISTRATION DEPT</span></h5>
 {% else %} 
 <h5 class="mb-1"> <span class="badge badge-primary"></span></h5>
@@ -53,7 +52,7 @@
 
 </div>
 
-{% if object.verification_status == 2 %}
+{% if object.verification_status == 1 %}
 
 <div class="col-md-12 alert alert-primary mt-1 mb-3 py-2" role="alert">
 <h4 class="alert-heading font-18">Kindly review admission details for this application application before proceeding to approve institutions payment</h4>
@@ -320,7 +319,7 @@
 </div> -->
 
 
-{% if object.verification_status == 2 %}
+{% if object.board_verification_status == 1 %}
 <div class="d-flex justify-content-end">  
 
 <a href="javascript:{document.getElementById('approve{{object.slug }}').submit()}">
@@ -331,12 +330,21 @@
 </a>
 
 
-<a href="{% url 'registration:institutions_indexing_payment_details' object.institution.slug %}" class="btn btn-outline-success py-0 mr-3 mt-1"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Return to Institutions Payment Details</a>  
+<!-- <a href="{% url 'registration:institutions_indexing_payment_details' object.institution.slug %}" class="btn btn-outline-success py-0 mr-3 mt-1"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Return to Institutions Payment Details</a>   -->
+
+<div class="d-flex justify-content-end mb-2"> 
+<a href="{{request.META.HTTP_REFERER}}" class="btn btn-outline-primary py-0 mr-3 mt-1"><i class="fas fa-angle-double-left" aria-hidden="true"></i> Go Back </a>
+</div>
+
 
 {% else %}
 <div class="d-flex justify-content-end mr-3">  
 
-<a href="{% url 'registration:institutions_indexing_payment_details' object.institution.slug %}" class="btn btn-outline-success py-0 mr-3 mt-1"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Return to Institutions Payment Details</a> 
+<!-- <a href="{% url 'registration:institutions_indexing_payment_details' object.institution.slug %}" class="btn btn-outline-success py-0 mr-3 mt-1"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Return to Institutions Payment Details</a>  -->
+
+<div class="d-flex justify-content-end mb-2"> 
+<a href="{{request.META.HTTP_REFERER}}" class="btn btn-outline-primary py-0 mr-3 mt-1"><i class="fas fa-angle-double-left" aria-hidden="true"></i> Go Back </a>
+</div>
 
 <!-- <a href="{% url 'registration:dashboard' %}" class="btn btn-outline-primary py-0 mr-3 mt-1"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Return to Dashboard</a>   -->
 </div>

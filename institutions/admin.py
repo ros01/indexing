@@ -61,7 +61,7 @@ admin.site.register(TransferGrade, TransferGradeAdmin)
 
 
 class StudentIndexingAdmin(admin.ModelAdmin):
-  list_display = ('student_profile', 'slug', 'academic_session', 'admission_type', 'indexing_status', 'verification_status', 'timestamp', 'updated')
+  list_display = ('student_profile', 'slug', 'academic_session', 'admission_type', 'indexing_status', 'verification_status', 'rejection_status', 'timestamp', 'updated')
   list_display_links = ('student_profile', 'academic_session', 'admission_type', 'indexing_status', 'timestamp')
   list_filter = ('student_profile', 'academic_session', 'admission_type', 'indexing_status', 'timestamp')
   search_fields = ('student_profile', 'academic_session', 'admission_type', 'indexing_status', 'timestamp')

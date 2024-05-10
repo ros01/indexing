@@ -41,9 +41,11 @@
 {% if object.verification_status == 1 %}
  <h5 class="mb-1"> <span class="badge badge-warning">Pending</span></h5> 
 {% elif  object.verification_status == 2 %}
-<h5 class="mb-1"> <span class="badge badge-primary">Verified</span></h5>
+<h5 class="mb-1"> <span class="badge badge-primary">Verified by Institution</span></h5>
+{% elif  object.verification_status == 32 %}
+<h5 class="mb-1"> <span class="badge badge-primary">Rejected by Institution</span></h5>
 {% else %} 
-<h5 class="mb-1"> <span class="badge badge-primary"></span></h5>
+<h5 class="mb-1"> <span class="badge badge-primary">Verified by Institution</span></h5>
 {% endif %}
 
 </div>
@@ -224,7 +226,7 @@
     {% if payment_object.payment_status == 1 %}
     <h5 class="mb-1"> <span class="badge badge-warning">Pending</span></h5> 
     {% elif  payment_object.payment_status >= 2 %}
-    <h5 class="mb-1"> <span class="badge badge-primary">Verified</span></h5>
+    <h5 class="mb-1"> <span class="badge badge-primary">Verified by Institution</span></h5>
     {% else %} 
     <h5 class="mb-1"> <span class="badge badge-primary"></span></h5>
     {% endif %}
