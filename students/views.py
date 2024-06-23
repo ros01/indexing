@@ -554,6 +554,7 @@ class StudentIndexingWizardView(SessionWizardView):
         indexing.student_profile = self.student_profile
         indexing.institution = self.student_profile.institution
         indexing.matric_no = self.student_profile.student.matric_no
+        indexing.academic_session = self.student_profile.academic_session
         indexing.save()
         url_kwargs={
             'islug': indexing.institution.slug,

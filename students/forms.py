@@ -376,7 +376,7 @@ class IndexingModelForm(forms.ModelForm):
             # 'utme_grade',
             # 'gce_alevels',
             # 'degree_result',
-            'academic_session',
+            # 'academic_session',
             'admission_letter',
             
                 ]
@@ -405,7 +405,7 @@ class IndexingModelForm(forms.ModelForm):
        #
        # self.fields['matric_no'].label = "Matric Number"
        self.fields['admission_letter'].label = "Upload Admission Letter in PDF or Jpeg format"
-       self.fields['academic_session'].label = "Academic Session"
+       # self.fields['academic_session'].label = "Academic Session"
       
 
     def clean_matric_no(self):  

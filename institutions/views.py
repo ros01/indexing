@@ -390,6 +390,60 @@ class StudentProfileUpdateView (StaffRequiredMixin, SuccessMessageMixin, UpdateV
             student=self.object.get_full_name,
         )
 
+    def get_success_url(self):
+        return reverse("institutions:student_profiles_list") 
+
+
+    def post(self, request, *args, **kwargs):
+    	email = request.POST['email']
+    	pk = self.kwargs.get("pk")
+    	obj = get_object_or_404(User, id=pk)
+    	# obj = StudentProfile.objects.get(student__email= form.cleaned_data["email"]).student.email
+    	form = self.form_class(request.POST or None, instance = obj)
+    	if form.is_valid():
+        	student_profile = form.save()
+        	user = student_profile
+        	student_profile = StudentProfile.objects.filter(student=user).first()
+        	print("User:", user)
+        	# reset_password(user, request)
+        	reset_user_password(user, self.request)
+        	messages.success(request, 'Student Profile Update Successful')
+        	return redirect(student_profile.get_absolute_url())
+    	else:
+        	messages.error(request, 'The email you are trying to assign to this student is already in use')
+        	user = get_object_or_404(User, id=pk)
+        	student_profile = StudentProfile.objects.filter(student=user).first()
+        	return redirect(student_profile.get_absolute_url())
+
+        	# form = self.form_class(request.POST or None, instance = obj)
+        	# return render(request, self.template_name)
+        	# return redirect("institutions:student_profiles_list")
+
+
+        
+    	return super(StudentProfileUpdateView, self).form_valid(form)
+    	# return reverse("institutions:student_profiles_list") 
+    	
+
+
+
+class StudentProfileUpdateView1 (StaffRequiredMixin, SuccessMessageMixin, UpdateView):
+    form_class = SignupForm
+    template_name = "institutions/update_student_profile.html"
+    # success_message = "Student Profile Update Successful"
+
+    success_message = "%(student)s  Student Profile Update Successful"
+    def get_object(self, queryset=None):
+    	pk = self.kwargs.get("pk")
+    	user = User.objects.get(id=pk)
+    	return user
+
+    def get_success_message(self, cleaned_data):
+      return self.success_message % dict(
+            cleaned_data,
+            student=self.object.get_full_name,
+        )
+
 
 
     def get_success_url(self):

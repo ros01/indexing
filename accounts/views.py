@@ -34,7 +34,7 @@ AUTH_USER_MODEL = 'accounts.User'
 
 
 class SigninTemplateView(TemplateView):
-    template_name = "accounts/signin.html"
+    template_name = "accounts/sign_in.html"
 
 
 

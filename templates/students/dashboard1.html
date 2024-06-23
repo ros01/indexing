@@ -25,13 +25,15 @@
 <div class="page-title-box">
 <div class="float-right">
 <div class="dropdown">
-<button class="btn btn-secondary btn-round dropdown-toggle px-3" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-<i class="mdi mdi-settings mr-1"></i>Settings
+<button class="btn btn-primary btn-round dropdown-toggle px-3" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+<i class="mdi mdi-settings mr-1"></i>My Profile Details
 </button>
 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-<a class="dropdown-item" href="#">Action</a>
-<a class="dropdown-item" href="#">Another action</a>
-<a class="dropdown-item" href="#">Something else here</a>
+
+
+<a class="dropdown-item" href="{{ obj.get_student_profile_details_url }}">My Student Profile</a>
+<a class="dropdown-item" href="{% url 'students:application_history' %}">My Application Status</a>
+<!-- <a class="dropdown-item" href="#">Something else here</a> -->
 </div>
 </div>
 </div>
@@ -161,10 +163,10 @@
 
 
 
-<div class="col-12">
+<!-- <div class="col-12">
 <div class="card">
-<div class="card-body table-data">
-<h6 class="d-inline-block">Overview</h6>
+<div class="card-body table-data"> -->
+<!-- h6 class="d-inline-block">Overview</h6>
 
 <form method='GET' action="{% url 'indexing_unit:dashboard' %}">
 <input type='text' placeholder="Search..." name='q' value='{{ request.GET.q }}'>
@@ -173,14 +175,14 @@
 {% if request.GET.q %}
 <p> You searched for <b>{{ request.GET.q }}</b></p>
 {% endif %}
+ -->
 
 
 
 
 
 
-
-<div class="float-right ml-2">
+<!-- <div class="float-right ml-2">
 <div class="dropdown">
 <a class="btn btn-outline-light btn-sm" id="dropdownMenuButton2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 <i class="mdi mdi-menu"></i>
@@ -191,7 +193,7 @@
 <a class="dropdown-item" href="#">This Month</a>
 </div>
 </div>
-</div>
+</div> -->
 
 
 
@@ -281,12 +283,14 @@
 </div>
  -->
 
-</div>
-</div>                                    
-</div> 
-</div><!-- end row -->
+<!-- </div>
+</div>  -->                                   
+<!-- </div>  -->
+<!-- </div> -->
+<!-- end row -->
 
-</div><!-- container -->
+<!-- </div> -->
+<!-- container -->
 
 </div> <!-- Page content Wrapper -->
 </div> <!-- content -->
