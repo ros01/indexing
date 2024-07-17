@@ -369,7 +369,7 @@ class StudentIndexing(models.Model):
     # utme_grade_result = models.FileField(null=True, blank=True, upload_to='%Y/%m/%d/')
     indexing_status = models.CharField(max_length=200, choices=INDEXING_STATUS, default='pending')
     verification_status = models.CharField(max_length=200, choices=VERIFICATION_STATUS, default='pending')
-    rejection_status = models.IntegerField(max_length=200, choices=VERIFICATION_STATUS, default='pending')
+    rejection_status = models.CharField(max_length=200, choices=VERIFICATION_STATUS, default='pending')
     rejection_reason = models.CharField(max_length=200, null=True, blank=True)
     board_verification_status = models.IntegerField(default=1)
     updated         = models.DateTimeField(auto_now=True)
