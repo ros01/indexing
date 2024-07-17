@@ -912,7 +912,7 @@ class IndexingVerificationsListView(StaffRequiredMixin, ListView):
 		query = request.GET.get('q')
 		if query:
 			qs = qs.filter(name__icontains=query)
-		return qs.filter(verification_status=2) 
+		return qs.filter(verification_status="approved") 
 
 
 class IndexingRejectionsListView(StaffRequiredMixin, ListView):
@@ -924,7 +924,7 @@ class IndexingRejectionsListView(StaffRequiredMixin, ListView):
 		query = request.GET.get('q')
 		if query:
 			qs = qs.filter(name__icontains=query)
-		return qs.filter(verification_status=3) 
+		return qs.filter(rejection_status="rejected") 
 
 
 class IndexingVerificationsDetailView(StaffRequiredMixin, DetailView):
