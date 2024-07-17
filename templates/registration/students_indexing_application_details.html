@@ -44,12 +44,10 @@
 <h5 class="mb-0 pb-2"> <i class="fa fa-graduation-cap text-primary"></i> Student Indexing Application Details </h5>
 </div> 
 
-{% if object.verification_status == 1 %}
+{% if object.indexing_status == "pending" %}
  <h5 class="mb-1"> <span class="badge badge-warning">Pending</span></h5> 
-{% elif  object.verification_status == 2 %}
-<h5 class="mb-1"> <span class="badge badge-primary">VERFIED BY INSTITUTION</span></h5>
-{% elif  object.verification_status == 3 %}
-<h5 class="mb-1"> <span class="badge badge-primary">VERFIED BY RRBN REGISTRATION DEPT</span></h5>
+{% elif  object.indexing_status == "verified" %}
+<h5 class="mb-1"> <span class="badge badge-primary">VERIFIED BY RRBN REGISTRATIONS</span></h5>
 {% else %} 
 <h5 class="mb-1"> <span class="badge badge-primary"></span></h5>
 {% endif %}
@@ -277,7 +275,7 @@
 </div>
 </div>
 <hr>
-{% if object.verification_status <= 3 %}
+{% if object.indexing_status == "verified" %}
 <div class="d-flex justify-content-end">  
 
 <!-- <a href="{% url 'registration:students_index_number_list' %}" class="btn btn-outline-primary py-0 mr-3 mt-1 mb-3"><i class="fas fa-angle-double-left" aria-hidden="true"></i> Return to Index Numbering List </a> -->

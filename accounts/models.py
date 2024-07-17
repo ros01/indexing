@@ -59,6 +59,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         ('Indexing Unit', 'Indexing Unit'),
         ('Registrar', 'Registrar'),
         ('Registration', 'Registration'),
+        ('Sysadmin', 'Sysadmin'),
         )
 
     email = models.EmailField(unique=True)

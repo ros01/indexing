@@ -8,30 +8,39 @@
 <div class="col-md-12 mt-4 mx-1">
 <div class="row">
 <div class="col-md-12">
-    <div class="card">   
-        <div class="card-body">
-            <h4 class="mt-0 header-title text-primary">Students Indexing Rejections List</h4>
-            <p class="text-muted  font-14">Please select academic session to view Students Indexing Rejections.
-            </p>
-            <select class="custom-select mb-4 col-md-2" 
-            name="academic_session" 
-            hx-get="{% url 'institutions:rejections_list' %}"
-            hx-trigger="change"
-            hx-target="#rejections">
+<div class="card">   
+<div class="card-body">
+<h4 class="mt-0 header-title text-primary">Students Indexing Rejections List</h4>
+<p class="text-muted  font-14">Please select academic session to view Students Indexing Rejections.
+</p>
+<select class="custom-select mb-4 col-md-2" 
+name="academic_session" 
+hx-get="{% url 'institutions:rejections_list' %}"
+hx-trigger="change"
+hx-target="#rejections">
 
-                <option selected>Select Academic Session</option>
-                {% for academic_session in academic_sessions %}
-                    <option value="{{academic_session.pk}}"> {{academic_session.name}}</option>
-                {% endfor %}
-            </select>
+<option selected>Select Academic Session</option>
+{% for academic_session in academic_sessions %}
+<option value="{{academic_session.pk}}"> {{academic_session.name}}</option>
+{% endfor %}
+</select>
 
-            <div id="rejections">
-                {% include 'partials/rejections.html' %}
-            </div>
-        </div>
-    </div>
+<div id="rejections">
+{% include 'partials/rejections.html' %}
+</div>
+</div>
+</div>
 </div> <!-- end col -->
 </div> <!-- end row -->
+</div>
+</div>
+
+<div class="row mb-4">
+<div class="col-lg-12 col-sm-12">
+<div class="card">
+
+
+</div>
 </div>
 </div>
 {% endblock content %}

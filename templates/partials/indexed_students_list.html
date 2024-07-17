@@ -16,8 +16,8 @@
                 <tbody>
                 {% for object in indexing_list %}
                 <tr>
-                    <td>{{object.institution}}</td>
                     <td>{{object.student_profile.student.last_name}} {{object.student_profile.student.first_name}}</td>
+                    <td>{{object.institution}}</td>
                     <td>{{object.academic_session}}</td>
                     <td>{{object.matric_no}}</td>
                     <td>{{object.index_number}}</td>

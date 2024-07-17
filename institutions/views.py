@@ -831,11 +831,11 @@ class StudentIndexingApplicationDetails(StaffRequiredMixin, DetailView):
 def verify_application(request, slug):
   if request.method == 'POST':
      object = get_object_or_404(StudentIndexing, slug=slug)
-     payment_object = object.indexingpayment_set.first()
-     object.verification_status = 2
-     payment_object.payment_status = 2
+     # payment_object = object.indexingpayment_set.first()
+     object.verification_status = "approved"
+     # payment_object.payment_status = 2
      object.save()
-     payment_object.save()
+     # payment_object.save()
      context = {}
      context['object'] = object
      messages.success(request, ('Indexing Application Verified'))
@@ -852,14 +852,12 @@ def verify_application(request, slug):
      #        'sslug': self.slug,})
      # return render(request, 'institutions/verification_successful.html',context)
 
-
-
 def reject_application(request, slug):
   if request.method == 'POST':
      object = get_object_or_404(StudentIndexing, slug=slug)
-     payment_object = object.indexingpayment_set.first()
+     # payment_object = object.indexingpayment_set.first()
      object.rejection_reason = request.POST.get('rejection_reason')
-     object.rejection_status = 2
+     object.rejection_status = "rejected"
      # payment_object.payment_status = 1
      object.save()
      # payment_object.save()
@@ -1038,7 +1036,7 @@ class InstitutionsPaymentsListView(StaffRequiredMixin, ListView):
 	def get_queryset(self):
 		user = self.request.user
 		try:
-			obj = InstitutionPayment.objects.filter(institution = user.get_indexing_officer_profile.institution)
+			obj = InstitutionIndexing.objects.filter(institution = user.get_indexing_officer_profile.institution)
 			print ("obj:", obj)
 			if obj.exists():
 				return obj
@@ -1072,7 +1070,7 @@ def students_applications_list(request):
 def applications_list(request):
 	academic_session = request.GET.get('academic_session')
 	user = request.user
-	applications = StudentIndexing.objects.filter(academic_session=academic_session, institution=user.get_indexing_officer_profile.institution, verification_status=1, rejection_status = 1)
+	applications = StudentIndexing.objects.filter(academic_session=academic_session, institution=user.get_indexing_officer_profile.institution, verification_status="pending", rejection_status = 1)
 	context = {'applications': applications}
 	return render(request, 'partials/applications.html', context)
 
@@ -1089,7 +1087,7 @@ def students_verifications_list(request):
 def verifications_list(request):
 	academic_session = request.GET.get('academic_session')
 	user = request.user
-	verifications = StudentIndexing.objects.filter(academic_session=academic_session, institution=user.get_indexing_officer_profile.institution, verification_status=2)
+	verifications = StudentIndexing.objects.filter(academic_session=academic_session, institution=user.get_indexing_officer_profile.institution, verification_status="approved")
 	context = {'verifications': verifications}
 	return render(request, 'partials/verifications.html', context)
 
@@ -1105,7 +1103,7 @@ def students_rejections_list(request):
 def rejections_list(request):
 	academic_session = request.GET.get('academic_session')
 	user = request.user
-	rejections = StudentIndexing.objects.filter(academic_session=academic_session, institution=user.get_indexing_officer_profile.institution, rejection_status=2)
+	rejections = StudentIndexing.objects.filter(academic_session=academic_session, institution=user.get_indexing_officer_profile.institution, rejection_status="rejected")
 	context = {'rejections': rejections}
 	return render(request, 'partials/rejections.html', context)
 
@@ -1123,9 +1121,9 @@ def institutions_payments_list(request):
 def payments_list(request):
 	academic_session = request.GET.get('academic_session')
 	user = request.user
-	payments = InstitutionPayment.objects.filter(academic_session=academic_session, institution = user.get_indexing_officer_profile.institution)
-	context = {'payments': payments}
-	return render(request, 'partials/payments.html', context)
+	students_indexing = InstitutionIndexing.objects.filter(academic_session=academic_session, institution = user.get_indexing_officer_profile.institution)
+	context = {'students_indexing': students_indexing}
+	return render(request, 'partials/students_indexing.html', context)
 
 
 @login_required
@@ -1151,14 +1149,14 @@ def pay_institutions_indexing_fee(request):
 	academic_sessions = AcademicSession.objects.all()
 	academic_session = request.GET.get('academic_session')
 	# print("Academic Session:", academic_session)
-	form = InstitutionPaymentModelForm(request.POST or None, request = request)
+	form = InstitutionIndexingModelForm(request.POST or None, request = request)
 	context = {'academic_sessions': academic_sessions, 'academic_session': academic_session, 'form':form}
 	return render(request, 'institutions/pay_institutions_indexing_fee.html', context)
 
 class InstitutionPaymentCreateView(StaffRequiredMixin, SuccessMessageMixin, CreateView):
-    model = InstitutionPayment
+    model = InstitutionIndexing
     template_name = "partials/institutions_payment_partial.html"
-    form_class = InstitutionPaymentModelForm
+    form_class = InstitutionIndexingModelForm
     # success_message = "%(institution)s Institution Indexing Payment Submission Successful"
     academic_sessions = AcademicSession.objects.all()
 
@@ -1204,33 +1202,33 @@ class InstitutionPaymentCreateView(StaffRequiredMixin, SuccessMessageMixin, Crea
     def post(self, request, *args, **kwargs):
     	user = self.request.user
     	session=request.POST.get('academic_session')
-    	student_payments = request.POST.getlist('students_payments')
-    	print ("List of Students:", student_payments)
-    	students = IndexingPayment.objects.all()
+    	student_indexing = request.POST.getlist('student_indexing')
+    	print ("List of Students:", student_indexing)
+    	students = StudentIndexing.objects.all()
 
-    	institution_payment = InstitutionPayment.objects.create(
+    	institution_indexing = InstitutionIndexing.objects.create(
             # students_payments=request.POST.get('students_payments'),
             academic_session = AcademicSession.objects.get(id=session),
             rrr_number=request.POST.get('rrr_number'),
             payment_amount=request.POST.get('payment_amount'),
             payment_method=request.POST.get('payment_method'),
-            payment_receipt=request.POST.get('payment_receipt'),
+            payment_receipt=request.FILES.get('payment_receipt'),
             institution = InstitutionProfile.objects.get(name=user.get_indexing_officer_profile.institution),
             )
 
 
     	# students_list = InstitutionPayment.objects.filter(pk__in=student_payments)
     	# for institution_payment in students_list:
-    	institution_payment.students_payments.add(*student_payments)
-    	print ("Student Payments:", *student_payments)
+    	institution_indexing.student_indexing.add(*student_indexing)
+    	print ("Student Payments:", *student_indexing)
 
 
-    	institution = institution_payment.institution.name
+    	institution = institution_indexing.institution.name
 
     	print ("institution:", institution)
 
-    	messages.success(request, f"{institution}s Institution Indexing Payment Submission Successful") 
-    	return redirect(institution_payment.get_absolute_url())
+    	messages.success(request, f"{institution}s Institution Indexing Submission Successful") 
+    	return redirect(institution_indexing.get_absolute_url())
 
 
     	
@@ -1249,9 +1247,9 @@ def add_film(request):
     return render(request, 'partials/film-list.html', {'films': films})
 
 class InstitutionPaymentCreateView1(StaffRequiredMixin, SuccessMessageMixin, CreateView):
-    model = InstitutionPayment
+    model = InstitutionIndexing
     template_name = "institutions/pay_institutions_indexing_fee.html"
-    form_class = InstitutionPaymentModelForm
+    form_class = InstitutionIndexingModelForm
     success_message = "%(institution)s Institution Indexing Payment Submission Successful"
     academic_sessions = AcademicSession.objects.all()
 
@@ -1297,9 +1295,9 @@ class InstitutionPaymentCreateView1(StaffRequiredMixin, SuccessMessageMixin, Cre
 
 
 class InstitutionPaymentsCreateView(StaffRequiredMixin, SuccessMessageMixin, CreateView):
-    model = InstitutionPayment
+    model = InstitutionIndexing
     template_name = "institutions/institutions_indexing_payment.html"
-    form_class = InstitutionPaymentModelForm
+    form_class = InstitutionIndexingModelForm
     success_message = "%(institution)s Institution Indexing Payment Submission Successful"
 
     def get_success_message(self, cleaned_data):
@@ -1336,7 +1334,7 @@ class InstitutionPaymentsCreateView(StaffRequiredMixin, SuccessMessageMixin, Cre
 
 
 class InstitutionsIndexingPaymentDetailView(StaffRequiredMixin, DetailView):
-	queryset = InstitutionPayment.objects.all()
+	queryset = InstitutionIndexing.objects.all()
 	template_name = "institutions/institutions_payment_details.html"
 
 

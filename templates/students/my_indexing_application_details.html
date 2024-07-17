@@ -296,29 +296,38 @@
 
 
 
-{% if object.indexing_status == 3 %}
+
 
 <div class="d-flex justify-content-end">   
 <!-- <a href="{% url 'students:my_indexing_application_list' %}" class="btn btn-outline-primary py-0 mr-3 mt-1 mb-3"><i class="fa fa-angle-double-left" aria-hidden="true"></i></i> Return to Application Submission List</a> -->
 
-<a href="{{request.META.HTTP_REFERER}}" class="btn btn-outline-primary py-0"><i class="fas fa-angle-double-left" aria-hidden="true"></i> Go Back </a>
+<!-- <a href="{{request.META.HTTP_REFERER}}" class="btn btn-outline-primary py-0"><i class="fas fa-angle-double-left" aria-hidden="true"></i> Go Back </a> -->
 
 
-{% else %}
 
 
-<div class="card-body mb-3 pb-3"><p class="lead text-primary"><strong>Next step is payment of student indexing fee</strong></p>
+
+<!-- <div class="card-body mb-3 pb-3"><p class="lead text-primary"><strong>Next step is payment of student indexing fee</strong></p>
 Kindly note that you need to have ready your indexing payment receipt in order to proceed with your application.  Click Proceed to Payment if you have ready your payment receipt at this time, or click Continue Later to go and make your payment through your institution approved channels and continue after obtaining your receipt. 
+</div> -->
+<div class="d-flex justify-content-end">  
+
+<a href="{{request.META.HTTP_REFERER}}" class="btn btn-outline-primary py-0 px-2 mr-3 mt-2 mb-4 "><i class="fas fa-angle-double-left" aria-hidden="true"></i> Go Back </a>
+
+
+ 
+<a href="{% url 'students:my_indexing_application_list' %}" class="btn btn-outline-primary py-0 px-2 mr-3 mt-2 mb-4"><i class="fas fa-angle-double-left" aria-hidden="true"></i> My applications List</a>
+
+<!-- <a href="{% url 'students:indexing_application_payment' %}" class="text-success py-0 px-2 mt-2 mb-4 mr-4 btn btn-outline-success"><i class="fa fa-play text-success"></i>Proceed to Payment</a> -->
+
+
+<a href="{% url 'students:dashboard' %}" class="btn btn-outline-primary py-0 px-2 mt-2 mb-4 mr-4"><i class="fas fa-angle-double-left"></i>Return to Dashboard</a>
+
+
 </div>
 
-<div class="d-flex justify-content-end">   
-<a href="{% url 'students:my_indexing_application_list' %}" class="btn btn-warning text-dark py-0 px-2 mr-3 mt-2 mb-4 "><i class="fa fa-times" aria-hidden="true"></i> Continue Later</a>
-
-<a href="{% url 'students:indexing_application_payment' %}" class="text-success py-0 px-2 mt-2 mb-4 mr-4 btn btn-outline-success"><i class="fa fa-play text-success"></i>Proceed to Payment</a>
-</div>
 
 
-{% endif %}
 </div>
 
 

@@ -95,14 +95,14 @@ admin.site.register(IndexingPayment, IndexingPaymentAdmin)
 
 # admin.site.register(InstitutionPayment, InstitutionPaymentAdmin)
 
-class InstitutionPaymentAdmin(admin.ModelAdmin):
+class InstitutionIndexingAdmin(admin.ModelAdmin):
   list_display = ('institution', 'academic_session', 'payment_status', 'rrr_number', 'payment_amount')
   list_display_links = ('institution', 'academic_session', 'payment_status', 'rrr_number')
   list_filter = ('institution', 'academic_session', 'payment_status', 'rrr_number')
   search_fields = ('institution', 'academic_session', 'payment_status', 'rrr_number')
   list_per_page = 25
 
-admin.site.register(InstitutionPayment, InstitutionPaymentAdmin)
+admin.site.register(InstitutionIndexing, InstitutionIndexingAdmin)
 
 
 class AcademicSessionAdmin(admin.ModelAdmin):

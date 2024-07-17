@@ -13,6 +13,7 @@ from .views import (
     IndexNumberIssuanceListView,
     IndexNumberIssuanceList,
     InstitutionsIndexingPreIssueDetailView,
+    StudentIndexingVerifiedDetails,
     StudentsIndexingApplicationDetails,
     StudentsPostIndexingDetails,
     IssueIndexingNumber,
@@ -55,6 +56,7 @@ urlpatterns = [
     path('institutions_indexed_students_list', InstitutionsIndexedStudentsListView.as_view(), name='institutions_indexed_students_list'),
     
     path('student_indexing_details/<slug:islug>/<slug:sslug>',  StudentIndexingApplicationDetailView.as_view(), name='student_indexing_details'),
+    path('student_indexing_verified_details/<slug:islug>/<slug:sslug>',  StudentIndexingVerifiedDetails.as_view(), name='student_indexing_verified_details'),
     path('students_indexing_details/<slug:islug>/<slug:sslug>',  StudentsIndexingApplicationDetails.as_view(), name='students_indexing_details'),
     path('students_post_indexing_details/<slug:islug>/<slug:sslug>',  StudentsPostIndexingDetails.as_view(), name='students_post_indexing_details'),
     path('student_indexing_number_details/<slug:slug>',  StudentIndexingNumberDetailView.as_view(), name='student_indexing_number_details'),

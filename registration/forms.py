@@ -38,8 +38,7 @@ class InstitutionPaymentForm1(DynamicFormMixin, forms.Form):
 		academic_session = form['academic_session'].value()
 		institution = form['institution'].value()
 		return InstitutionPayment.objects.filter(academic_session=academic_session, institution=institution)     
-    
-    # course field
+
 
 	academic_session = forms.ModelChoiceField(
         queryset=AcademicSession.objects.all(),
@@ -52,7 +51,7 @@ class InstitutionPaymentForm1(DynamicFormMixin, forms.Form):
         initial = InstitutionProfile.objects.first()
     )
 
-    # module field
+
 	institution_payments = DynamicField(
         forms.ModelChoiceField,
         queryset=institution_payment_choices,

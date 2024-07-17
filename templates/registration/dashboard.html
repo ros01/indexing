@@ -25,17 +25,17 @@
 <div class="page-title-box">
 <div class="float-right">
 <div class="dropdown">
-<button class="btn btn-secondary btn-round dropdown-toggle px-3" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-<i class="mdi mdi-settings mr-1"></i>Settings
+<button class="btn btn-primary btn-round dropdown-toggle px-3" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+<i class="mdi mdi-settings mr-1"></i>Quick Links
 </button>
 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-<a class="dropdown-item" href="#">Action</a>
-<a class="dropdown-item" href="#">Another action</a>
-<a class="dropdown-item" href="#">Something else here</a>
+<a class="dropdown-item" href="{% url 'registration:institutions_list' %}">Institutions</a>
+<a class="dropdown-item" href="{% url 'registration:indexing_officers_list' %}">Indexing Officers</a>
+<a class="dropdown-item" href="{% url 'registration:admission_quota_list' %}">Admission Quotas</a>
 </div>
 </div>
 </div>
-<h4 class="page-title text-primary">RRBN Registration Dashboard</h4>
+<h4 class="page-title text-primary">Registration Dashboard</h4>
 </div>
 </div>
 </div>
@@ -109,7 +109,7 @@
 <!-- <div class="col-lg-4"> -->
 <div class="col-md-12 col-xl-3">
 <div class="card m-b-30">
-<h4 class="card-header mt-0 text-primary">View Institutions</h4>
+<h4 class="card-header mt-0 text-primary">Institutions</h4>
 <div class="card-body">
 <!-- <h4 class="card-title font-20 mt-0">Post Accreditation Institution Creation</h4> -->
 <p class="card-text"><strong class="text-primary"> Note: </strong>Insitutions with Board accreditation</p>
@@ -123,7 +123,7 @@
 <!-- <div class="col-lg-4"> -->
 <div class="col-md-12 col-xl-3">
 <div class="card m-b-30">
-<h4 class="card-header mt-0 text-primary">View Indexing Officer</h4>
+<h4 class="card-header mt-0 text-primary">Indexing Officers</h4>
 <div class="card-body">
 <!-- <h4 class="card-title font-20 mt-0">Post Accreditation Institution Creation</h4> -->
 <p class="card-text"><strong class="text-primary"> Note: </strong>View Institutions Indexing Officers </p>
@@ -135,7 +135,7 @@
 
 <div class="col-md-12 col-xl-3">
 <div class="card m-b-30">
-<h5 class="card-header mt-0 text-primary">Yearly Admmission Quota</h5>
+<h5 class="card-header mt-0 text-primary">Admmission Quotas</h5>
 <div class="card-body">
 <!-- <h4 class="card-title font-20 mt-0">Post Accreditation Institution Creation</h4> -->
 <p class="card-text"><strong class="text-primary"> Note: </strong>Institutions Yearly Admission Quota</p>
@@ -146,7 +146,7 @@
 
 <div class="col-md-12 col-xl-3">
 <div class="card m-b-30">
-<h4 class="card-header mt-0 text-primary">View Student Records</h4>
+<h4 class="card-header mt-0 text-primary">Student Records</h4>
 <div class="card-body">
 <!-- <h4 class="card-title font-20 mt-0">Post Accreditation Institution Creation</h4> -->
 <p class="card-text"><strong class="text-primary"> Note: </strong>Student Records by institution</p>
@@ -158,7 +158,7 @@
 
 
 
-<div class="col-12">
+<!-- <div class="col-12">
 <div class="card">
 <div class="card-body table-data">
 <h6 class="d-inline-block">Overview</h6>
@@ -169,7 +169,7 @@
 
 {% if request.GET.q %}
 <p> You searched for <b>{{ request.GET.q }}</b></p>
-{% endif %}
+{% endif %} -->
 
 
 
@@ -177,7 +177,7 @@
 
 
 
-<div class="float-right ml-2">
+<!-- <div class="float-right ml-2">
 <div class="dropdown">
 <a class="btn btn-outline-light btn-sm" id="dropdownMenuButton2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 <i class="mdi mdi-menu"></i>
@@ -188,7 +188,7 @@
 <a class="dropdown-item" href="#">This Month</a>
 </div>
 </div>
-</div>
+</div> -->
 <!-- <div class="table-responsive">
 <table class="table">
 <thead>
@@ -278,9 +278,9 @@
 
 
 
-</div>
+<!-- </div>
 </div>                                    
-</div> 
+</div>  -->
 </div><!-- end row -->
 
 </div><!-- container -->

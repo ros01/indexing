@@ -340,7 +340,19 @@ class TransferGrade(models.Model):
     def __str__(self):
         return str(self.degree_type)
 
+VERIFICATION_STATUS = (
+    ('pending', 'Pending'),
+    ('approved', 'Approved'),
+    ('rejected', 'Rejected'),
+    )
 
+INDEXING_STATUS = (
+    ('pending', 'Pending'),
+    ('submitted', 'Submitted'),
+    ('verified', 'Verified'), 
+    ('board_rejection', 'Board Rejection'),
+    ('indexed', 'Indexed')
+    )
 class StudentIndexing(models.Model):    
     student_profile = models.ForeignKey(StudentProfile,  null=True, blank=True, on_delete=models.CASCADE)
     institution = models.ForeignKey(InstitutionProfile,  on_delete=models.DO_NOTHING)
@@ -355,8 +367,8 @@ class StudentIndexing(models.Model):
     transfer_grade = models.ForeignKey(TransferGrade, on_delete=models.CASCADE, null=True, blank=True) 
     admission_letter = models.FileField(upload_to='%Y/%m/%d/')
     # utme_grade_result = models.FileField(null=True, blank=True, upload_to='%Y/%m/%d/')
-    indexing_status = models.IntegerField(default=1)
-    verification_status = models.IntegerField(default=1)
+    indexing_status = models.CharField(max_length=200, choices=INDEXING_STATUS, default='pending')
+    verification_status = models.CharField(max_length=200, choices=VERIFICATION_STATUS, default='pending')
     rejection_status = models.IntegerField(default=1)
     rejection_reason = models.CharField(max_length=200, null=True, blank=True)
     board_verification_status = models.IntegerField(default=1)
@@ -364,7 +376,7 @@ class StudentIndexing(models.Model):
     timestamp       = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return  str(self.slug)
+        return  str(self.student_profile)
 
     class Meta:
         unique_together = ('student_profile', 'matric_no')
@@ -432,14 +444,19 @@ class StudentIndexing(models.Model):
         }
         return reverse('indexing_unit:student_indexing_details', kwargs=url_kwargs)
 
-
-
     def get_reg_indexing_url(self):
         url_kwargs={
             'islug': self.institution.slug,
             'sslug': self.slug,
         }
         return reverse('registration:student_indexing_details', kwargs=url_kwargs)
+
+    def get_verified_indexing_url(self):
+        url_kwargs={
+            'islug': self.institution.slug,
+            'sslug': self.slug,
+        }
+        return reverse('registration:student_indexing_verified_details', kwargs=url_kwargs)
 
 
     def get_reg_indexed_url(self):
@@ -525,7 +542,7 @@ class IndexingPayment(models.Model):
 
     @property
     def get_indexing_students_list(self):
-        studentsList = self.institutionpayment_set.all()
+        studentsList = self.institutionindexing_set.all()
         return studentsList 
 
     def get_absolute_url(self):
@@ -549,11 +566,11 @@ pre_save.connect(pre_save_student_indexing_payment_receiver, sender=IndexingPaym
 
 
 
-class InstitutionPayment(models.Model):
+class InstitutionIndexing(models.Model):
     institution = models.ForeignKey(InstitutionProfile, on_delete=models.DO_NOTHING)
     # student_profile = models.ForeignKey(StudentProfile,  null=True, blank=True, on_delete=models.DO_NOTHING)
     # student_indexing = models.ForeignKey(StudentIndexing,  null=True, blank=True, on_delete=models.DO_NOTHING)
-    students_payments = models.ManyToManyField(IndexingPayment)
+    student_indexing = models.ManyToManyField(StudentIndexing)
     # students_payments = models.ManyToManyField(IndexingPayment, related_name='institutionpayments') #students_payment.institutionpayments.all()
     slug  = models.SlugField(blank=True)
     # academic_session = models.CharField(max_length=200, choices = ACADEMIC_SESSION,  null=True, blank=True)
@@ -590,18 +607,18 @@ class InstitutionPayment(models.Model):
     #         student.save()
     #     super(InstitutionPayment, self).save(*args, **kwargs)
 
-def pre_save_institution_indexing_payment_receiver(sender, instance, *args, **kwargs):
+def pre_save_institution_indexing_receiver(sender, instance, *args, **kwargs):
     if not instance.slug:
         instance.slug = create_slug7(instance)
 
-pre_save.connect(pre_save_institution_indexing_payment_receiver, sender=InstitutionPayment)
+pre_save.connect(pre_save_institution_indexing_receiver, sender=InstitutionIndexing)
 
-def post_save_institution_payment_receiver(sender, instance,  *args, **kwargs):
-    for student in instance.students_payments.all():
-        student.payment_verification_status  = 2
+def post_save_institution_indexing_receiver(sender, instance,  *args, **kwargs):
+    for student in instance.student_indexing.all():
+        student.indexing_status  = "submitted"
         student.save()
 
-m2m_changed.connect(post_save_institution_payment_receiver, sender=InstitutionPayment.students_payments.through)
+m2m_changed.connect(post_save_institution_indexing_receiver, sender=InstitutionIndexing.student_indexing.through)
 
 
 # @receiver(post_save, sender=InstitutionPayment)

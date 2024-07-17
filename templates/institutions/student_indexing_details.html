@@ -6,7 +6,12 @@
 
 
 {% block content %}
-<link rel="stylesheet" href="{% static 'dlite-demo/assets/css/dashlite.css' %}">
+<!-- <link rel="stylesheet" href="{% static 'dlite-demo/assets/css/dashlite.css' %}"> -->
+
+
+<link rel="stylesheet" href="{% static 'css/main.css' %}">
+
+
 <div class="container-fluid py-4">
 <div class="row ml-3 mb-3">
 <div class="col-lg-12 col-xl-9">
@@ -16,9 +21,9 @@
 <li class="nav-item">
 <a class="nav-link active" href="#admission" data-toggle="tab" aria-expanded="false"><i class="ti-user mr-2"></i>Admission Details</a>
 </li>
-<li class="nav-item">
+<!-- <li class="nav-item">
 <a class="nav-link" href="#payment" data-toggle="tab" aria-expanded="false"><i class="ti-image mr-2"></i>Payment Details</a>
-</li>
+</li> -->
 
 <!-- <li class="nav-item">
 <a class="nav-link" href="#settings" data-toggle="tab" aria-expanded="false"><i class="ti-settings mr-2"></i>Settings</a>
@@ -44,24 +49,26 @@
 </div> 
 
 
-{% if object.verification_status == 1 %}
+{% if object.verification_status == "pending" %}
  <h5 class="mb-1"> <span class="badge badge-warning">Pending</span></h5> 
-{% elif  object.verification_status == 3 %}
+{% elif  object.verification_status == "approved" %}
+<h5 class="mb-1"> <span class="badge badge-primary">Approved</span></h5>
+{% elif  object.verification_status == "rejected" %}
 <h5 class="mb-1"> <span class="badge badge-primary">Rejected</span></h5>
 {% else %} 
 <h5 class="mb-1"> <span class="badge badge-primary"></span></h5>
 {% endif %}
 
 </div>
-{% if object.verification_status == 1 %}
+{% if object.verification_status == "pending" %}
 <div class="col-md-12 alert alert-primary mt-1 mb-3 py-2" role="alert">
-<h4 class="alert-heading font-18">Kindly review both admission and payment details before approving or rejecting application</h4>
+<h4 class="alert-heading font-18">Carefully review student indexing details before approving or rejecting application</h4>
 </div>
-{% elif object.verification_status == 2 %}
+{% elif object.verification_status == "approved" %}
 <div class="col-md-12 alert alert-primary mt-1 mb-3 py-2" role="alert">
 <h4 class="alert-heading font-18">Kindly proceed to Institution Payment to Submit Students Indexing Details to the Board</h4>
 </div>
-{% elif object.verification_status == 3 %}
+{% elif object.verification_status == "rejected" %}
 <div class="col-md-12 alert alert-primary mt-1 mb-3 py-2" role="alert">
 <h4 class="alert-heading font-18">Kindly revert to student so he can remedy errors with his application</h4>
 </div>
@@ -357,7 +364,7 @@
 
 
 <hr>
-{% if object.verification_status == 1 %}
+{% if object.verification_status == "pending" %}
 <div class="d-flex justify-content-end">  
 
 <a href="javascript:{document.getElementById('approve{{object.slug }}').submit()}">
@@ -426,7 +433,7 @@
 <div class="nk-file-name-sub">Indexing Application Rejection</div>
 </div>
 </div>
-<a href="#" class="close" data-dismiss="modal"><em class="icon ni ni-cross-sm"></em></a>
+<a href="#" class="close" data-dismiss="modal"><em class="btn-close"></em></a>
 </div>
 <div class="modal-body p-0">
 <div class="nk-file-share-header">
@@ -522,6 +529,17 @@
 </div>
 </div>
 </div>
+
+<div class="row mb-4">
+<div class="col-lg-12 col-sm-12">
+<div class="card">
+
+
+</div>
+</div>
+</div>
+
+
 
 
 {% endblock content %}

@@ -1,0 +1,231 @@
+{% extends 'registration/dashboard_base.html'%}
+{% load static %}
+
+{% block title %}Institution | {{ block.super }}{% endblock title %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+<div class="row ml-3 mb-3">
+<div class="col-lg-12 col-xl-9">
+
+<div class="card mb-3">
+<div class="card-header profile-tabs pb-0">
+<ul class="nav nav-tabs">
+<li class="nav-item">
+<a class="nav-link active" href="#institution-payment" data-toggle="tab" role="tab" aria-expanded="false"><i class="ti-user mr-2"></i>Institution Indexing Payment Details</a>
+</li>
+<!-- <li class="nav-item">
+<a class="nav-link" href="#student" data-toggle="tab" aria-expanded="false"><i class="ti-image mr-2"></i>Students Details</a>
+</li>  -->
+</ul>
+</div>
+<div class="card-body mb-0 pb-0">
+<div class="">
+<div class="tab-content">
+<div class="tab-pane active" id="institution-payment">
+<div class="row justify-content-center">
+{% include 'partials/_alerts.html' %} 
+
+
+
+<div class="col-md-12  profile-detail">
+
+
+{% if object.payment_status == 1 %}
+<div class="col-md-12 alert alert-primary mt-1 mb-3 py-2" role="alert">
+<h4 class="alert-heading font-18">Please first verify individual student applications before proceeding to verify batch</h4>
+</div>
+
+{% else %}
+
+<div class="col-md-12 alert alert-primary mt-1 mb-3 py-2" role="alert">
+<h4 class="alert-heading font-18">Application and payment details verified for every student on this list for {{object.academic_session}} Academic Session</h4>
+</div>
+{% endif %}
+
+
+
+
+<div class="d-flex justify-content-between align-items-center">
+
+
+ <div class="w-50">
+
+<h5 class="mb-1"> <i class="fa fa-graduation-cap text-primary"></i> Institution Details</h5> 
+</div> 
+{% if object.payment_status == 1 %}
+ <h5 class="mb-1"> <span class="badge badge-warning">Pending Verification</span></h5> 
+{% elif object.payment_status == 2 %}
+ <h5 class="mb-1"> <span class="badge badge-primary">VERIFIED BY RRBN REGISTRATION DEPT</span></h5> 
+{% else %}
+<h5 class="mb-1"> <span class="badge badge-primary"></span></h5>
+{% endif %}
+
+</div> 
+</div>
+
+<div>  
+<p class="text-sm mb-0">
+                      
+
+<ul class="list-unstyled">                        
+<li>Institution: <span class="text-dark font-weight-bold ms-sm-2">{{object.institution}}</span></li>
+
+<li>Course of Study:  <span class="text-dark font-weight-bold ms-sm-2">{{object.institution.course_type}}</span></li>
+<li>Academic Session:  <span class="text-dark font-weight-bold ms-sm-2">{{object.academic_session}}</span></li>
+
+</ul> 
+</div>
+</div>
+<!-- </div>
+</div>
+</div>
+</div>
+</div> -->
+
+<!-- <div class="card mb-3">
+<div class="card-body mb-0 pb-0">
+<div class="">
+<div class="tab-content">
+<div class="tab-pane active"> -->
+<div class="row justify-content-center">
+<div class="col-md-12  profile-detail">
+<div class="">
+<h5 class="mb-1"> <i class="fas fa-money-check-alt text-primary"></i> Payment Details</h5>
+</div>
+</div>
+<div>  
+
+<ul class="list-unstyled">                           
+<li>RRR Number: <span class="text-dark font-weight-bold ms-sm-2">{{object.rrr_number}}</span></li>
+<!-- <li>Receipt Number: <span class="text-dark font-weight-bold ms-sm-2">{{object.receipt_number}}</span></li> -->
+<li>Payment Amount: <span class="text-dark font-weight-bold ms-sm-2">{{object.payment_amount}}</span></li>
+<li>Payment Method: <span class="text-dark font-weight-bold ms-sm-2">{{object.payment_method}}</span></li>
+<li>Payment Date: <span class="text-dark font-weight-bold ms-sm-2">{{object.payment_date}}</span></li>
+
+{% if object.payment_receipt %}
+<li>Payment Receipt:   <span class="text-dark font-weight-bold ms-sm-2">
+        <i class="fa fa-eye text-primary"></i>
+        <a class="text-primary" href="{{object.payment_receipt.url}}" target="_blank">&nbsp; View Receipt</a>
+        </span></li>
+
+{% endif %}
+</ul>
+</div>
+</div>
+
+<h5 class="mb-0 pb-0"> <i class="fa fa-graduation-cap text-primary"></i> Student Details </h5>
+
+<table class="table table-striped table-bordered dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+<thead>
+<tr>
+<th> S/No</th>
+<th>Student Name</th>
+<th>Course</th>
+<th>Academic Session</th>
+<th>Matric No</th>
+<th>Admission Type</th>
+<th>Actions</th>
+</tr>
+</thead>
+<tbody>
+
+
+{% for student in object.student_indexing.all %}
+
+
+
+{% if student.indexing_status == "submitted" %}
+<tr>
+<td>{{forloop.counter}}</td>
+<td>{{student.student_profile.student.last_name}} {{student.student_profile.student.first_name}}</td>
+<td>{{student.institution.course_type}}</td>
+ <td>{{student.academic_session}}</td>
+<td>{{student.student_profile.student.matric_no}}</td>
+<td>{{student.admission_type}}</td>
+
+<td><a href="{{ student.get_reg_indexing_url }}"> <i class="fas fa-search text-primary"></i> <span class="badge badge-boxed  badge-primary">View Details </span></a></td> 
+</tr>
+
+{% else %}
+
+<p>  </p>
+
+{% endif %}
+
+
+
+
+{% endfor %}
+</tbody>
+</table>
+
+
+
+<hr>
+
+{% if object.payment_status == 1 %}
+<div class="d-flex justify-content-end mr-2 mb-4">   
+<a href="javascript:{document.getElementById('verify_payment{{object.slug }}').submit()}">
+<!-- <button class="btn btn-success py-0 mr-2 mt-1 mb-1"> Verify Payment<i class="fa fa-check" aria-hidden="true"></i></button>  -->
+<input type="submit" class="btn btn-outline-primary py-0 mr-3 mt-1 mb-1" value="Verify Batch" onclick="return confirm('Are you sure you want to approve this institution payment?')" >
+</a>
+<a href="javascript:{document.getElementById('reject_payment{{object.slug }}').submit()}">
+<!-- <button class="btn btn-danger py-0 mr-2 mt-1 mb-1"> Reject Payment<i class="fa fa-reply" aria-hidden="true"></i></button> -->
+<input type="submit" class="btn btn-outline-danger py-0 mr-3 mt-1 mb-1" value="Reject Batch" onclick="return confirm('Are you sure you want to reject this institution payment?')" >
+</a> 
+<a href="{% url 'registration:institutions_payments_list' %}" class="btn btn-outline-success py-0 mr-2 mt-1 mb-1"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Indexing Submissions List</a>  
+</div>
+{% else %}
+<div class="d-flex justify-content-end mr-2 mb-4">   
+<a href="{% url 'registration:institutions_verified_payments_list' %}" class="btn btn-outline-success py-0 mr-2 mt-1 mb-1"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Verified Indexing List</a>  
+</div>
+{% endif %}
+
+<form id="verify_payment{{object.slug }}" method="POST" action="{% url 'registration:verify_payment' object.slug %}">
+{% csrf_token%}
+<input type="hidden">
+</form>
+
+<form id="reject_payment{{object.slug }}" method="POST" action="{% url 'registration:reject_payment' object.slug %}">
+{% csrf_token%}
+<input type="hidden">
+</form>
+
+
+
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+<div class="row mb-4">
+<div class="col-lg-12 col-sm-12">
+<div class="card">
+
+
+
+
+
+</div>
+</div>
+</div>
+
+
+
+
+
+<script>
+  $(function () {
+    $('#myTab li:last-child a').tab('show')
+  })
+</script>
+
+
+{% endblock content %}

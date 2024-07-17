@@ -21,7 +21,7 @@ class IssueIndexing(models.Model):
     # academic_session = models.CharField(max_length=200, choices = ACADEMIC_SESSION,  null=True, blank=True)
     academic_session = models.ForeignKey(AcademicSession,  on_delete=models.CASCADE)
     student_indexing = models.ForeignKey(StudentIndexing, null=True, on_delete=models.CASCADE)
-    indexing_payment = models.ForeignKey(IndexingPayment, null=True, on_delete=models.CASCADE)
+    # indexing_payment = models.ForeignKey(IndexingPayment, null=True, on_delete=models.CASCADE)
     index_number = models.CharField(max_length=200, unique=True)
     updated         = models.DateTimeField(auto_now=True)
     timestamp       = models.DateTimeField(auto_now_add=True)
@@ -50,11 +50,11 @@ class IssueIndexing(models.Model):
 
     def save(self, *args, **kwargs):
         super(IssueIndexing, self).save(*args, **kwargs)
-        self.student_indexing.verification_status = 4
-        self.student_indexing.indexing_status = 4
-        self.indexing_payment.payment_status = 4
+        # self.student_indexing.verification_status = 5
+        self.student_indexing.indexing_status = "indexed"
+        # self.indexing_payment.payment_status = 4
         self.student_indexing.save()  
-        self.indexing_payment.save()   
+        # self.indexing_payment.save()   
 
 def pre_save_issue_indexing_receiver(sender, instance, *args, **kwargs):
     if not instance.slug:

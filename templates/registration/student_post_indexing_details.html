@@ -41,19 +41,19 @@
 <h5 class="mb-0 pb-2"> <i class="fa fa-graduation-cap text-primary"></i> Student Indexing Application Details </h5>
 </div> 
 
-{% if object.verification_status == 1 %}
+{% if object.indexing_status == "submitted" %}
  <h5 class="mb-1"> <span class="badge badge-warning">Pending</span></h5> 
-{% elif  object.verification_status == 2 %}
-<h5 class="mb-1"> <span class="badge badge-primary">VERFIED BY INSTITUTION</span></h5>
-{% elif  object.verification_status == 3 %}
-<h5 class="mb-1"> <span class="badge badge-primary">VERFIED BY RRBN REGISTRATION DEPT</span></h5>
+{% elif  object.indexing_status == "verified" %}
+<h5 class="mb-1"> <span class="badge badge-primary">VERFIED BY RRBN REGISTRATIONS</span></h5>
+{% elif  object.indexing_status == "indexed" %}
+<h5 class="mb-1"> <span class="badge badge-primary">INDEXED BY RRBN REGISTRATIONS</span></h5>
 {% else %} 
 <h5 class="mb-1"> <span class="badge badge-primary"></span></h5>
 {% endif %}
 
 </div>
 
-{% if object.verification_status == 2 %}
+{% if object.indexing_status == "submitted" %}
 
 <div class="col-md-12 alert alert-primary mt-1 mb-3 py-2" role="alert">
 <h4 class="alert-heading font-18">Kindly review admission details for this application application before proceeding to approve institutions payment</h4>

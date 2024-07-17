@@ -131,22 +131,22 @@ class CustomModelMultipleChoiceField(forms.ModelMultipleChoiceField):
 
 
 
-class InstitutionPaymentModelForm(forms.ModelForm):
-    students_payments = forms.ModelMultipleChoiceField(queryset=None, widget=forms.CheckboxSelectMultiple(attrs={"checked":""}))
+class InstitutionIndexingModelForm(forms.ModelForm):
+    student_indexing = forms.ModelMultipleChoiceField(queryset=None, widget=forms.CheckboxSelectMultiple(attrs={"checked":""}))
     
     class Meta:
-         model = InstitutionPayment
-         fields = ('students_payments', 'academic_session', 'rrr_number', 'payment_amount', 'payment_method', 'payment_receipt')  
+         model = InstitutionIndexing
+         fields = ('student_indexing', 'academic_session', 'rrr_number', 'payment_amount', 'payment_method', 'payment_receipt')  
     
 
     def __init__(self, *args, **kwargs):
       
        
        self.request = kwargs.pop('request')
-       super(InstitutionPaymentModelForm, self).__init__(*args, **kwargs)
+       super(InstitutionIndexingModelForm, self).__init__(*args, **kwargs)
        user = self.request.user
        academic_session = self.request.GET.get('academic_session')
-       self.fields['students_payments'].queryset = IndexingPayment.objects.filter(institution = user.get_indexing_officer_profile.institution, student_indexing__verification_status = 2, payment_verification_status=1, academic_session = academic_session)
+       self.fields['student_indexing'].queryset = StudentIndexing.objects.filter(institution = user.get_indexing_officer_profile.institution, indexing_status = "pending", verification_status = "approved", academic_session = academic_session)
        # self.fields['students_payments'].queryset = IndexingPayment.objects.filter(institution = user.get_indexing_officer_profile.institution, student_indexing__verification_status = 2, payment_verification_status=1)
        self.fields['academic_session'].label = "Academic Session"
        self.fields['rrr_number'].label = "RRR Number"
@@ -154,7 +154,7 @@ class InstitutionPaymentModelForm(forms.ModelForm):
        self.fields['payment_method'].label = "Payment Method"
        self.fields['payment_receipt'].label = "Payment Receipt (Jpeg or PDF)"
        self.fields['payment_receipt'].widget.attrs['placeholder'] = "Jpeg or PDF"
-       self.fields['students_payments'].label = "Select Students for Institution Indexing Payment"
+       self.fields['student_indexing'].label = "Select Students for Institution Indexing Payment"
   
     
 

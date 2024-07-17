@@ -1,0 +1,292 @@
+{% extends 'sysadmin/dashboard_base.html'%}
+{% load static %}
+{% block title%}| System Admin Dashboard {% endblock %}
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/dataTables.bootstrap4.min.css' %}" >
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.20/datatables.min.css" >
+{% endblock %}
+
+
+{% block content %}
+<!--main containere-->
+
+<div class="container">
+<div class="row mobile-top">
+<div class="col-md-12 col-lg-3 p-1 magin-right">
+<div class="card card-style">
+<div class="card-body">
+<p class="card-title text-center"><i class="fa fa-hourglass-half text-warning"></i> Total User Accounts</p>
+<h3 class="mt-3 text-center">21</h3>
+
+</div>
+</div>
+</div>
+
+<div class="col-md-12 col-lg-3 p-1 magin-right">
+<div class="card card-style">
+<div class="card-body">
+<p class="card-title text-center"><i class="fa fa-money-bill text-warning"></i> Active User Accounts</p>
+<h3 class="mt-3 text-center">21</h3>
+
+</div>
+</div>
+
+</div>
+<div class="col-md-12 col-lg-3 p-1 magin-right">
+<div class="card card-style">
+<div class="card-body">
+<p class="card-title text-center"><i class="fa fa-clock text-warning"></i> Deactivated User Accounts</p>
+<h3 class="mt-3 text-center">21</h3>
+
+</div>
+</div>
+</div>
+
+<div class="col-md-12 col-lg-3 p-1 magin-right">
+<div class="card card-style">
+<div class="card-body">
+<p class="card-title text-center"><i class="fa fa-lightbulb text-warning"></i> Deployed Modules
+</p>
+<h3 class="mt-3 text-center">21</h3>
+
+</div>
+</div>
+</div>
+
+</div>
+    
+<!--utility items-->
+    <div class="row mt-5 mobile-top2">
+        <div class="col-md-12 col-lg-4">
+            <div class="card card-style-2">
+                <div class="card-body">
+                    <i class="fa fa-shield-alt" style="font-size: 30px; margin-right: 15px; color: #EFB465;"></i>
+                    <h6 class="pb-2" style="margin: -45px 0 0 60px; font-weight: bold;">Manage Portal Users</h6>
+                    <ul class="list-unstyled d-flex">
+                        <i class="fa fa-check-circle text-success mt-1"
+                            style="font-size: 15px; margin:0 7px 0 60px;"></i>
+                        <li><a class="text-dark" href="#"> RRBN Users</a></li>
+                    </ul>
+                    <ul class="list-unstyled d-flex">
+                        <i class="fa fa-check-circle text-success mt-1"
+                            style="font-size: 15px; margin:0 7px 0 60px;"></i>
+                        <li><a class="text-dark" href="#"> Institution Users</a></li>
+                    </ul>
+
+                    <!-- <ul class="list-unstyled d-flex">
+                        <i class="fa fa-check-circle text-success mt-1"
+                            style="font-size: 15px; margin:0 7px 0 60px;"></i>
+                        <li><a class="text-dark" href="#"> Registration Users</a></li>
+                    </ul> -->
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12 col-lg-4">
+            <div class="card card-style-2">
+                <div class="card-body">
+                    <i class="fa fa-lightbulb" style="font-size: 30px; margin-right: 15px; color: #EFB465;"></i>
+                    <h6 class="pb-2" style="margin: -45px 0 0 60px; font-weight: bold;">Documents Master Settings</h6>
+                    <ul class="list-unstyled d-flex">
+                        <i class="fa fa-check-circle text-success mt-1"
+                            style="font-size: 15px; margin:0 7px 0 60px;"></i>
+                        <li><a class="text-dark" href="#"> Documents Upload Settings</a></li>
+                    </ul>
+                    <ul class="list-unstyled d-flex m-up">
+                        <i class="fa fa-check-circle text-success mt-1"
+                            style="font-size: 15px; margin:0 7px 0 60px;"></i>
+                        <li><a class="text-dark" href="#"> Meta Data Settings</a></li>
+                    </ul>
+                    <ul class="list-unstyled d-flex m-up">
+                        <i class="fa fa-check-circle text-success mt-1"
+                            style="font-size: 15px; margin:0 7px 0 60px;"></i>
+                        <li><a class="text-dark" href="#"> Doc Content Settings</a></li>
+                    </ul>
+                    <ul class="list-unstyled d-flex m-up">
+                        <i class="fa fa-check-circle text-success mt-1"
+                            style="font-size: 15px; margin:0 7px 0 60px;"></i>
+                        <li><a class="text-dark" href="#"> Workflow Settings</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12 col-lg-4">
+            <div class="card card-style-2">
+                <div class="card-body">
+                    <i class="fa fa-wrench" style="font-size: 30px; margin-right: 15px; color: #EFB465;"></i>
+                    <h6 class="pb-2" style="margin: -50px 0 0 60px; font-weight: bold;">Utilities</h6>
+                    <!-- <ul class="list-unstyled d-flex">
+                        <i class="fa fa-check-circle text-success mt-1"
+                            style="font-size: 15px; margin:0 5px 0 60px;"></i>
+                        <li><a class="text-dark" href="#"> Issue Certificates & Permits</a></li>
+                    </ul>
+
+                    <ul class="list-unstyled d-flex m-up">
+                        <i class="fa fa-check-circle text-success mt-1"
+                            style="font-size: 15px; margin:0 5px 0 60px;"></i>
+                        <li><a class="text-dark" href="#">Check SMS Balance</a></li>
+                    </ul>
+                    
+
+                    <ul class="list-unstyled d-flex m-up">
+                        <i class="fa fa-check-circle text-success mt-1"
+                            style="font-size: 15px; margin:0 5px 0 60px;"></i>
+                        <li><a class="text-dark" href="#">Test SMS Delivery</a></li>
+                    </ul> -->
+
+                    <ul class="list-unstyled d-flex m-up">
+                        <i class="fa fa-check-circle text-success mt-1"
+                            style="font-size: 15px; margin:0 7px 0 60px;"></i>
+                        <li><a class="text-dark" href="#">Test Email Delivery</a></li>
+                    </ul>
+
+                    <ul class="list-unstyled d-flex m-up">
+                        <i class="fa fa-check-circle text-success mt-1"
+                            style="font-size: 15px; margin:0 5px 0 60px;"></i>
+                        <li><a class="text-dark" href="#">Server Monitoring</a></li>
+                    </ul>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="col-10 mx-auto">
+<div class="card">
+<div class="card-body table-data">
+<h6 class="d-inline-block">Search</h6>
+
+<form method='GET' action="{% url 'sysadmin:dashboard' %}">
+<input type='text' placeholder="Search..." name='q' value='{{ request.GET.q }}'>
+</form>
+
+{% if request.GET.q %}
+<p> You searched for <b>{{ request.GET.q }}</b></p>
+{% endif %}
+
+            
+<section class="px-2 pt-3 pb-2"> 
+<div class="row mt-3 mb-2">
+<div class="col text-left mb-1">
+<h5 class="text-primary">Deployed Modules & User Accounts Summary</h5>
+</div>
+</div>
+
+</section>
+<div class="table-responsive-lg">
+<!-- <div class="table-responsive"> -->
+<table class="table">
+<thead>
+<tr>
+    <th class="border-top-0 w-60">S/N</th>
+    <th class="border-top-0">Module Name</th>
+    <th class="border-top-0">Total Users</th>
+    <th class="border-top-0">Active Users</th>
+    <th class="border-top-0">Inactive Users</th>
+    <th class="border-top-0">Status</th> 
+    <th class="border-top-0">Action</th> 
+</tr>
+</thead>
+
+<tbody>
+{% for object in object_list %}
+<tr>
+<td width="2%">{{forloop.counter}}</td>
+<td width="15%">{{object.role}}</td>
+<!-- <td width="15%">{% if sys %} {{ sys.count }} {% endif %} Indexing Count {% if ind %} {{ ind.count }} {% endif %}</td> -->
+
+<td width="15%"> {{ ind.count }} </td>
+
+<td width="15%">{{object}}</td>
+<td width="15%">{{object.inspection_date}}</td>
+<td width="14%">{{object.inspection_date}}</td>
+<td width="12%"><a href="#" class="btn btn-outline-warning btn-sm"><i class="fa fa-eye text-danger"></i> View</a></td>
+</tr>
+{% endfor %}
+</tbody>
+
+
+</table>
+<!-- </div> -->
+</div>
+
+
+
+
+
+</div>
+</div>                                    
+</div> 
+
+
+
+
+<!-- <div class="row">
+<div class="col col-lg-12">
+            
+<section class="px-2 pt-3 pb-2"> 
+<div class="row mt-3 mb-2">
+<div class="col text-left mb-1">
+<p class="text-success display-4 paragraph2">Deployed Modules and User Accounts Summary</p>
+<hr>
+</div>
+</div>
+
+</section>
+<div class="table-responsive-lg">
+<table class="table table-striped table-bordered table-hover" id="mydata">
+
+
+
+<thead>
+<tr style="background: #dddddd;">
+<th class="display-4 paragraph3" style="color: #000; "width="2%">SN</th>
+<th class="display-4 paragraph3" style="color: #000; "width="15%">Module Name</th>
+<th class="display-4 paragraph3" style="color: #000; "width="13%">Type</th>
+<th class="display-4 paragraph3" style="color: #000; "width="15%">Total Users</th>
+<th class="display-4 paragraph3" style="color: #000; "width="15%">Active Users</th>
+<th class="display-4 paragraph3" style="color: #000; "width="15%">Inactive Users</th>
+<th class="display-4 paragraph3" style="color: #000; "width="13%">Status</th>
+<th class="display-4 paragraph3" style="color: #000; "width="11%">Action</th>
+</tr> </thead> 
+
+
+<tbody>
+{% if schedule_qs %}
+{% for object in schedule_qs %}
+<tr>
+<td width="2%">{{forloop.counter}}</td>
+<td width="15%">{{object.application_no}}</td>
+<td width="15%">{{object.hospital_name}}</td>
+<td width="12%">{{object.hospital.license_type}}</td>
+<td width="15%">{{object.hospital.facility_address}}</td>
+<td width="15%">{{object.inspection_date}}</td>
+<td width="14%">{{object.inspection_date}}</td>
+<td width="12%"><a href="#" class="btn btn-outline-warning btn-sm"><i class="fa fa-eye text-danger"></i> View</a></td>
+</tr>
+{% endfor %}
+{% endif %}
+</tbody>
+</table>
+</div>
+</div>
+</div> -->
+
+
+
+</div>
+
+<script src="{% static 'js/jquery.js' %}"></script>
+<script src="{% static 'js/poppert.min.js' %}"></script>
+<script src="{% static 'js/dataTables.bootstrap4.min.js' %}"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.20/datatables.min.js"></script>
+<script>
+$('#mydata').dataTable();
+</script>
+
+
+
+
+
+{% endblock %}

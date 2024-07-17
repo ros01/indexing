@@ -693,7 +693,7 @@ class InstitutionsVerifiedPaymentsList(StaffRequiredMixin, ListView):
 
 
 class InstitutionsIndexingPaymentDetailView(StaffRequiredMixin, DetailView):
-	queryset = InstitutionPayment.objects.all()
+	queryset = InstitutionIndexing.objects.all()
 	template_name = "indexing_unit/institutions_payment_details.html"
 
 	# def get_queryset(self):
@@ -715,7 +715,7 @@ class InstitutionsIndexingPaymentDetailView(StaffRequiredMixin, DetailView):
 	# 	return context
 
 class InstitutionsIndexingPreIssueDetailView(StaffRequiredMixin, DetailView):
-	queryset = InstitutionPayment.objects.prefetch_related(Prefetch('students_payments', queryset=IndexingPayment.objects.filter(payment_status = 2)))
+	queryset = InstitutionIndexing.objects.prefetch_related(Prefetch('student_indexing', queryset=StudentIndexing.objects.filter(verification_status = 3)))
 	template_name = "indexing_unit/institutions_indexing_pre_issue_details.html"
 
 
@@ -725,7 +725,7 @@ class VerifiedPaymentsListView(StaffRequiredMixin, ListView):
 	def get_queryset(self):
 		user = self.request.user
 		try:
-			obj = InstitutionPayment.objects.filter(payment_status=2)
+			obj = StudentIndexing.objects.filter(verification_status=4)
 			print ("obj:", obj)
 			if obj.exists():
 				return obj
@@ -738,7 +738,7 @@ class InstitutionsPaymentsListView1(StaffRequiredMixin, ListView):
 	def get_queryset(self):
 		user = self.request.user
 		try:
-			obj = InstitutionPayment.objects.filter(institution = user.get_indexing_officer_profile.institution, payment_status=1)
+			obj = InstitutionIndexing.objects.filter(institution = user.get_indexing_officer_profile.institution, payment_status=1)
 			print ("obj:", obj)
 			if obj.exists():
 				return obj

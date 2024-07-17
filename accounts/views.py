@@ -159,6 +159,8 @@ def login(request):
             return redirect('students:dashboard')
         if user.role == 'Registration':
             return redirect('registration:dashboard')
+        if user.role == 'Sysadmin':
+            return redirect('sysadmin:dashboard')
         else:
             messages.error(request, 'Please enter the correct email and password for your account. Note that both fields may be case-sensitive.')
             return redirect('accounts:signin')

@@ -1,8 +1,6 @@
 PAYMENT_METHOD = (
         ('Bank', 'Bank'),
-        ('Card', 'Card'),
-        ('Cash', 'Cash'),
-        
+        ('Card', 'Card'),     
         )
 
 SEX = (

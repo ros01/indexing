@@ -135,7 +135,7 @@ def institutions_payments_list(request):
 def payments_list(request):
 	academic_session = request.GET.get('academic_session')
 	user = request.user
-	payments = InstitutionPayment.objects.filter(academic_session=academic_session, payment_status=1)
+	payments = InstitutionIndexing.objects.filter(academic_session=academic_session, payment_status=1)
 	context = {'payments': payments}
 	return render(request, 'partials/registration_payments.html', context)
 
@@ -150,7 +150,7 @@ def institutions_verified_payments_list(request):
 def verified_payments_list(request):
 	academic_session = request.GET.get('academic_session')
 	user = request.user
-	payments = InstitutionPayment.objects.filter(academic_session=academic_session, payment_status=2)
+	payments = InstitutionIndexing.objects.filter(academic_session=academic_session, payment_status=2)
 	context = {'payments': payments}
 	return render(request, 'partials/registration_verified_payments.html', context)
 
@@ -159,7 +159,7 @@ class InstitutionsPaymentsListView(StaffRequiredMixin, ListView):
 	template_name = "registration/institutions_payments_list.html"
 	def get_queryset(self):
 		request = self.request
-		qs = InstitutionPayment.objects.all()
+		qs = InstitutionIndexing.objects.all()
 		query = request.GET.get('q')
 		if query:
 			qs = qs.filter(name__icontains=query)
@@ -170,16 +170,16 @@ class InstitutionsVerifiedPaymentsList(StaffRequiredMixin, ListView):
 	template_name = "registration/institutions_verified_payments_list.html"
 	def get_queryset(self):
 		request = self.request
-		qs = InstitutionPayment.objects.all()
+		qs = InstitutionIndexing.objects.all()
 		query = request.GET.get('q')
 		if query:
 			qs = qs.filter(name__icontains=query)
 		return qs.filter(payment_status=2)
 
 
-class InstitutionsIndexingPaymentDetailView(DetailView):
-	queryset = InstitutionPayment.objects.all()
-	template_name = "registration/institutions_payment_details.html"
+class InstitutionsIndexingPaymentDetailView(StaffRequiredMixin, DetailView):
+	queryset = InstitutionIndexing.objects.all()
+	template_name = "registration/institutions_indexing_submission.html"
 
 
 	# def get_queryset(self):
@@ -189,15 +189,15 @@ class InstitutionsIndexingPaymentDetailView(DetailView):
 	# 	print("qs1:", qs1)
 	# 	return qs1
 
-class InstitutionsIndexingPaymentVerifiedDetailView(DetailView):
-	queryset = InstitutionPayment.objects.all()
+class InstitutionsIndexingPaymentVerifiedDetailView(StaffRequiredMixin, DetailView):
+	queryset = InstitutionIndexing.objects.all()
 	template_name = "registration/institutions_payment_verified_details.html"
 
 
 
 @login_required
 def students_index_number_list(request):
-	form = InstitutionPaymentForm()
+	form = InstitutionIndexingForm()
 	context = {'form': form}
 	return render(request, 'registration/academic_session_indexing_list.html', context)
 	# academic_sessions = AcademicSession.objects.all()
@@ -215,8 +215,9 @@ def select_institution(request):
 	context = {'institutions':institutions, 'is_htmx': True}
 	return render(request, 'partials/indexing_numbers_pre_list.html', context)
 
+@login_required
 def indexing_numbers_list(request):
-	form = InstitutionPaymentForm(request.GET)
+	form = InstitutionIndexingForm(request.GET)
 	# return HttpResponse(form['institution_payments'])
 	
 	academic_session = form['institution_payments'].value()
@@ -227,8 +228,8 @@ def indexing_numbers_list(request):
 	academic_session = request.GET.get('academic_session')
 	institution = request.GET.get('institution')
 	user = request.user
-	students_payments = IndexingPayment.objects.filter(payment_status= 3)
-	qs = InstitutionPayment.objects.filter(students_payments__in=students_payments, payment_status = 2)
+	student_indexing = StudentIndexing.objects.filter(verification_status= 3)
+	qs = InstitutionIndexing.objects.filter(student_indexing__in=student_indexing, verification_status = 2)
 	print ("Institution Payment Aca:", qs)
 	query = qs.filter(Q(academic_session = request.GET.get('academic_session')) & Q(institution = request.GET.get('institution')))
 	print ("Institution Payment:", query)
@@ -238,12 +239,12 @@ def indexing_numbers_list(request):
 		# return render(request, 'partials/indexing_numbers_pre_issue_list.html', context)
 	return render(request, 'partials/indexing_numbers_pre_issue_list.html', context)
 
-class IndexNumberIssuanceListView(ListView):
+class IndexNumberIssuanceListView(StaffRequiredMixin, ListView):
 	template_name = "registration/institutions_indexing_list.html"
 	
 	def get_queryset(self):
-		students_payments = IndexingPayment.objects.filter(payment_status= 3)
-		qs = InstitutionPayment.objects.filter(students_payments__in=students_payments, payment_status = 2)
+		student_indexing = StudentIndexing.objects.filter(verification_status= 3)
+		qs = InstitutionIndexing.objects.filter(student_indexing__in=student_indexing, payment_status = 2)
 		return qs.distinct()
 
 
@@ -270,7 +271,7 @@ class IndexNumberIssuanceListView(ListView):
 		return context
 
 
-class IndexNumberIssuanceList(ListView):
+class IndexNumberIssuanceList(StaffRequiredMixin, ListView):
 	template_name = "registration/index_number_issuance_list.html"
 	
 
@@ -284,8 +285,8 @@ class IndexNumberIssuanceList(ListView):
 	# 	return qs.distinct()
 
 	def get_queryset(self):
-		students_payments = IndexingPayment.objects.filter(payment_status= 3)
-		qs = InstitutionPayment.objects.filter(students_payments__in=students_payments, payment_status = 2)
+		student_indexing = StudentIndexing.objects.filter(indexing_status= "verified")
+		qs = InstitutionIndexing.objects.filter(student_indexing__in=student_indexing, payment_status = 2)
 		return qs.distinct()
 
 
@@ -338,7 +339,7 @@ class IndexNumberIssuanceList(ListView):
 
 class InstitutionsIndexingPreIssueDetailView(StaffRequiredMixin, DetailView):
 	# queryset = InstitutionPayment.objects.prefetch_related(Prefetch('students_payments', queryset=IndexingPayment.objects.filter(payment_status = 3)))
-	queryset = InstitutionPayment.objects.all()
+	queryset = InstitutionIndexing.objects.all()
 	template_name = "registration/institutions_indexing_pre_issue_details.html"
 
 	
@@ -380,6 +381,25 @@ class StudentIndexingApplicationDetailView(StaffRequiredMixin, DetailView):
     	return context
 
 
+
+class StudentIndexingVerifiedDetails(StaffRequiredMixin, DetailView):
+    # queryset = StudentIndexing.objects.all()
+    template_name = "registration/student_indexing_verified_details.html"
+
+    def get_object(self):
+    	institutionprofile_slug = self.kwargs.get("islug")
+    	studentindexing_slug = self.kwargs.get("sslug")
+    	obj = get_object_or_404(StudentIndexing, institution__slug = institutionprofile_slug, slug = studentindexing_slug)
+    	return obj
+
+
+    def get_context_data(self, **kwargs):
+    	context = super().get_context_data(**kwargs)
+    	obj = self.get_object()
+    	context['payment_object'] = obj.indexingpayment_set.first()
+    	return context
+
+
 class StudentsPostIndexingDetails(StaffRequiredMixin, DetailView):
     # queryset = StudentIndexing.objects.all()
     template_name = "registration/student_post_indexing_details.html"
@@ -397,16 +417,16 @@ class StudentsPostIndexingDetails(StaffRequiredMixin, DetailView):
     	context['payment_object'] = obj.indexingpayment_set.first()
     	return context
 
-
+@login_required
 def approve_application(request, slug):
   if request.method == 'POST':
      object = get_object_or_404(StudentIndexing, slug=slug)
-     payment_object = object.indexingpayment_set.first()
+     # payment_object = object.indexingpayment_set.first()
      # object.verification_status = 3
-     object.board_verification_status = 2
-     payment_object.payment_status = 3
+     object.indexing_status = "verified"
+     # payment_object.payment_status = 3
      object.save()
-     payment_object.save()
+     # payment_object.save()
      context = {}
      context['object'] = object
      messages.success(request, ('Indexing Application Verified'))
@@ -414,15 +434,15 @@ def approve_application(request, slug):
             'sslug': object.slug,}))
      # return render(request, 'indexing_unit/verification_successful.html',context)
 
-
+@login_required
 def reject_application(request, slug):
   if request.method == 'POST':
      object = get_object_or_404(StudentIndexing,slug=slug)
-     payment_object = object.indexingpayment_set.first()
-     object.board_verification_status = 1
-     payment_object.payment_status = 2
+     # payment_object = object.indexingpayment_set.first()
+     object.indexing_status = "board_rejection"
+     # payment_object.payment_status = 2
      object.save()
-     payment_object.save()
+     # payment_object.save()
      context = {}
      context['object'] = object
      messages.error(request, ('Indexing Application Rejected'))
@@ -430,26 +450,27 @@ def reject_application(request, slug):
             'sslug': object.slug,}))
      # return render(request, 'indexing_unit/verification_failed.html',context)
 
+@login_required
 def verify_payment(request, slug):
   if request.method == 'POST':
-     object = get_object_or_404(InstitutionPayment, slug=slug)
+     object = get_object_or_404(InstitutionIndexing, slug=slug)
      object.payment_status = 2
      object.save()
      context = {}
      context['object'] = object
      messages.success(request, ('Institution Payment Verified'))
-     return HttpResponseRedirect(reverse("registration:institutions_indexing_payment_details", kwargs={'slug': object.slug}))
+     return HttpResponseRedirect(reverse("registration:institutions_indexing_payment_verified_details", kwargs={'slug': object.slug}))
      # return render(request, 'indexing_unit/payment_verification_successful.html',context)
 
-
+@login_required
 def reject_payment(request, slug):
   if request.method == 'POST':
-     object = get_object_or_404(InstitutionPayment, slug=slug)
+     object = get_object_or_404(InstitutionIndexing, slug=slug)
      object.payment_status = 1
      object.save()
      context = {}
      context['object'] = object
-     messages.error(request, ('Institution Payment Rejected'))
+     messages.error(request, ('Institution Payment Not Verified'))
      return HttpResponseRedirect(reverse("registration:institutions_indexing_payment_details", kwargs={'slug': object.slug}))
 
 
@@ -496,12 +517,12 @@ class IssueIndexingNumber(StaffRequiredMixin, SuccessMessageMixin, CreateView, I
         
         return kwargs
 
-    def form_valid(self, form):
-        indexing = form.save(commit=False)
-        indexing_payment = IndexingPayment.objects.get(student_indexing=self.student_indexing)
-        indexing.indexing_payment = indexing_payment
-        indexing.save()
-        return super(IssueIndexingNumber, self).form_valid(form)
+    # def form_valid(self, form):
+    #     indexing = form.save(commit=False)
+    #     student_indexing = StudentIndexing.objects.get(student_profile=self.student_profile)
+    #     indexing.student_indexing = student_indexing
+    #     indexing.save()
+    #     return super(IssueIndexingNumber, self).form_valid(form)
 
 
     def form_invalid(self, form):
@@ -530,7 +551,7 @@ class InstitutionsIndexedStudentsListView(StaffRequiredMixin, ListView):
 	    return context
 	    
 
-class InstitutionsIndexedStudentsList(ListView):
+class InstitutionsIndexedStudentsList(StaffRequiredMixin, ListView):
 	template_name = "registration/indexed_students_list.html"
 	def get_queryset(self):
 		institutions = InstitutionProfile.objects.all()
@@ -556,7 +577,7 @@ class InstitutionsIndexedStudentsList(ListView):
 		return context
 
 
-class InstitutionsIndexedStudentsListView(ListView):
+class InstitutionsIndexedStudentsListView(StaffRequiredMixin, ListView):
 	template_name = "registration/institutions_indexed_students_list.html"
 	def get_queryset(self):
 		institutions = InstitutionProfile.objects.all()
