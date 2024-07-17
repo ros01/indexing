@@ -1070,7 +1070,7 @@ def students_applications_list(request):
 def applications_list(request):
 	academic_session = request.GET.get('academic_session')
 	user = request.user
-	applications = StudentIndexing.objects.filter(academic_session=academic_session, institution=user.get_indexing_officer_profile.institution, verification_status="pending", rejection_status = 1)
+	applications = StudentIndexing.objects.filter(academic_session=academic_session, institution=user.get_indexing_officer_profile.institution, verification_status="pending", rejection_status = "pending")
 	context = {'applications': applications}
 	return render(request, 'partials/applications.html', context)
 
