@@ -341,7 +341,7 @@ class StudentProfileCreateView(StaffRequiredMixin, SuccessMessageMixin, CreateVi
 								messages.error(request, f'This User: {student} and possibly other students on this list exit already exist')
 							return redirect("institutions:create_student_profile")
 						else:
-							student = User.objects.create(email=row['email'], last_name=row['last_name'], first_name=row['first_name'], middle_name=row['middle_name'], phone_no=row['phone_no'], matric_no=row['matric_no'], password = make_password('Rebelspy1%'),)
+							student = User.objects.create(email=row['email'], last_name=row['last_name'], first_name=row['first_name'], middle_name=row['middle_name'], phone_no=row['phone_no'], matric_no=row['matric_no'], password = make_password('student@001'),)
 							
 					except Exception as e:
 						messages.error(request, e)

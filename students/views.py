@@ -85,13 +85,13 @@ def status(request):
         return MyStudentProfileListView.as_view()(request)
     elif StudentProfile.objects.filter(student = user, indexing_status=2):
         return ApplicationList.as_view()(request)
-    elif StudentIndexing.objects.filter(student_profile__student = user, indexing_status=1):
+    elif StudentIndexing.objects.filter(student_profile__student = user, verification_status='pending'):
         return MyIndexingApplicationListView.as_view()(request)
-    elif StudentIndexing.objects.filter(student_profile__student = user, indexing_status=2):
+    elif StudentIndexing.objects.filter(student_profile__student = user, verification_status='approved'):
         return MyIndexingApplicationListView.as_view()(request)
     # elif IndexingPayment.objects.filter(student_profile__student = user, payment_verification_status=1):
     #     return MyIndexingPaymentListView.as_view()(request)
-    elif StudentIndexing.objects.filter(student_profile__student = user, indexing_status=3):
+    elif StudentIndexing.objects.filter(student_profile__student = user, verification_status='approved', indexing_status='indexed'):
         return MyIndexingCompleteListView.as_view()(request)
     else:
          return MyIndexingCompleteListView.as_view()(request)
