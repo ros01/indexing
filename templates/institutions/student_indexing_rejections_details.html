@@ -37,12 +37,12 @@
 
 <h5 class="mb-0 pb-2"> <i class="fa fa-graduation-cap text-primary"></i> Student Indexing Application Details </h5>
 </div> 
-{% if object.rejection_status == 1 %}
+{% if object.rejection_status == "pending" %}
  <h5 class="mb-1"> <span class="badge badge-warning">Pending</span></h5> 
-{% elif  object.rejection_status == 2 %}
+{% elif  object.rejection_status == "rejected"  %}
 <h5 class="mb-1"> <span class="badge badge-danger">Rejected</span></h5>
 {% else %} 
-<h5 class="mb-1"> <span class="badge badge-primary"></span>Verified</h5>
+<h5 class="mb-1"> <span class="badge badge-primary"></span>Rejected</h5>
 {% endif %}
 
 </div>
