@@ -10,7 +10,7 @@ from django.views.generic import (
 )
 
 import random
-from accounts.forms import SignupForm
+from accounts.forms import *
 from .forms import *
 from registration.forms import *
 from institutions.models import *
@@ -166,7 +166,7 @@ class IndexingOfficerCreateView2(CreateView):
 
 class IndexingOfficerCreateView(StaffRequiredMixin, SuccessMessageMixin, CreateView):
 	model = User
-	user_form = SignupForm
+	user_form = UserUpdateForm
 	form = IndexingOfficerProfileForm
 	template_name = 'indexing_unit/create_indexing_officer.html'
 	template_name1 = 'indexing_unit/indexing_officer_details.html'
@@ -191,6 +191,7 @@ class IndexingOfficerCreateView(StaffRequiredMixin, SuccessMessageMixin, CreateV
 		if user_form.is_valid() and form.is_valid():
 			user = user_form.save(commit=False)
 			user.is_active = True
+			user.set_password('indexing@001') 
 			user.save()
 			indexing_officer = form.save(commit=False)
 			IndexingOfficerProfile.objects.create(
@@ -229,7 +230,7 @@ class IndexingOfficerDetailView(StaffRequiredMixin, DetailView):
 
 
 class IndexingOfficerUpdateView (StaffRequiredMixin, SuccessMessageMixin, UpdateView):
-    form_class = SignupForm
+    form_class = UserUpdateForm
     template_name = "indexing_unit/update_indexing_officer.html"
     # success_message = "Student Profile Update Successful"
 
@@ -254,11 +255,47 @@ class IndexingOfficerUpdateView (StaffRequiredMixin, SuccessMessageMixin, Update
     #     	form  = self.form(instance=obj)
     # 	return render(request, self.template_name, {'form':form})
 
+    def post(self, request, *args, **kwargs):
+       
+        obj = self.get_object()
+        user = User.objects.filter(email=obj.email).first()
+       
+
+        form = UserUpdateForm(request.POST or None, instance=user)
+       
+        if form.is_valid():
+            
+            
+
+            user = form.save(commit=False)
+            user.is_active = True  # Deactivate account till it is confirmed
+            user.hospital = True
+            user.set_password('indexing@001') 
+            # user.password = make_password('rrbnhq123%') 
+            user.save()
+            indexing_officer = IndexingOfficerProfile.objects.filter(indexing_officer=user).first()
+            user = user
+            reset_password(user, request)
+            return redirect(indexing_officer.get_absolute_url())        
+            
+        else:
+            messages.error(request, 'Indexing Officer Profile Update Failed.')
+            indexing_officer = IndexingOfficerProfile.objects.filter(indexing_officer=user).first() 
+            return redirect(indexing_officer.get_absolute_url())
+        return super(IndexingOfficerUpdateView, self).form_valid(form)
+
+
+
+    
+
  
     def get_success_url(self):
         # obj = self.get_object()
         # return reverse("indexing_unit:indexing_officer_detail" object.pk)
         return reverse("indexing_unit:indexing_officers_list") 
+
+
+
 
        
 
