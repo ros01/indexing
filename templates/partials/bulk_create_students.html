@@ -1,20 +1,11 @@
 {% extends 'institutions/dashboard_base2.html'%}
 {% load static %}
-{% load widget_tweaks %}
 {% load crispy_forms_tags %}
-{% block title%}| Welcome {% endblock %}
-
-{% block styles %}
-
-
-{% endblock %}
-
 
 
 {% block content %}
 
-
-<div class="col-md-11 ml-3 mb-3" >
+<div class="col-md-11 ml-3 mb-3">
 <div class="col-md-12 col-xl-9">
 <div class="card m-b-30">
 <div class="card-header profile-tabs pb-0">
@@ -22,7 +13,10 @@
 <li class="nav-item">
 <a class="nav-link active" href="#profile" data-toggle="tab" aria-expanded="false"><i class="ti-user mr-2"></i>Student Profiles Creation</a>
 </li>
+
+
 <li class="nav-item">
+
 </li>
 </ul>
 </div>
@@ -45,33 +39,29 @@
 
 <div class="d-flex justify-content-end mb-3">   
 <a href="{% url 'institutions:downloadfile' %}" class="btn btn-outline-success py-0 mt-1 mb-3"><i class="fas fa-arrow-circle-down" aria-hidden="true"></i> Download CSV</a>  
-
+</div>
 
 
 </div>
-
 <div>
 <p class="lead text-primary ">Batch create student profiles from csv file.
 </p>
 
 </div>
 
-
-
-
-<select class="custom-select mb-4 col-md-5" 
-            name="academic_session" 
-            hx-get="{% url 'institutions:create_student_profile' %}"
-            hx-trigger="change"
-            hx-target="body">
-
-<option selected>Select Academic Session</option>
-{% for academic_session in academic_sessions %}
-<option value="{{academic_session.pk}}"> {{academic_session.name}}</option>
-{% endfor %}
-</select>
-
+<div class="form-group row">
+<div class="col-md-5 alert alert-primary mt-1 mb-3 py-2 pr-0 pl-2" role="alert">
+<h4 class="alert-heading font-18"><span class="text-danger">Selected Academic Session: </span><em>{{academic_session_name}}</em></h4>
+<h4 class="alert-heading font-18"><span class="text-danger">Assigned Quota: </span><em>{{admission_quota}}</em></h4>
+<h4 class="alert-heading font-18"><span class="text-danger">Quota Used: </span><em>{{quota_used}}</em></h4>
+<h4 class="alert-heading font-18"><span class="text-danger">Quota Remaining: </span><em>{{quota_remaining}}</em></h4>
 </div>
+</div>
+
+
+
+ <!-- <span class="text-default">Selected Academic Session: </span> <em class="text-primary">{{academic_session_name}} </em> -->
+
 
 
 <div class="">
@@ -97,10 +87,10 @@
 
 <div class="d-flex justify-content-end mb-3">
 
-<a href="{% url 'institutions:student_profiles_list' %}" class="btn btn-outline-primary px-2 mr-3 mt-1"><i class="fas fa-angle-double-left" aria-hidden="true"></i> Go Students List </a>
+<a href="{{request.META.HTTP_REFERER}}" class="btn btn-outline-primary pr-3 mr-3 mt-2"><i class="fas fa-angle-double-left" aria-hidden="true"></i> Go Back </a>
 
 
-<input type="submit" class="btn btn-outline-primary btn-sm px-2 mt-1 float-right" value="Batch Create Student Profiles" onclick="return confirm('Are you sure you want to submit this payment?')">
+<input type="submit" class="btn btn-outline-primary btn-sm px-4 mt-2 float-right" value="Batch Create Student Profiles" onclick="return confirm('Are you sure you want to submit this payment?')">
 
 
 
@@ -110,14 +100,8 @@
 
 
 
-
-
-
 </div>
 </div>
-
-
-
 </div>
 </div>
 </div>
@@ -126,11 +110,15 @@
     <div class="row">
         <div class="col-lg-12 col-sm-12">
             <div class="card">
+       
             </div>
         </div>
     </div>
 </div>
 </div>
+
+
+
 
 
 

@@ -114,8 +114,7 @@
 
 <a href="{% url 'registration:indexed_students_list' %}" class="btn btn-outline-primary py-0 mr-3 mt-1 mb-1"><i class="fas fa-angle-double-left" aria-hidden="true"></i> Issued Indexing List </a>
 
-
-<a href="{% url 'registration:students_index_number_list' %}" class="btn btn-outline-primary py-0 mr-2 mt-1 mb-1"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Indexing List</a>  
+<a href="{% url 'registration:institutions_indexing_pre_issue_details' object.student_indexing.institutionindexing_set.first.slug %}" class="btn btn-outline-primary py-0 mr-2 mt-1 mb-1"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Indexing List</a>  
 </div>
 
 </div>

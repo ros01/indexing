@@ -1,4 +1,3 @@
-{% extends 'institutions/dashboard_base2.html'%}
 {% load static %}
 {% load widget_tweaks %}
 {% load crispy_forms_tags %}
@@ -11,10 +10,9 @@
 
 
 
-{% block content %}
 
 
-<div class="col-md-11 ml-3 mb-3" >
+<div class="col-md-11 ml-3 mb-3">
 <div class="col-md-12 col-xl-9">
 <div class="card m-b-30">
 <div class="card-header profile-tabs pb-0">
@@ -63,8 +61,7 @@
             name="academic_session" 
             hx-get="{% url 'institutions:create_student_profile' %}"
             hx-trigger="change"
-            hx-target="body">
-
+            hx-target="#session-list">
 <option selected>Select Academic Session</option>
 {% for academic_session in academic_sessions %}
 <option value="{{academic_session.pk}}"> {{academic_session.name}}</option>
@@ -95,19 +92,15 @@
 </div>
 
 
-<div class="d-flex justify-content-end mb-3">
+<div class="form-group">
 
-<a href="{% url 'institutions:student_profiles_list' %}" class="btn btn-outline-primary px-2 mr-3 mt-1"><i class="fas fa-angle-double-left" aria-hidden="true"></i> Go Students List </a>
-
-
-<input type="submit" class="btn btn-outline-primary btn-sm px-2 mt-1 float-right" value="Batch Create Student Profiles" onclick="return confirm('Are you sure you want to submit this payment?')">
+<input type="submit" class="btn btn-outline-primary btn-sm px-4 mt-2 float-right" value="Batch Create Student Profiles" onclick="return confirm('Are you sure you want to submit this payment?')">
 
 
 
 </div>
 </form>
 </div>
-
 
 
 
@@ -134,4 +127,3 @@
 
 
 
-{% endblock %}

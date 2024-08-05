@@ -113,6 +113,23 @@ class AcademicSessionDetailView(StaffRequiredMixin, DetailView):
 
 
 
+class AcademicSessionUpdateView(StaffRequiredMixin, SuccessMessageMixin, UpdateView):
+    model = AcademicSession
+    template_name = "indexing_unit/update_academic_session.html"
+    form_class = AcademicSessionModelForm
+    success_message = "%(name)s Academic Session Update Successful"
+
+    def get_success_message(self, cleaned_data):
+        return self.success_message % dict(
+            cleaned_data,
+            name=self.object.name,
+        )
+
+    def get_success_url(self):
+    	view_name = 'indexing_unit:academic_session_detail'
+    	return reverse(view_name, kwargs={'slug': self.object.slug})
+
+
 class AcademicSessionListView(StaffRequiredMixin, ListView):
 	template_name = "indexing_unit/academic_session_list.html"
 	def get_queryset(self):
@@ -123,6 +140,90 @@ class AcademicSessionListView(StaffRequiredMixin, ListView):
 			qs = qs.filter(name__icontains=query)
 		return qs 
 
+
+def activate_academic_session(request, slug):
+  if request.method == 'POST':
+     object = get_object_or_404(AcademicSession, slug=slug)
+     object.status = 1
+     object.save()
+     context = {}
+     context['object'] = object
+     messages.success(request, ('Academic Session is now Active'))
+     return HttpResponseRedirect(reverse("indexing_unit:academic_session_detail", kwargs={'slug': object.slug,}))
+
+
+def deactivate_academic_session(request, slug):
+  if request.method == 'POST':
+     object = get_object_or_404(AcademicSession, slug=slug)
+     object.status = 0
+     object.save()
+     context = {}
+     context['object'] = object
+     messages.success(request, ('Academic Session has now been deactivated'))
+     return HttpResponseRedirect(reverse("indexing_unit:academic_session_detail", kwargs={'slug': object.slug,}))
+
+
+class AdmissionQuotaListView(StaffRequiredMixin, ListView):
+	template_name = "indexing_unit/admission_quota_list.html"
+	def get_queryset(self):
+		request = self.request
+		qs = AdmissionQuota.objects.all()
+		query = request.GET.get('q')
+		if query:
+			qs = qs.filter(name__icontains=query)
+		return qs 
+
+class AdmissionQuotaCreateView(StaffRequiredMixin, CreateView):
+    model = AdmissionQuota
+    template_name = "indexing_unit/assign_admission_quota.html"
+    form_class = AdmissionQuotaForm
+
+
+class AdmissionQuotaDetailView(StaffRequiredMixin, DetailView):
+	queryset = AdmissionQuota.objects.all()
+	template_name = "indexing_unit/admission_quota_details.html"
+
+
+class AdmissionQuotaUpdateView (StaffRequiredMixin, SuccessMessageMixin, UpdateView):
+    model = AdmissionQuota
+    form_class = AdmissionQuotaForm
+    template_name = "indexing_unit/update_admission_quota.html"
+    # success_message = "Student Profile Update Successful"
+
+    success_message = "%(institution)s Admision Quota Update Successful"
+
+    def get_success_message(self, cleaned_data):
+      return self.success_message % dict(
+            cleaned_data,
+            institution=self.object.institution.name,
+        )
+
+ 
+    def get_success_url(self):
+        obj = self.get_object()
+        return reverse("indexing_unit:admission_quota_list")
+
+
+def activate_institution_quota(request, slug):
+  if request.method == 'POST':
+     object = get_object_or_404(AdmissionQuota, slug=slug)
+     object.status = 1
+     object.save()
+     context = {}
+     context['object'] = object
+     messages.success(request, ('Admission Quota is now unlocked for this instituion for this academic session'))
+     return HttpResponseRedirect(reverse("indexing_unit:admission_quota_detail", kwargs={'slug': object.slug,}))
+
+
+def deactivate_institution_quota(request, slug):
+  if request.method == 'POST':
+     object = get_object_or_404(AdmissionQuota, slug=slug)
+     object.status = 0
+     object.save()
+     context = {}
+     context['object'] = object
+     messages.success(request, ('Academic Quota is now locked for this institution for this academic session'))
+     return HttpResponseRedirect(reverse("indexing_unit:admission_quota_detail", kwargs={'slug': object.slug,}))
 
 
 class InstitutionCreateView(StaffRequiredMixin, SuccessMessageMixin, CreateView):
@@ -138,6 +239,28 @@ class InstitutionCreateView(StaffRequiredMixin, SuccessMessageMixin, CreateView)
         )
 
 
+
+class InstitutionUpdateView(StaffRequiredMixin, SuccessMessageMixin, UpdateView):
+    model = InstitutionProfile
+    template_name = "indexing_unit/update_institution.html"
+    form_class = InstitutionProfileForm
+    success_message = "%(name)s Institution Profile Successful"
+
+    def get_success_message(self, cleaned_data):
+        return self.success_message % dict(
+            cleaned_data,
+            name=self.object.name,
+        )
+
+    def get_success_url(self):
+    	view_name = 'indexing_unit:institution_detail'
+    	return reverse(view_name, kwargs={'slug': self.object.slug})
+
+    # def get_success_url(self):
+    #     obj = self.get_object()
+    #     print ("Object:", obj)
+    #     return redirect(obj.get_absolute_url())
+        # return reverse("indexing_unit:institution_detail", kwargs={"pk": self.pk})
 
 # class InstitutionCreateView(CreateView):
 # 	user_form = SignupForm
@@ -373,15 +496,9 @@ class IndexingOfficerListView(StaffRequiredMixin, ListView):
 			qs = qs.filter(name__icontains=query)
 		return qs  #.filter(title__icontains='vid')
 
-class AdmissionQuotaListView(StaffRequiredMixin, ListView):
-	template_name = "indexing_unit/admission_quota_list.html"
-	def get_queryset(self):
-		request = self.request
-		qs = AdmissionQuota.objects.all()
-		query = request.GET.get('q')
-		if query:
-			qs = qs.filter(name__icontains=query)
-		return qs 
+
+
+
 
 
 class InstitutionCreateView1(CreateView):
@@ -434,42 +551,7 @@ class InstitutionDetailView(StaffRequiredMixin, SuccessMessageMixin, DetailView)
     #     )
 
  
-class AdmissionQuotaCreateView(StaffRequiredMixin, CreateView):
-    model = AdmissionQuota
-    template_name = "indexing_unit/assign_admission_quota.html"
-    form_class = AdmissionQuotaForm
 
-
-    # def form_invalid(self, form):
-    # 	print(form.errors)
-    # 	return self.render_to_response(self.get_context_data(form=form))
-
-
-
-class AdmissionQuotaDetailView(StaffRequiredMixin, DetailView):
-	queryset = AdmissionQuota.objects.all()
-	template_name = "indexing_unit/admission_quota_details.html"
-
-
-
-class AdmissionQuotaUpdateView (StaffRequiredMixin, SuccessMessageMixin, UpdateView):
-    model = AdmissionQuota
-    form_class = AdmissionQuotaForm
-    template_name = "indexing_unit/assign_admission_quota.html"
-    # success_message = "Student Profile Update Successful"
-
-    success_message = "%(institution)s Admision Quota Update Successful"
-
-    def get_success_message(self, cleaned_data):
-      return self.success_message % dict(
-            cleaned_data,
-            institution=self.object.institution.name,
-        )
-
- 
-    def get_success_url(self):
-        obj = self.get_object()
-        return reverse("indexing_unit:admission_quota_list")
 
 class IndexingApplicationsListView(StaffRequiredMixin, ListView):
 	template_name = "indexing_unit/students_indexing_applications_list.html"

@@ -65,7 +65,10 @@ urlpatterns = [
     # path('student_indexing_verifications_list', IndexingVerificationsListView.as_view(), name='student_indexing_verifications_list'),
 
     path('<slug:slug>/admission_quota_detail',  AdmissionQuotaDetailView.as_view(), name='admission_quota_detail'),
-    
+    path('pay_institutions_indexing_fee',  views.pay_institutions_indexing_fee, name='pay_institutions_indexing_fee'),
+    path('pay_session_indexing_fee',  InstitutionPaymentCreateView.as_view(), name='pay_session_indexing_fee'),
+
+    path('batch_create_student_profiles',  views.batch_create_student_profiles, name='batch_create_student_profiles'),
     path('create_student_profile',  StudentProfileCreateView.as_view(), name='create_student_profile'),
     path('<int:pk>/student_profile_update',  StudentProfileUpdateView.as_view(), name='student_profile_update'),
 

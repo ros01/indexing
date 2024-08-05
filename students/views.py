@@ -514,7 +514,7 @@ def show_transfer_form(wizard):
     cleaned_data = wizard.get_cleaned_data_for_step('utme_admission') or {'direct_entry': 'none'}
     return cleaned_data['direct_entry'] == '4'
 
-class StudentIndexingWizardView(SessionWizardView):
+class StudentIndexingWizardView(StaffRequiredMixin, SessionWizardView):
     # form_list = [IndexingModelForm, UtmeGradeModelForm, GceAlevelsModelForm, DegreeResultModelForm, TransferGradeModelForm] 
     form_list = [("start_application", IndexingModelForm),
          ("utme_admission", UtmeGradeModelForm),

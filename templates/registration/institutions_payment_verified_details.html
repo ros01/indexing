@@ -214,7 +214,7 @@
 <tbody>
 {% for student in object.student_indexing.all %}
 
-{% if student.indexing_status == "verified" %}
+{% if student.indexing_status != "pending" or student.indexing_status != "submitted"%}
 <tr>
 <td>{{student.student_profile.student.last_name}} {{student.student_profile.student.first_name}}</td>
 <td>{{student.institution.course_type}}</td>

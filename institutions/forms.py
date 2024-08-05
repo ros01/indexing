@@ -59,6 +59,12 @@ class StudentProfileUpdateModelForm(forms.ModelForm):
 
 
 class StudentProfileModelForm(forms.ModelForm):
+
+    # academic_session = forms.ModelChoiceField(
+    #     queryset = AcademicSession.objects.all(),
+    #     widget = forms.RadioSelect,
+    #     empty_label = None,
+    #     )
       
     class Meta:
          model = StudentProfile
@@ -146,7 +152,7 @@ class InstitutionIndexingModelForm(forms.ModelForm):
        super(InstitutionIndexingModelForm, self).__init__(*args, **kwargs)
        user = self.request.user
        academic_session = self.request.GET.get('academic_session')
-       self.fields['student_indexing'].queryset = StudentIndexing.objects.filter(institution = user.get_indexing_officer_profile.institution, indexing_status = "pending", verification_status = "approved", academic_session = academic_session)
+       self.fields['student_indexing'].queryset = StudentIndexing.objects.filter(institution = user.get_indexing_officer_profile.institution, indexing_status = "pending", verification_status = "approved", academic_session = academic_session).union(StudentIndexing.objects.filter(institution = user.get_indexing_officer_profile.institution, indexing_status = "pending", verification_status = "indexed", academic_session = academic_session))
        # self.fields['students_payments'].queryset = IndexingPayment.objects.filter(institution = user.get_indexing_officer_profile.institution, student_indexing__verification_status = 2, payment_verification_status=1)
        self.fields['academic_session'].label = "Academic Session"
        self.fields['rrr_number'].label = "RRR Number"
@@ -157,9 +163,6 @@ class InstitutionIndexingModelForm(forms.ModelForm):
        self.fields['student_indexing'].label = "Select Students for Institution Indexing Payment"
   
     
-
-
-      
 
 
 

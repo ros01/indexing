@@ -47,14 +47,29 @@
 {% if object.indexing_status == "pending" %}
  <h5 class="mb-1"> <span class="badge badge-warning">Pending</span></h5> 
 {% elif  object.indexing_status == "verified" %}
-<h5 class="mb-1"> <span class="badge badge-primary">VERIFIED BY RRBN REGISTRATIONS</span></h5>
+<h5 class="mb-1"> <span class="badge badge-primary">VERIFIED BY RRBN REGISTRATIONS</span>
+{% elif  object.indexing_status == "indexed" %}
+<h5 class="mb-1"> <span class="badge badge-primary">INDEXED BY RRBN REGISTRATIONS</span></h5>
 {% else %} 
 <h5 class="mb-1"> <span class="badge badge-primary"></span></h5>
 {% endif %}
 </div>
+
+{% if  object.indexing_status == "verified" %}
 <div class="col-md-12 alert alert-primary mt-1 mb-3 py-2" role="alert">
-    <h4 class="alert-heading font-18">Admission and payment details for this application application verified by RRBN Registration Dept</h4>
-    </div>
+<h4 class="alert-heading font-18">Admission and payment details for this application application verified by RRBN Registrations</h4>
+</div>
+
+{% elif  object.indexing_status == "indexed" %}
+<div class="col-md-12 alert alert-primary mt-1 mb-3 py-2" role="alert">
+<h4 class="alert-heading font-18">Student already indexed by RRBN Registrations</h4>
+</div>
+{% else %}
+<div class="col-md-12 alert alert-primary mt-1 mb-3 py-2" role="alert">
+<h4 class="alert-heading font-18">Admission and payment details for this application application pending verification by RRBN Registrations</h4>
+</div>
+
+{% endif %}
 </div>
 <div class="col-md-7 mt-0">
 <h5 class="mb-1"> <i class="fa fa-graduation-cap text-primary"></i> Basic Details</h5>
@@ -65,6 +80,11 @@
     <li>Institution: <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.institution}}</span></li>
     <li>Course of Study:  <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.institution.course_type}}</span></li>
     <li>Matric No: <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.student.matric_no}}</span></li>
+
+    {% if object.issueindexing_set.first.index_number %}
+    <li>Indexing No: <span class="text-danger font-weight-bold ms-sm-2">{{object.issueindexing_set.first.index_number}}</span></li>
+    {% endif %}
+
 </ul>
  </div>
 

@@ -210,7 +210,7 @@
 
 <div class="d-flex justify-content-end">  
 
-<a href="{% url 'registration:institutions_indexing_payment_verified_details' object.institution.slug %}" class="btn btn-outline-primary py-0 mr-3 mt-1"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Return to Institutions Verified Submissions</a> 
+<a href="{% url 'registration:institutions_indexing_payment_verified_details' object.institutionindexing_set.first.slug %}" class="btn btn-outline-primary py-0 mr-3 mt-1"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Return to Institutions Verified Submissions</a> 
 
 </div>
 

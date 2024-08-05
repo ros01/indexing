@@ -130,7 +130,7 @@ def staff_required(function):
         # booking.save()
 
 
-class DashboardView(StaffRequiredMixin, DetailView):
+class DashboardView(LoginRequiredMixin, StaffRequiredMixin, DetailView):
     template_name = "institutions/dashboard1.html"
 
     def get_object(self):
@@ -166,7 +166,7 @@ class InstitutionDetailView(LoginRequiredMixin, SuccessMessageMixin, DetailView)
 		return context
 
 
-class AdmissionQuotaListView(StaffRequiredMixin, ListView):
+class AdmissionQuotaListView(LoginRequiredMixin, StaffRequiredMixin, ListView):
 	template_name = "institutions/admission_quota_list.html"
 	def get_queryset(self):
 		request = self.request
@@ -177,7 +177,7 @@ class AdmissionQuotaListView(StaffRequiredMixin, ListView):
 			qs = qs.filter(name__icontains=query)
 		return qs 
 
-class AdmissionQuotaDetailView(StaffRequiredMixin, DetailView):
+class AdmissionQuotaDetailView(LoginRequiredMixin, StaffRequiredMixin, DetailView):
 	# queryset = AdmissionQuota.objects.all()
 	template_name = "institutions/admission_quota_details.html"
 
@@ -233,6 +233,7 @@ def slug_router(request, slug):
     else:
         return HttpResponseNotFound('404 Page not found')    
 
+@login_required
 def downloadfile(request):
 	 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 	 filename = 'students_list.csv'
@@ -262,20 +263,226 @@ class InstitutionObjectMixin(object):
 
 
 
-class StudentProfileCreateView(StaffRequiredMixin, SuccessMessageMixin, CreateView):
+@login_required
+def batch_create_student_profiles(request):
+	academic_sessions = AcademicSession.objects.filter(status = 1)
+	academic_session = request.GET.get('academic_session')
+	print("Academic Session S:", academic_session)
+	form = StudentProfileModelForm(request.POST or None)
+	context = {'academic_sessions': academic_sessions, 'academic_session': academic_session, 'form':form, 'is_htmx': True}
+	# return render(request, 'institutions/pay_institutions_indexing_fee.html', context)
+	return render(request, 'institutions/bulk_create_students.html', context)
+
+
+class StudentProfileCreateView(LoginRequiredMixin, StaffRequiredMixin, SuccessMessageMixin, CreateView):
 	form = StudentProfileModelForm
 	def get(self, request, *args, **kwargs):
 		form = StudentProfileModelForm()
-		template_name = 'institutions/bulk_create_students.html'
-		return render(request, template_name, {'form':form})
+		template_name = 'partials/bulk_create_students.html'
 
-	def get_context_data(self, request, *args, **kwarg):
 		user = self.request.user
+		institution = InstitutionProfile.objects.filter(name=user.get_indexing_officer_profile.institution).first()
+		print("Institution1:", institution)
+		session = self.request.GET.get('academic_session')
+		print("Form Session:", session)
+		academic_session_name = AcademicSession.objects.get(id=session)
+		print("Academic Session1:", academic_session_name)
+		academic_session = academic_session_name.id
+		quota = AdmissionQuota.objects.get_or_none(institution = institution, academic_session = academic_session)
+		admission_quota = quota.admission_quota
+		students_list = StudentProfile.objects.filter(institution = institution, academic_session = academic_session)
+		quota_used = len(students_list)
+		quota_remaining = admission_quota - quota_used
+		context = { 'quota_remaining': quota_remaining, 'quota_used': quota_used, 'admission_quota': admission_quota, 'academic_session': academic_session, 'academic_session_name': academic_session_name, 'form':form}
+		print("A Quota:", quota.admission_quota)
+		if quota.status == 0:
+			messages.error(self.request, "This session is locked for students indexing. Please select an active academic session to proceed ")
+			return redirect("institutions:batch_create_student_profiles")
+		else:
+			return render(request, template_name, context)
+
+	def get_form(self, *args, **kwargs):
+		form = super(StudentProfileCreateView, self).get_form(*args, **kwargs)
+		academic_session = self.get_academic_session()
+		form.fields["academic_session"].queryset = academic_session
+		return form
+
+			
+	def post(self, request, *args, **kwargs):
+		user = self.request.user
+		institution = InstitutionProfile.objects.filter(name=user.get_indexing_officer_profile.institution).first()
+		print("Institution:", institution)
+		session = request.POST.get('academic_session')
+		academic_session = AcademicSession.objects.get(id=session)
+		print("Academic Session:", academic_session)
+		quota = AdmissionQuota.objects.get_or_none(institution = institution, academic_session = academic_session)
+		print("Quota:", quota)
+		if quota is None:
+			admission_quota = 0;
+		else:
+			admission_quota = quota.admission_quota
+		print("Admission Quota:", admission_quota)
+		students_qs = institution.studentprofile_set.all()		
+
+		students_list = students_qs.filter(academic_session = academic_session)
+		paramFile = io.TextIOWrapper(request.FILES['students_list'].file)
+		portfolio1 = csv.DictReader(paramFile)
+		list_of_dict = list(portfolio1)
+		email_check = list_of_dict[0]["email"] == None
+
+		try:
+			context = {}
+			if len(list_of_dict) == 0:
+				messages.error(request, "No Data in List. Please populate list and try again")
+				print("Number in List:",  len(list_of_dict))
+				return redirect("institutions:batch_create_student_profiles")
+			elif email_check:
+				messages.error(request, "No email in list. Please add email and try again")
+				print("Number of emails in List:",  len(data[0]["email"]))
+				return redirect("institutions:batch_create_student_profiles")
+			elif admission_quota == 0:
+				messages.error(request, "No Quota Assigned for Selected Academic Session")
+				print("Number in List:",  len(list_of_dict))
+				print("Number of students registered:", len(students_list))
+				print("Admission Quota:", int(admission_quota))
+				return redirect("institutions:batch_create_student_profiles")
+
+			elif len(students_list) > admission_quota or len(list_of_dict) > admission_quota or len(list_of_dict) + int(len(students_list)) > admission_quota:
+				messages.error(request, "Admission Quota exceeded!")
+				print("Number in List:",  len(list_of_dict))
+				print("Number of students registered:", len(students_list))
+				print("Admission Quotas:", int(admission_quota))
+				return redirect("institutions:batch_create_student_profiles")
+			else:
+				for row in list_of_dict:
+					data = row['email']
+					students_list = User.objects.filter(email = data)
+					try:
+						if students_list.exists():
+							messages.error(request, f'This User: {data} and possibly other students on this list exit already exist')
+							return redirect("institutions:batch_create_student_profiles")
+						else:
+							for data in list_of_dict:
+								data = User.objects.create(email=row['email'], last_name=row['last_name'], first_name=row['first_name'], middle_name=row['middle_name'], phone_no=row['phone_no'], matric_no=row['matric_no'], password = make_password('student@001'),)
+
+								objs = [
+						            StudentProfile(
+						            	student = User.objects.get(email=row['email']),
+						            	institution=institution,
+						            	academic_session = academic_session,
+						            )
+						            for row in list_of_dict   	
+						         ]
+								for obj in objs:
+									obj.slug = create_slug3(instance=obj)
+								nmsg = StudentProfile.objects.bulk_create(objs)
+								messages.success(request, "Bulk Create of Students successful!")
+								returnmsg = {"status_code": 200}
+								for obj in objs:
+									user = obj.data
+									reset_password(user, request)
+								return redirect("institutions:batch_create_student_profiles")
+							
+					except Exception as e:
+						messages.error(request, e)
+							
+		except Exception as e:
+			print('Error While Importing Data: ', e)
+			returnmsg = {"status_code": 500}
+		return JsonResponse(returnmsg)
+		
+
+
+class StudentProfileCreateView0(StaffRequiredMixin, SuccessMessageMixin, CreateView):
+	form = StudentProfileModelForm
+	def get(self, request, *args, **kwargs):
 		form = StudentProfileModelForm()
-		qs1 = InstitutionProfile.objects.filter(name=user.get_indexing_officer_profile.institution)
-		obj = qs1.first().studentprofile_set.all()
-		context['object'] = obj
-		context['form'] = form
+		template_name = 'partials/bulk_create_students.html'
+
+		user = self.request.user
+		# form = StudentProfileModelForm()
+		institution = InstitutionProfile.objects.filter(name=user.get_indexing_officer_profile.institution).first()
+		print("Institution1:", institution)
+		session = self.request.GET.get('academic_session')
+		# session = form['academic_session'].value()
+		print("Form Session:", session)
+		academic_session_name = AcademicSession.objects.get(id=session)
+		print("Academic Session1:", academic_session_name)
+		academic_session = academic_session_name.id
+		quota = AdmissionQuota.objects.get_or_none(institution = institution, academic_session = academic_session)
+		admission_quota = quota.admission_quota
+		students_list = StudentProfile.objects.filter(institution = institution, academic_session = academic_session)
+		quota_used = len(students_list)
+		quota_remaining = admission_quota - quota_used
+		context = { 'quota_remaining': quota_remaining, 'quota_used': quota_used, 'admission_quota': admission_quota, 'academic_session': academic_session, 'academic_session_name': academic_session_name, 'form':form}
+		print("A Quota:", quota.admission_quota)
+		if quota.status == 0:
+			messages.error(self.request, "This session is locked for students indexing. Please select an active academic session to proceed ")
+			return redirect("institutions:batch_create_student_profiles")
+		else:
+			return render(request, template_name, context)
+
+	# def get_context_data(self, **kwargs):
+	# 	context = super().get_context_data(**kwargs)
+	# 	context['academic_sessions'] = AcademicSession.objects.all()
+	# 	context['academic_session'] = self.request.GET.get('academic_session')
+	# 	context['is_htmx'] = True
+	# 	return context
+
+	# def get_context_data(self, request, *args, **kwarg):
+	# 	user = self.request.user
+	# 	form = StudentProfileModelForm()
+	# 	qs1 = InstitutionProfile.objects.filter(name=user.get_indexing_officer_profile.institution)
+	# 	obj = qs1.first().studentprofile_set.all()
+	# 	context['object'] = obj
+	# 	context['form'] = form
+
+	# def dispatch(self, *args, **kwargs):
+	# 	# quota = self.get_academic_session()
+	# 	user = self.request.user
+	# 	form = StudentProfileModelForm()
+	# 	institution = InstitutionProfile.objects.filter(name=user.get_indexing_officer_profile.institution).first()
+	# 	print("Institution1:", institution)
+	# 	session = self.request.GET.get('academic_session')
+	# 	# session = form['academic_session'].value()
+	# 	print("Form Session:", session)
+	# 	academic_session = AcademicSession.objects.get(id=session)
+	# 	print("Academic Session1:", academic_session)
+	# 	quota = AdmissionQuota.objects.get_or_none(institution = institution, academic_session = academic_session)
+	# 	print("A Quota:", quota.admission_quota)
+	# 	if quota.status == 0:
+	# 		messages.error(self.request, "You can no longer index students for selected academic session. Please select an active academic session to proceed ")
+	# 		return redirect("institutions:batch_create_student_profiles")
+	# 	else:
+	# 		return super(StudentProfileCreateView, self).dispatch(*args, **kwargs)
+
+	# def get_academic_session(self, *args, **kwarg):
+	# 	user = self.request.user
+	# 	form = StudentProfileModelForm()
+	# 	institution = InstitutionProfile.objects.filter(name=user.get_indexing_officer_profile.institution).first()
+	# 	print("Institution1:", institution)
+	# 	session = self.request.GET.get('academic_session')
+	# 	# session = form['academic_session'].value()
+	# 	print("Form Session:", session)
+	# 	academic_session = AcademicSession.objects.get(id=session)
+	# 	print("Academic Session1:", academic_session)
+	# 	quota = AdmissionQuota.objects.get_or_none(institution = institution, academic_session = academic_session)
+	# 	print("A Quota:", quota.admission_quota)
+	# 	return quota
+		# if quota.active == False:
+		# 	messages.error(request, "You can no longer index students for selected academic session. Please select an active academic session to proceed ")
+		# 	return redirect("institutions:create_student_profile")
+		# else:
+		# 	return quota
+
+	def get_form(self, *args, **kwargs):
+		form = super(StudentProfileCreateView, self).get_form(*args, **kwargs)
+		academic_session = self.get_academic_session()
+		form.fields["academic_session"].queryset = academic_session
+		return form
+
+
+	
 			
 	def post(self, request, *args, **kwargs):
 		user = self.request.user
@@ -304,22 +511,34 @@ class StudentProfileCreateView(StaffRequiredMixin, SuccessMessageMixin, CreateVi
 		paramFile = io.TextIOWrapper(request.FILES['students_list'].file)
 		portfolio1 = csv.DictReader(paramFile)
 		list_of_dict = list(portfolio1)
+		email_check = list_of_dict[0]["email"] == None
 
 		try:
 			context = {}
-			if admission_quota == 0:
+			if len(list_of_dict) == 0:
+				messages.error(request, "No Data in List. Please populate list and try again")
+				print("Number in List:",  len(list_of_dict))
+				return redirect("institutions:batch_create_student_profiles")
+			elif email_check:
+				messages.error(request, "No email in list. Please add email and try again")
+				print("Number of emails in List:",  len(data[0]["email"]))
+				return redirect("institutions:batch_create_student_profiles")
+
+			elif admission_quota == 0:
 				messages.error(request, "No Quota Assigned for Selected Academic Session")
 				print("Number in List:",  len(list_of_dict))
 				print("Number of students registered:", len(students_list))
 				print("Admission Quota:", int(admission_quota))
-				return redirect("institutions:create_student_profile")
+				return redirect("institutions:batch_create_student_profiles")
+
+
 
 			elif len(students_list) > admission_quota or len(list_of_dict) > admission_quota or len(list_of_dict) + int(len(students_list)) > admission_quota:
 				messages.error(request, "Admission Quota exceeded!")
 				print("Number in List:",  len(list_of_dict))
 				print("Number of students registered:", len(students_list))
 				print("Admission Quotas:", int(admission_quota))
-				return redirect("institutions:create_student_profile")
+				return redirect("institutions:batch_create_student_profiles")
 
 			# elif len(list_of_dict) > admission_quota:
 			# 	messages.error(request, "Admission Quota exceeded!")	
@@ -339,7 +558,7 @@ class StudentProfileCreateView(StaffRequiredMixin, SuccessMessageMixin, CreateVi
 						if students_list.exists():
 							for student in students_list:
 								messages.error(request, f'This User: {student} and possibly other students on this list exit already exist')
-							return redirect("institutions:create_student_profile")
+							return redirect("institutions:batch_create_student_profiles")
 						else:
 							student = User.objects.create(email=row['email'], last_name=row['last_name'], first_name=row['first_name'], middle_name=row['middle_name'], phone_no=row['phone_no'], matric_no=row['matric_no'], password = make_password('student@001'),)
 							
@@ -363,7 +582,7 @@ class StudentProfileCreateView(StaffRequiredMixin, SuccessMessageMixin, CreateVi
 					user = obj.student
 					reset_password(user, request)
 				# return redirect(institution.first().get_student_profiles_list())
-				return redirect("institutions:create_student_profile")			
+				return redirect("institutions:batch_create_student_profiles")			
 		except Exception as e:
 			print('Error While Importing Data: ', e)
 			returnmsg = {"status_code": 500}
@@ -373,7 +592,7 @@ class StudentProfileCreateView(StaffRequiredMixin, SuccessMessageMixin, CreateVi
 
 
 
-class StudentProfileUpdateView (StaffRequiredMixin, SuccessMessageMixin, UpdateView):
+class StudentProfileUpdateView (LoginRequiredMixin, StaffRequiredMixin, SuccessMessageMixin, UpdateView):
     form_class = SignupForm
     template_name = "institutions/update_student_profile.html"
     # success_message = "Student Profile Update Successful"
@@ -427,7 +646,7 @@ class StudentProfileUpdateView (StaffRequiredMixin, SuccessMessageMixin, UpdateV
 
 
 
-class StudentProfileUpdateView1 (StaffRequiredMixin, SuccessMessageMixin, UpdateView):
+class StudentProfileUpdateView1 (LoginRequiredMixin, StaffRequiredMixin, SuccessMessageMixin, UpdateView):
     form_class = SignupForm
     template_name = "institutions/update_student_profile.html"
     # success_message = "Student Profile Update Successful"
@@ -520,7 +739,7 @@ class StudentProfileUpdateView1 (StaffRequiredMixin, SuccessMessageMixin, Update
 
 
 
-class StudentProfileCreateView1(StaffRequiredMixin, SuccessMessageMixin, CreateView):
+class StudentProfileCreateView1(LoginRequiredMixin, StaffRequiredMixin, SuccessMessageMixin, CreateView):
 	def get(self, request, *args, **kwargs):
 		template_name = 'institutions/bulk_create_students.html'
 		return render(request, template_name)
@@ -696,7 +915,7 @@ class StudentProfileDetailView1(StaffRequiredMixin, DetailView):
 	template_name = "institutions/student_profile_details.html"
 
 
-class StudentProfileDetailView(StaffRequiredMixin, DetailView):
+class StudentProfileDetailView(LoginRequiredMixin, StaffRequiredMixin, DetailView):
 	template_name = "institutions/student_profile_details.html"
 
 	def get_object(self):
@@ -729,7 +948,7 @@ def student_list(request):
 	return render(request, 'partials/students_list.html', context)
 
 
-class StudentProfilesListView(StaffRequiredMixin, ListView):
+class StudentProfilesListView(LoginRequiredMixin, StaffRequiredMixin, ListView):
 	template_name = "institutions/students_profiles_list.html"
 
 	def get_queryset(self):
@@ -755,7 +974,7 @@ class StudentProfilesListView(StaffRequiredMixin, ListView):
 	    context['obj'] = obj
 	    return context
 
-class IndexedStudentsListView(StaffRequiredMixin, ListView):
+class IndexedStudentsListView(LoginRequiredMixin, StaffRequiredMixin, ListView):
 	template_name = "institutions/indexed_students_list.html"
 	def get_queryset(self):
 		user = self.request.user
@@ -778,7 +997,7 @@ class IndexedStudentsListView(StaffRequiredMixin, ListView):
 	    return context
 	    print ("context:", context)
 
-class StudentIndexingApplicationsListView(StaffRequiredMixin, ListView):
+class StudentIndexingApplicationsListView(LoginRequiredMixin, StaffRequiredMixin, ListView):
 	template_name = "institutions/student_indexing_applications_list.html"
 	def get_queryset(self):
 		request = self.request
@@ -792,7 +1011,7 @@ class StudentIndexingApplicationsListView(StaffRequiredMixin, ListView):
 		return qs.filter #(indexing_status=2) 
 
 
-class StudentIndexingApplicationDetailView(StaffRequiredMixin, DetailView):
+class StudentIndexingApplicationDetailView(LoginRequiredMixin, StaffRequiredMixin, DetailView):
 	# queryset = StudentIndexing.objects.all()
 	template_name = "institutions/student_indexing_details.html"
 
@@ -810,7 +1029,7 @@ class StudentIndexingApplicationDetailView(StaffRequiredMixin, DetailView):
 		return context
 
 
-class StudentIndexingApplicationDetails(StaffRequiredMixin, DetailView):
+class StudentIndexingApplicationDetails(LoginRequiredMixin, StaffRequiredMixin, DetailView):
 	# queryset = StudentIndexing.objects.all()
 	template_name = "institutions/students_indexing_post_application_details.html"
 
@@ -827,7 +1046,7 @@ class StudentIndexingApplicationDetails(StaffRequiredMixin, DetailView):
 		return context
 
 
-
+@login_required
 def verify_application(request, slug):
   if request.method == 'POST':
      object = get_object_or_404(StudentIndexing, slug=slug)
@@ -852,6 +1071,7 @@ def verify_application(request, slug):
      #        'sslug': self.slug,})
      # return render(request, 'institutions/verification_successful.html',context)
 
+@login_required
 def reject_application(request, slug):
   if request.method == 'POST':
      object = get_object_or_404(StudentIndexing, slug=slug)
@@ -868,12 +1088,7 @@ def reject_application(request, slug):
             'sslug': object.slug,}))
 
 
-
-
-
-
-
-
+@login_required
 def verify_payment(request, id):
   if request.method == 'POST':
      object = get_object_or_404(IndexingPayment, pk=id)
@@ -884,7 +1099,7 @@ def verify_payment(request, id):
      messages.success(request, ('Indexing Application Payment Verified'))
      return render(request, 'institutions/submitted_payment_details.html',context)
 
-
+@login_required
 def reject_payment(request, id):
   if request.method == 'POST':
      object = get_object_or_404(IndexingPayment, pk=id)
@@ -895,7 +1110,7 @@ def reject_payment(request, id):
      # messages.error(request, ('Indexing Application Rejected'))
      return render(request, 'institutions/payment_verification_failed.html',context)
 
-
+@login_required
 def process(request, id):
   if request.method == 'POST':
   	 StudentIndexing.objects.filter(application_status=2).update(application_status=3)
@@ -915,7 +1130,7 @@ class IndexingVerificationsListView(StaffRequiredMixin, ListView):
 		return qs.filter(verification_status="approved") 
 
 
-class IndexingRejectionsListView(StaffRequiredMixin, ListView):
+class IndexingRejectionsListView(LoginRequiredMixin, StaffRequiredMixin, ListView):
 	template_name = "institutions/student_indexing_rejections_list.html"
 	def get_queryset(self):
 		request = self.request
@@ -927,7 +1142,7 @@ class IndexingRejectionsListView(StaffRequiredMixin, ListView):
 		return qs.filter(rejection_status="rejected") 
 
 
-class IndexingVerificationsDetailView(StaffRequiredMixin, DetailView):
+class IndexingVerificationsDetailView(LoginRequiredMixin, StaffRequiredMixin, DetailView):
 	queryset = StudentIndexing.objects.all()
 	template_name = "institutions/student_indexing_verifications_details.html"
 
@@ -946,7 +1161,7 @@ class IndexingVerificationsDetailView(StaffRequiredMixin, DetailView):
 
 
 
-class IndexingRejectionsDetailView(StaffRequiredMixin, DetailView):
+class IndexingRejectionsDetailView(LoginRequiredMixin, StaffRequiredMixin, DetailView):
 	queryset = StudentIndexing.objects.all()
 	template_name = "institutions/student_indexing_rejections_details.html"
 
@@ -963,7 +1178,7 @@ class IndexingRejectionsDetailView(StaffRequiredMixin, DetailView):
 		return context
 
 
-class GenerateInvoiceView(StaffRequiredMixin, ListView):
+class GenerateInvoiceView(LoginRequiredMixin, StaffRequiredMixin, ListView):
     template_name = "institutions/generate_invoice.html"
     def get_queryset(self):
     	request = self.request
@@ -975,14 +1190,14 @@ class GenerateInvoiceView(StaffRequiredMixin, ListView):
 
 
 
-class IndexingPaymentCreateView(StaffRequiredMixin, CreateView):
+class IndexingPaymentCreateView(LoginRequiredMixin, StaffRequiredMixin, CreateView):
     model = IndexingPayment
     template_name = "institutions/student_indexing_fee_payment.html"
     form_class = IndexingPaymentForm
 
 
 
-class IndexingPaymentsListView(StaffRequiredMixin, ListView):
+class IndexingPaymentsListView(LoginRequiredMixin, StaffRequiredMixin, ListView):
 	template_name = "institutions/students_indexing_payments_list.html"
 	queryset = IndexingPayment.objects.all()
 	# def get_queryset(self):
@@ -993,7 +1208,7 @@ class IndexingPaymentsListView(StaffRequiredMixin, ListView):
 	# 		qs = qs.filter(name__icontains=query)
 	# 	return qs.filter(indexing_status=3) 
 
-class SubmittedPaymentsListView(StaffRequiredMixin, ListView):
+class SubmittedPaymentsListView(LoginRequiredMixin, StaffRequiredMixin, ListView):
 	template_name = "institutions/submitted_payments_list.html"
 	# queryset = IndexingPayment.objects.all()
 
@@ -1008,7 +1223,7 @@ class SubmittedPaymentsListView(StaffRequiredMixin, ListView):
 			raise Http404
 
 
-class VerifiedPaymentsListView(StaffRequiredMixin, ListView):
+class VerifiedPaymentsListView(LoginRequiredMixin, StaffRequiredMixin, ListView):
 	template_name = "institutions/verified_payments_list.html"
 	
 	# def get_queryset(self):
@@ -1030,7 +1245,7 @@ class VerifiedPaymentsListView(StaffRequiredMixin, ListView):
 		return qs
 
 
-class InstitutionsPaymentsListView(StaffRequiredMixin, ListView):
+class InstitutionsPaymentsListView(LoginRequiredMixin, StaffRequiredMixin, ListView):
 	template_name = "institutions/institutions_payments_list.html"
 	
 	def get_queryset(self):
@@ -1045,12 +1260,12 @@ class InstitutionsPaymentsListView(StaffRequiredMixin, ListView):
 
 
 
-class StudentIndexingPaymentDetailView(StaffRequiredMixin, DetailView):
+class StudentIndexingPaymentDetailView(LoginRequiredMixin, StaffRequiredMixin, DetailView):
 	queryset = IndexingPayment.objects.all()
 	template_name = "institutions/submitted_payment_details.html"
 
 
-class IndexingPaymentsDetails(StaffRequiredMixin, TemplateView):
+class IndexingPaymentsDetails(LoginRequiredMixin, StaffRequiredMixin, TemplateView):
     template_name = "institutions/students_indexing_payments_details.html"
     
     def get_context_data(self, *args, **kwargs):
@@ -1087,7 +1302,7 @@ def students_verifications_list(request):
 def verifications_list(request):
 	academic_session = request.GET.get('academic_session')
 	user = request.user
-	verifications = StudentIndexing.objects.filter(academic_session=academic_session, institution=user.get_indexing_officer_profile.institution, verification_status="approved")
+	verifications = StudentIndexing.objects.filter(academic_session=academic_session, institution=user.get_indexing_officer_profile.institution, verification_status="approved").union(StudentIndexing.objects.filter(academic_session=academic_session, institution=user.get_indexing_officer_profile.institution, verification_status="indexed"))
 	context = {'verifications': verifications}
 	return render(request, 'partials/verifications.html', context)
 
@@ -1153,7 +1368,7 @@ def pay_institutions_indexing_fee(request):
 	context = {'academic_sessions': academic_sessions, 'academic_session': academic_session, 'form':form}
 	return render(request, 'institutions/pay_institutions_indexing_fee.html', context)
 
-class InstitutionPaymentCreateView(StaffRequiredMixin, SuccessMessageMixin, CreateView):
+class InstitutionPaymentCreateView(LoginRequiredMixin, StaffRequiredMixin, SuccessMessageMixin, CreateView):
     model = InstitutionIndexing
     template_name = "partials/institutions_payment_partial.html"
     form_class = InstitutionIndexingModelForm
@@ -1294,7 +1509,7 @@ class InstitutionPaymentCreateView1(StaffRequiredMixin, SuccessMessageMixin, Cre
 
 
 
-class InstitutionPaymentsCreateView(StaffRequiredMixin, SuccessMessageMixin, CreateView):
+class InstitutionPaymentsCreateView(LoginRequiredMixin, StaffRequiredMixin, SuccessMessageMixin, CreateView):
     model = InstitutionIndexing
     template_name = "institutions/institutions_indexing_payment.html"
     form_class = InstitutionIndexingModelForm
@@ -1333,13 +1548,13 @@ class InstitutionPaymentsCreateView(StaffRequiredMixin, SuccessMessageMixin, Cre
         
 
 
-class InstitutionsIndexingPaymentDetailView(StaffRequiredMixin, DetailView):
+class InstitutionsIndexingPaymentDetailView(LoginRequiredMixin, StaffRequiredMixin, DetailView):
 	queryset = InstitutionIndexing.objects.all()
 	template_name = "institutions/institutions_payment_details.html"
 
 
 
-class StudentIndexingNumberDetailView(StaffRequiredMixin, DetailView):
+class StudentIndexingNumberDetailView(LoginRequiredMixin, StaffRequiredMixin, DetailView):
     queryset = IssueIndexing.objects.all()
     template_name = "institutions/students_indexing_number_details.html"
 

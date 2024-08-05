@@ -339,10 +339,12 @@
 
 
 {% else %}
-<div class="d-flex justify-content-end mb-3 mr-3">  
+<div class="d-flex justify-content-end mb-3 mr-1">  
 
 
-<a href="{% url 'registration:institutions_indexing_payment_details' object.institution.slug %}" class="btn btn-outline-primary py-0 mr-3 mt-1"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Return to Institutions Indexing Submissions</a> 
+<a href="{% url 'registration:institutions_indexing_payment_details' object.institutionindexing_set.first.slug %}" class="btn btn-outline-primary py-0 mr-3 mt-1"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Back to Indexing Submissions</a> 
+
+<!-- <a href="{{request.META.HTTP_REFERER}}" class="btn btn-outline-primary py-0 mt-1 px-3"><i class="fas fa-angle-double-left" aria-hidden="true"></i> Go Back</a> -->
 
 </div>
 

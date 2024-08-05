@@ -177,9 +177,43 @@ class InstitutionsVerifiedPaymentsList(StaffRequiredMixin, ListView):
 		return qs.filter(payment_status=2)
 
 
+class InstitutionsIndexingPreIssueDetailView(StaffRequiredMixin, DetailView):
+	# queryset = InstitutionPayment.objects.prefetch_related(Prefetch('students_payments', queryset=IndexingPayment.objects.filter(payment_status = 3)))
+	queryset = InstitutionIndexing.objects.all()
+	template_name = "registration/institutions_indexing_pre_issue_details.html"
+
+	
+
 class InstitutionsIndexingPaymentDetailView(StaffRequiredMixin, DetailView):
 	queryset = InstitutionIndexing.objects.all()
 	template_name = "registration/institutions_indexing_submission.html"
+
+	def get_context_data(self, **kwargs):
+		context = super(InstitutionsIndexingPaymentDetailView, self).get_context_data(**kwargs)
+		object = self.get_object()
+		student_list = object.student_indexing.all()
+		user_cannot_verify = {}
+		for student in student_list:
+			if student.indexing_status == "pending" or student.indexing_status == "submitted":
+				user_cannot_verify = True
+		# form = InstitutionPaymentForm()
+		# academic_session = form['academic_session'].value()
+		# # print("Academic Session:", academic_session)
+		# institution = form['institution'].value()
+		# if self.request.GET.get('academic_session'):
+		# 	academic_session = self.request.GET.get('academic_session')
+		# 	filter_set = filter_set.filter(academic_session=academic_session)
+
+
+		# if self.request.GET.get('institution'):
+		# 	institution = self.request.GET.get('institution')
+		# 	filter_set = filter_set.filter(institution=institution)
+
+
+
+		# context['form'] = InstitutionPaymentForm()	
+		context['user_cannot_verify'] = user_cannot_verify
+		return context
 
 
 	# def get_queryset(self):
@@ -337,10 +371,7 @@ class IndexNumberIssuanceList(StaffRequiredMixin, ListView):
 	
 
 
-class InstitutionsIndexingPreIssueDetailView(StaffRequiredMixin, DetailView):
-	# queryset = InstitutionPayment.objects.prefetch_related(Prefetch('students_payments', queryset=IndexingPayment.objects.filter(payment_status = 3)))
-	queryset = InstitutionIndexing.objects.all()
-	template_name = "registration/institutions_indexing_pre_issue_details.html"
+
 
 	
 
@@ -378,6 +409,7 @@ class StudentIndexingApplicationDetailView(StaffRequiredMixin, DetailView):
     	context = super().get_context_data(**kwargs)
     	obj = self.get_object()
     	context['payment_object'] = obj.indexingpayment_set.first()
+    	context['institution'] = obj.institution
     	return context
 
 

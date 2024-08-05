@@ -26,8 +26,8 @@ class IssueIndexing(models.Model):
     updated         = models.DateTimeField(auto_now=True)
     timestamp       = models.DateTimeField(auto_now_add=True)
 
-    class Meta:
-        unique_together = ('matric_no','index_number')
+    # class Meta:
+    #     unique_together = ('matric_no','index_number')
 
     def __str__(self):
         return  str(self.student_profile)
@@ -50,7 +50,7 @@ class IssueIndexing(models.Model):
 
     def save(self, *args, **kwargs):
         super(IssueIndexing, self).save(*args, **kwargs)
-        # self.student_indexing.verification_status = 5
+        self.student_indexing.verification_status = "indexed"
         self.student_indexing.indexing_status = "indexed"
         # self.indexing_payment.payment_status = 4
         self.student_indexing.save()  

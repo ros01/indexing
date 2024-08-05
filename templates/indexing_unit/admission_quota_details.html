@@ -22,6 +22,7 @@
 <div class="tab-content">
 <div class="tab-pane active" id="about">
 <div class="row justify-content-center">
+{% include 'partials/_alerts.html' %} 
 
 <div class="col-md-12  profile-detail">
 <div class="d-flex justify-content-between align-items-center">
@@ -50,10 +51,36 @@
 </div>
 
 <div class="d-flex justify-content-end mr-2 mb-2">   
-<a href="{% url 'indexing_unit:admission_quota_list' %}" class="btn btn-outline-primary py-0 mr-2 mt-1 mb-3"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Admission Quota List</a>  
+<a href="{% url 'indexing_unit:update_admission_quota' object.slug %}" class="btn btn-outline-primary py-0 mr-2 mt-1 mb-3"><i class="fab fa-bity" aria-hidden="true"></i> Update Quota List</a>  
 
-<a href="{% url 'indexing_unit:update_admission_quota' object.slug %}" class="btn btn-outline-danger py-0 mr-2 mt-1 mb-3"><i class="fab fa-bity" aria-hidden="true"></i> Update Quota List</a>  
+{% if object.status == 0 %} 
+<a href="javascript:{document.getElementById('activate{{object.slug }}').submit()}">
+<input type="submit" class="btn btn-outline-primary py-0 mr-3 mt-1" value="Unlock Institution's Quota" onclick="return confirm('Are you sure you want to unlock this Institutions Quota for this academic session?')">
+</a>
+
+{% else %}
+
+<a href="javascript:{document.getElementById('deactivate{{object.slug }}').submit()}">
+<input type="submit" class="btn btn-outline-danger py-0 mr-3 mt-1" value="Lock Institution's Quota"  onclick="return confirm('Are you sure you want to lock this Institutions Quota for this academic session?')" >
+</a>
+{% endif %}
+
+
+
+<a href="{% url 'indexing_unit:admission_quota_list' %}" class="btn btn-outline-primary py-0 mr-2 mt-1 mb-3"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Admission Quota List</a> 
 </div>
+
+<form id="activate{{object.slug }}" method="POST" action="{% url 'indexing_unit:activate_institution_quota' object.slug %}">
+{% csrf_token%}
+<input type="hidden">
+</form>
+
+<form id="deactivate{{object.slug }}" method="POST" action="{% url 'indexing_unit:deactivate_institution_quota' object.slug %}">
+{% csrf_token%}
+<input type="hidden">
+</form>
+
+
 
 </div>
 </div>

@@ -19,6 +19,7 @@ from multiselectfield import MultiSelectField
 class AcademicSession(models.Model):
     name = models.CharField(max_length=120, unique=True)
     slug = models.SlugField(blank=True)
+    status = models.IntegerField(default=1)
     updated = models.DateTimeField(auto_now=True)
     timestamp = models.DateTimeField(auto_now_add=True)
 
@@ -125,6 +126,7 @@ class AdmissionQuota(models.Model):
     objects = GetOrNoneManager()
     academic_session = models.ForeignKey(AcademicSession,  on_delete=models.CASCADE)
     admission_quota  = models.IntegerField()
+    status = models.IntegerField(default=1)
     slug      = models.SlugField(blank=True)
     updated = models.DateTimeField(auto_now=True)
     timestamp       = models.DateTimeField(auto_now_add=True)
@@ -344,6 +346,7 @@ VERIFICATION_STATUS = (
     ('pending', 'Pending'),
     ('approved', 'Approved'),
     ('rejected', 'Rejected'),
+    ('indexed', 'Indexed')
     )
 
 INDEXING_STATUS = (

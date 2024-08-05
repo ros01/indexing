@@ -76,6 +76,9 @@
     <li>Institution: <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.institution}}</span></li>
     <li>Course of Study:  <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.institution.course_type}}</span></li>
     <li>Matric No: <span class="text-dark font-weight-bold ms-sm-2">{{object.student_profile.student.matric_no}}</span></li>
+    {% if object.issueindexing_set.first.index_number %}
+    <li>Indexing No: <span class="text-danger font-weight-bold ms-sm-2">{{object.issueindexing_set.first.index_number}}</span></li>
+    {% endif %}
 </ul>
  </div>
 
