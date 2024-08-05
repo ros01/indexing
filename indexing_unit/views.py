@@ -75,7 +75,7 @@ class InstitutionAutocomplete(autocomplete.Select2QuerySetView):
         return qs
 
 
-class DashboardView(StaffRequiredMixin, ListView):
+class DashboardView(LoginRequiredMixin, StaffRequiredMixin, ListView):
 	#queryset = InstitutionProfile.objects.all()
 	template_name = "indexing_unit/dashboard1.html"
 
@@ -94,7 +94,7 @@ class DashboardView(StaffRequiredMixin, ListView):
 	# 	return context
 
 
-class AcademicSessionCreateView(StaffRequiredMixin, SuccessMessageMixin, CreateView):
+class AcademicSessionCreateView(LoginRequiredMixin, StaffRequiredMixin, SuccessMessageMixin, CreateView):
     model = AcademicSession
     template_name = "indexing_unit/create_academic_session.html"
     form_class = AcademicSessionModelForm
@@ -107,13 +107,13 @@ class AcademicSessionCreateView(StaffRequiredMixin, SuccessMessageMixin, CreateV
         )
 
 
-class AcademicSessionDetailView(StaffRequiredMixin, DetailView):
+class AcademicSessionDetailView(LoginRequiredMixin, StaffRequiredMixin, DetailView):
 	queryset = AcademicSession.objects.all()
 	template_name = "indexing_unit/academic_session_details.html"
 
 
 
-class AcademicSessionUpdateView(StaffRequiredMixin, SuccessMessageMixin, UpdateView):
+class AcademicSessionUpdateView(LoginRequiredMixin, StaffRequiredMixin, SuccessMessageMixin, UpdateView):
     model = AcademicSession
     template_name = "indexing_unit/update_academic_session.html"
     form_class = AcademicSessionModelForm
@@ -130,7 +130,7 @@ class AcademicSessionUpdateView(StaffRequiredMixin, SuccessMessageMixin, UpdateV
     	return reverse(view_name, kwargs={'slug': self.object.slug})
 
 
-class AcademicSessionListView(StaffRequiredMixin, ListView):
+class AcademicSessionListView(LoginRequiredMixin, StaffRequiredMixin, ListView):
 	template_name = "indexing_unit/academic_session_list.html"
 	def get_queryset(self):
 		request = self.request
@@ -140,7 +140,7 @@ class AcademicSessionListView(StaffRequiredMixin, ListView):
 			qs = qs.filter(name__icontains=query)
 		return qs 
 
-
+@login_required
 def activate_academic_session(request, slug):
   if request.method == 'POST':
      object = get_object_or_404(AcademicSession, slug=slug)
@@ -152,6 +152,7 @@ def activate_academic_session(request, slug):
      return HttpResponseRedirect(reverse("indexing_unit:academic_session_detail", kwargs={'slug': object.slug,}))
 
 
+@login_required
 def deactivate_academic_session(request, slug):
   if request.method == 'POST':
      object = get_object_or_404(AcademicSession, slug=slug)
@@ -163,7 +164,7 @@ def deactivate_academic_session(request, slug):
      return HttpResponseRedirect(reverse("indexing_unit:academic_session_detail", kwargs={'slug': object.slug,}))
 
 
-class AdmissionQuotaListView(StaffRequiredMixin, ListView):
+class AdmissionQuotaListView(LoginRequiredMixin, StaffRequiredMixin, ListView):
 	template_name = "indexing_unit/admission_quota_list.html"
 	def get_queryset(self):
 		request = self.request
@@ -173,18 +174,18 @@ class AdmissionQuotaListView(StaffRequiredMixin, ListView):
 			qs = qs.filter(name__icontains=query)
 		return qs 
 
-class AdmissionQuotaCreateView(StaffRequiredMixin, CreateView):
+class AdmissionQuotaCreateView(LoginRequiredMixin, StaffRequiredMixin, CreateView):
     model = AdmissionQuota
     template_name = "indexing_unit/assign_admission_quota.html"
     form_class = AdmissionQuotaForm
 
 
-class AdmissionQuotaDetailView(StaffRequiredMixin, DetailView):
+class AdmissionQuotaDetailView(LoginRequiredMixin, StaffRequiredMixin, DetailView):
 	queryset = AdmissionQuota.objects.all()
 	template_name = "indexing_unit/admission_quota_details.html"
 
 
-class AdmissionQuotaUpdateView (StaffRequiredMixin, SuccessMessageMixin, UpdateView):
+class AdmissionQuotaUpdateView (LoginRequiredMixin, StaffRequiredMixin, SuccessMessageMixin, UpdateView):
     model = AdmissionQuota
     form_class = AdmissionQuotaForm
     template_name = "indexing_unit/update_admission_quota.html"
@@ -203,7 +204,7 @@ class AdmissionQuotaUpdateView (StaffRequiredMixin, SuccessMessageMixin, UpdateV
         obj = self.get_object()
         return reverse("indexing_unit:admission_quota_list")
 
-
+@login_required
 def activate_institution_quota(request, slug):
   if request.method == 'POST':
      object = get_object_or_404(AdmissionQuota, slug=slug)
@@ -215,6 +216,7 @@ def activate_institution_quota(request, slug):
      return HttpResponseRedirect(reverse("indexing_unit:admission_quota_detail", kwargs={'slug': object.slug,}))
 
 
+@login_required
 def deactivate_institution_quota(request, slug):
   if request.method == 'POST':
      object = get_object_or_404(AdmissionQuota, slug=slug)
@@ -226,7 +228,7 @@ def deactivate_institution_quota(request, slug):
      return HttpResponseRedirect(reverse("indexing_unit:admission_quota_detail", kwargs={'slug': object.slug,}))
 
 
-class InstitutionCreateView(StaffRequiredMixin, SuccessMessageMixin, CreateView):
+class InstitutionCreateView(LoginRequiredMixin, StaffRequiredMixin, SuccessMessageMixin, CreateView):
     model = InstitutionProfile
     template_name = "indexing_unit/register_institution.html"
     form_class = InstitutionProfileForm
@@ -240,7 +242,7 @@ class InstitutionCreateView(StaffRequiredMixin, SuccessMessageMixin, CreateView)
 
 
 
-class InstitutionUpdateView(StaffRequiredMixin, SuccessMessageMixin, UpdateView):
+class InstitutionUpdateView(LoginRequiredMixin, StaffRequiredMixin, SuccessMessageMixin, UpdateView):
     model = InstitutionProfile
     template_name = "indexing_unit/update_institution.html"
     form_class = InstitutionProfileForm
@@ -287,7 +289,7 @@ class IndexingOfficerCreateView2(CreateView):
 
 
 
-class IndexingOfficerCreateView(StaffRequiredMixin, SuccessMessageMixin, CreateView):
+class IndexingOfficerCreateView(LoginRequiredMixin, StaffRequiredMixin, SuccessMessageMixin, CreateView):
 	model = User
 	user_form = UserUpdateForm
 	form = IndexingOfficerProfileForm
@@ -333,7 +335,7 @@ class IndexingOfficerCreateView(StaffRequiredMixin, SuccessMessageMixin, CreateV
     
 
 
-class IndexingOfficerDetailView(StaffRequiredMixin, DetailView):
+class IndexingOfficerDetailView(LoginRequiredMixin, StaffRequiredMixin, DetailView):
 	queryset = IndexingOfficerProfile.objects.all()
 	template_name = "indexing_unit/indexing_officer_details.html"
 
@@ -352,7 +354,7 @@ class IndexingOfficerDetailView(StaffRequiredMixin, DetailView):
 
 
 
-class IndexingOfficerUpdateView (StaffRequiredMixin, SuccessMessageMixin, UpdateView):
+class IndexingOfficerUpdateView (LoginRequiredMixin, StaffRequiredMixin, SuccessMessageMixin, UpdateView):
     form_class = UserUpdateForm
     template_name = "indexing_unit/update_indexing_officer.html"
     # success_message = "Student Profile Update Successful"
@@ -422,7 +424,7 @@ class IndexingOfficerUpdateView (StaffRequiredMixin, SuccessMessageMixin, Update
 
        
 
-
+@login_required
 def activate_user(request, slug):
   if request.method == 'POST':
      object = get_object_or_404(IndexingOfficerProfile, slug=slug)
@@ -435,6 +437,7 @@ def activate_user(request, slug):
      return HttpResponseRedirect(reverse("indexing_unit:indexing_officer_detail", kwargs={'slug': object.slug,}))
 
 
+@login_required
 def deactivate_user(request, slug):
   if request.method == 'POST':
      object = get_object_or_404(IndexingOfficerProfile, slug=slug)
@@ -452,7 +455,7 @@ def deactivate_user(request, slug):
 
 
 
-class UniversitiesListView(StaffRequiredMixin, ListView):
+class UniversitiesListView(LoginRequiredMixin, StaffRequiredMixin, ListView):
 	template_name = "indexing_unit/institutions_list1.html"
 	def get_queryset(self):
 		request = self.request
@@ -462,7 +465,7 @@ class UniversitiesListView(StaffRequiredMixin, ListView):
 			qs = qs.filter(name__icontains=query)
 		return qs  #.filter(title__icontains='vid')
 
-class CollegesListView(StaffRequiredMixin, ListView):
+class CollegesListView(LoginRequiredMixin, StaffRequiredMixin, ListView):
 	template_name = "indexing_unit/institutions_list1.html"
 	def get_queryset(self):
 		request = self.request
@@ -485,7 +488,7 @@ class CollegesListView(StaffRequiredMixin, ListView):
 # 		return qs  #.filter(title__icontains='vid') 
 
  
-class IndexingOfficerListView(StaffRequiredMixin, ListView):
+class IndexingOfficerListView(LoginRequiredMixin, StaffRequiredMixin, ListView):
 	template_name = "indexing_unit/indexing_officers_list.html"
 	def get_queryset(self):
 		request = self.request
@@ -540,7 +543,7 @@ class InstitutionCreateView1(CreateView):
 
 
 
-class InstitutionDetailView(StaffRequiredMixin, SuccessMessageMixin, DetailView):
+class InstitutionDetailView(LoginRequiredMixin, StaffRequiredMixin, SuccessMessageMixin, DetailView):
 	queryset = InstitutionProfile.objects.all()
 	template_name = "indexing_unit/institution_details.html"
 	success_message = "Institution Profiles was created successfully"
@@ -553,7 +556,7 @@ class InstitutionDetailView(StaffRequiredMixin, SuccessMessageMixin, DetailView)
  
 
 
-class IndexingApplicationsListView(StaffRequiredMixin, ListView):
+class IndexingApplicationsListView(LoginRequiredMixin, StaffRequiredMixin, ListView):
 	template_name = "indexing_unit/students_indexing_applications_list.html"
 	def get_queryset(self):
 		request = self.request
@@ -564,7 +567,7 @@ class IndexingApplicationsListView(StaffRequiredMixin, ListView):
 		return qs.filter(indexing_status=2) 
 
 
-class IndexingVerificationsDetailView(StaffRequiredMixin, DetailView):
+class IndexingVerificationsDetailView(LoginRequiredMixin, StaffRequiredMixin, DetailView):
 	queryset = StudentIndexing.objects.all()
 	template_name = "indexing_unit/student_indexing_verification_details.html"
 
@@ -572,7 +575,7 @@ class IndexingVerificationsDetailView(StaffRequiredMixin, DetailView):
 
 
 
-class IndexNumberIssuanceList(StaffRequiredMixin, ListView):
+class IndexNumberIssuanceList(LoginRequiredMixin, StaffRequiredMixin, ListView):
 	template_name = "indexing_unit/index_number_issuance_list.html"
 	def get_queryset(self):
 		request = self.request
@@ -597,7 +600,7 @@ def universities_list(request):
 	return render(request, 'partials/universities_list.html', context)
 
 
-class InstitutionListView(StaffRequiredMixin, ListView):
+class InstitutionListView(LoginRequiredMixin, StaffRequiredMixin, ListView):
 	template_name = "indexing_unit/select_institution.html"
 	def get_queryset(self):
 		institutions = InstitutionProfile.objects.all() 
@@ -619,7 +622,7 @@ class InstitutionListView(StaffRequiredMixin, ListView):
 		return context
 
 
-class InstitutionSearchView(ListView):
+class InstitutionSearchView(LoginRequiredMixin, ListView):
 	template_name = "indexing_unit/institutions_list1.html"
 	def get_queryset(self):
 		institutions = InstitutionProfile.objects.all() 
@@ -641,7 +644,7 @@ class InstitutionSearchView(ListView):
 		return context
 
 
-class InstitutionsIndexedStudentsList(ListView):
+class InstitutionsIndexedStudentsList(LoginRequiredMixin, ListView):
 	template_name = "indexing_unit/indexed_students_list.html"
 	def get_queryset(self):
 		institutions = InstitutionProfile.objects.all()
@@ -664,7 +667,7 @@ class InstitutionsIndexedStudentsList(ListView):
 		return context
 
 
-class InstitutionsIndexedStudentsListView(ListView):
+class InstitutionsIndexedStudentsListView(LoginRequiredMixin, ListView):
 	template_name = "indexing_unit/institutions_indexed_students_list.html"
 	def get_queryset(self):
 		institutions = InstitutionProfile.objects.all()
@@ -688,7 +691,7 @@ class InstitutionsIndexedStudentsListView(ListView):
 
 
 
-class InstitutionsIndexingStudentsListView(StaffRequiredMixin, ListView):
+class InstitutionsIndexingStudentsListView(LoginRequiredMixin, StaffRequiredMixin, ListView):
 	template_name = "indexing_unit/institutions_indexing_students_list.html"
 	def get_queryset(self):
 		request = self.request
@@ -712,7 +715,7 @@ class InstitutionsIndexingStudentsListView(StaffRequiredMixin, ListView):
 
     	 	
 
-class IssueIndexNumberDetails(StaffRequiredMixin, DetailView):
+class IssueIndexNumberDetails(LoginRequiredMixin, StaffRequiredMixin, DetailView):
 	queryset = StudentIndexing.objects.all()
 	template_name = "indexing_unit/assign_index_number_detail.html"
 
@@ -726,7 +729,7 @@ class IndexObjectMixin(object):
         return obj 
 
 
-class IssueIndexNumber1(CreateView):
+class IssueIndexNumber1(LoginRequiredMixin, CreateView):
     model = IssueIndexing
     template_name = "indexing_unit/issue_indexing_number.html"
     form_class = IssueIndexingForm
@@ -741,7 +744,7 @@ class IssueIndexNumber1(CreateView):
 
 
 
-class IssueIndexingNumber(StaffRequiredMixin, CreateView, IndexObjectMixin):
+class IssueIndexingNumber(LoginRequiredMixin, StaffRequiredMixin, CreateView, IndexObjectMixin):
     model = IssueIndexing
     template_name = "indexing_unit/issue_index_number.html"
     form_class = IssueIndexingForm
@@ -779,7 +782,7 @@ class IssueIndexingNumber(StaffRequiredMixin, CreateView, IndexObjectMixin):
 
 
 
-class IssuedIndexingApplications(StaffRequiredMixin, ListView):
+class IssuedIndexingApplications(LoginRequiredMixin, StaffRequiredMixin, ListView):
 	template_name = "indexing_unit/issued_indexing_applications_list.html"
 	def get_queryset(self):
 		request = self.request
@@ -789,7 +792,7 @@ class IssuedIndexingApplications(StaffRequiredMixin, ListView):
 			qs = qs.filter(name__icontains=query)
 		return qs
 
-class InstitutionsPaymentsListView(StaffRequiredMixin, ListView):
+class InstitutionsPaymentsListView(LoginRequiredMixin, StaffRequiredMixin, ListView):
 	template_name = "indexing_unit/institutions_payments_list.html"
 	def get_queryset(self):
 		request = self.request
@@ -800,7 +803,7 @@ class InstitutionsPaymentsListView(StaffRequiredMixin, ListView):
 		return qs.filter(payment_status=1)
 
 
-class InstitutionsVerifiedPaymentsList(StaffRequiredMixin, ListView):
+class InstitutionsVerifiedPaymentsList(LoginRequiredMixin, StaffRequiredMixin, ListView):
 	template_name = "indexing_unit/institutions_verified_payments_list.html"
 	def get_queryset(self):
 		request = self.request
@@ -811,7 +814,7 @@ class InstitutionsVerifiedPaymentsList(StaffRequiredMixin, ListView):
 		return qs.filter(payment_status=2)
 
 
-class InstitutionsIndexingPaymentDetailView(StaffRequiredMixin, DetailView):
+class InstitutionsIndexingPaymentDetailView(LoginRequiredMixin, StaffRequiredMixin, DetailView):
 	queryset = InstitutionIndexing.objects.all()
 	template_name = "indexing_unit/institutions_payment_details.html"
 
@@ -833,12 +836,12 @@ class InstitutionsIndexingPaymentDetailView(StaffRequiredMixin, DetailView):
 	# 	context['object_list'] = object_list
 	# 	return context
 
-class InstitutionsIndexingPreIssueDetailView(StaffRequiredMixin, DetailView):
+class InstitutionsIndexingPreIssueDetailView(LoginRequiredMixin, StaffRequiredMixin, DetailView):
 	queryset = InstitutionIndexing.objects.prefetch_related(Prefetch('student_indexing', queryset=StudentIndexing.objects.filter(verification_status = 3)))
 	template_name = "indexing_unit/institutions_indexing_pre_issue_details.html"
 
 
-class VerifiedPaymentsListView(StaffRequiredMixin, ListView):
+class VerifiedPaymentsListView(LoginRequiredMixin, StaffRequiredMixin, ListView):
 	template_name = "indexing_unit/verified_payments_list.html"
 	
 	def get_queryset(self):
@@ -851,7 +854,7 @@ class VerifiedPaymentsListView(StaffRequiredMixin, ListView):
 		except:
 			raise Http404
 
-class InstitutionsPaymentsListView1(StaffRequiredMixin, ListView):
+class InstitutionsPaymentsListView1(LoginRequiredMixin, StaffRequiredMixin, ListView):
 	template_name = "indexing_unit/institutions_payments_list.html"
 	
 	def get_queryset(self):
@@ -864,13 +867,13 @@ class InstitutionsPaymentsListView1(StaffRequiredMixin, ListView):
 		except:
 			raise Http404
 
-class IssuedIndexingApplicationsDetails(StaffRequiredMixin, DetailView):
+class IssuedIndexingApplicationsDetails(LoginRequiredMixin, StaffRequiredMixin, DetailView):
 	queryset = IssueIndexing.objects.all()
 	template_name = "indexing_unit/issued_indexing_applications_details.html"
 
 
 
-class StudentIndexingApplicationDetailView(StaffRequiredMixin, DetailView):
+class StudentIndexingApplicationDetailView(LoginRequiredMixin, StaffRequiredMixin, DetailView):
     # queryset = StudentIndexing.objects.all()
     template_name = "indexing_unit/student_indexing_application_details.html"
 
@@ -887,7 +890,7 @@ class StudentIndexingApplicationDetailView(StaffRequiredMixin, DetailView):
     	return context
 
   
-class StudentsIndexingApplicationDetails(StaffRequiredMixin, DetailView):
+class StudentsIndexingApplicationDetails(LoginRequiredMixin, StaffRequiredMixin, DetailView):
     # queryset = StudentIndexing.objects.all()
     template_name = "indexing_unit/students_indexing_application_details.html"
 
@@ -898,7 +901,7 @@ class StudentsIndexingApplicationDetails(StaffRequiredMixin, DetailView):
     	return obj
 
 
-
+@login_required
 def approve_application(request, slug):
   if request.method == 'POST':
      object = get_object_or_404(StudentIndexing, slug=slug)
@@ -915,6 +918,7 @@ def approve_application(request, slug):
      # return render(request, 'indexing_unit/verification_successful.html',context)
 
 
+@login_required
 def reject_application(request, slug):
   if request.method == 'POST':
      object = get_object_or_404(StudentIndexing,slug=slug)
@@ -930,6 +934,7 @@ def reject_application(request, slug):
             'sslug': object.slug,}))
      # return render(request, 'indexing_unit/verification_failed.html',context)
 
+@login_required
 def verify_payment(request, slug):
   if request.method == 'POST':
      object = get_object_or_404(InstitutionPayment, slug=slug)
@@ -942,6 +947,7 @@ def verify_payment(request, slug):
      # return render(request, 'indexing_unit/payment_verification_successful.html',context)
 
 
+@login_required
 def reject_payment(request, slug):
   if request.method == 'POST':
      object = get_object_or_404(InstitutionPayment, slug=slug)
@@ -977,7 +983,7 @@ def reject_payment(request, slug):
 
 
 
-class StudentIndexingNumberDetailView(StaffRequiredMixin, DetailView):
+class StudentIndexingNumberDetailView(LoginRequiredMixin, StaffRequiredMixin, DetailView):
     queryset = IssueIndexing.objects.all()
     template_name = "indexing_unit/students_indexing_number_details.html"
 
