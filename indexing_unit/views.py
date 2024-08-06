@@ -653,7 +653,7 @@ class InstitutionsIndexedStudentsList(LoginRequiredMixin, ListView):
 	def get_context_data(self, **kwargs):
 		context = super(InstitutionsIndexedStudentsList, self).get_context_data(**kwargs)
 		filter_set = self.get_queryset()
-		form = InstitutionPaymentForm()
+		form = InstitutionPaymentForm(self.request.GET or None)
 		academic_session = form['academic_session'].value()
 		institution = form['institution'].value()
 		if self.request.GET.get('academic_session'):
@@ -662,7 +662,7 @@ class InstitutionsIndexedStudentsList(LoginRequiredMixin, ListView):
 		if self.request.GET.get('institution'):
 			institution = self.request.GET.get('institution')
 			filter_set = filter_set.filter(institution=institution)
-		context['form'] = InstitutionPaymentForm()	
+		context['form'] = InstitutionPaymentForm(self.request.GET or None)	
 		context['indexing'] = filter_set
 		return context
 
@@ -676,7 +676,7 @@ class InstitutionsIndexedStudentsListView(LoginRequiredMixin, ListView):
 	def get_context_data(self, **kwargs):
 		context = super(InstitutionsIndexedStudentsListView, self).get_context_data(**kwargs)
 		filter_set = self.get_queryset()
-		form = InstitutionPaymentForm()
+		form = InstitutionPaymentForm(self.request.GET or None)
 		academic_session = form['academic_session'].value()
 		institution = form['institution'].value()
 		if self.request.GET.get('academic_session'):
@@ -685,7 +685,7 @@ class InstitutionsIndexedStudentsListView(LoginRequiredMixin, ListView):
 		if self.request.GET.get('institution'):
 			institution = self.request.GET.get('institution')
 			filter_set = filter_set.filter(institution=institution)
-		context['form'] = InstitutionPaymentForm()	
+		context['form'] = InstitutionPaymentForm(self.request.GET or None)	
 		context['indexing'] = filter_set
 		return context
 
