@@ -11,13 +11,13 @@ class InstitutionPaymentForm(DynamicFormMixin, forms.Form):
 
 	academic_session = forms.ModelChoiceField(
         queryset=AcademicSession.objects.all(),
-        initial = AcademicSession.objects.first()
+        # initial = AcademicSession.objects.first()
     )
 
 
 	institution = forms.ModelChoiceField(
         queryset=InstitutionProfile.objects.all(),
-        initial = InstitutionProfile.objects.first()
+        # initial = InstitutionProfile.objects.first()
     )
 
 def __init__(self, *args, **kwargs):

@@ -48,12 +48,15 @@ urlpatterns = [
     path('select_institution', views.select_institution, name='select_institution'),
     path('indexing_numbers_list', views.indexing_numbers_list, name='indexing_numbers_list'),
     path('institutions_indexing_number_list', IndexNumberIssuanceListView.as_view(), name='institutions_indexing_number_list'),
+
+
     path('students_index_number_list', IndexNumberIssuanceList.as_view(), name='students_index_number_list'),
+    path('indexed_students_list', InstitutionsIndexedStudentsList.as_view(), name='indexed_students_list'),
+    path('institutions_indexed_students_list', InstitutionsIndexedStudentsListView.as_view(), name='institutions_indexed_students_list'),
     path('institutions_indexing_pre_issue_details/<slug:slug>',  InstitutionsIndexingPreIssueDetailView.as_view(), name='institutions_indexing_pre_issue_details'),
     path('<slug:slug>/issue_indexing_number',  IssueIndexingNumber.as_view(), name='issue_indexing_number'),
     
-    path('indexed_students_list', InstitutionsIndexedStudentsList.as_view(), name='indexed_students_list'),
-    path('institutions_indexed_students_list', InstitutionsIndexedStudentsListView.as_view(), name='institutions_indexed_students_list'),
+    
     
     path('student_indexing_details/<slug:islug>/<slug:sslug>',  StudentIndexingApplicationDetailView.as_view(), name='student_indexing_details'),
     path('student_indexing_verified_details/<slug:islug>/<slug:sslug>',  StudentIndexingVerifiedDetails.as_view(), name='student_indexing_verified_details'),

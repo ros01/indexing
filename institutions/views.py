@@ -296,7 +296,7 @@ class StudentProfileCreateView(LoginRequiredMixin, StaffRequiredMixin, SuccessMe
 		context = { 'quota_remaining': quota_remaining, 'quota_used': quota_used, 'admission_quota': admission_quota, 'academic_session': academic_session, 'academic_session_name': academic_session_name, 'form':form}
 		print("A Quota:", quota.admission_quota)
 		if quota.status == 0:
-			messages.error(self.request, "This session is locked for students indexing. Please select an active academic session to proceed ")
+			messages.error(self.request, "This session is locked for students indexing. Please select an active academic session to proceed or Contact RRBN")
 			return redirect("institutions:batch_create_student_profiles")
 		else:
 			return render(request, template_name, context)
@@ -379,7 +379,7 @@ class StudentProfileCreateView(LoginRequiredMixin, StaffRequiredMixin, SuccessMe
 								messages.success(request, "Bulk Create of Students successful!")
 								returnmsg = {"status_code": 200}
 								for obj in objs:
-									user = obj.data
+									user = obj.student
 									reset_password(user, request)
 								return redirect("institutions:batch_create_student_profiles")
 							
