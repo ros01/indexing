@@ -70,7 +70,7 @@ urlpatterns = [
 
     path('batch_create_student_profiles',  views.batch_create_student_profiles, name='batch_create_student_profiles'),
     path('create_student_profile',  StudentProfileCreateView.as_view(), name='create_student_profile'),
-    path('<int:pk>/student_profile_update',  StudentProfileUpdateView.as_view(), name='student_profile_update'),
+    path('<slug:slug>/student_profile_update',  StudentProfileUpdateView.as_view(), name='student_profile_update'),
 
 
     path('downloadfile', views.downloadfile, name='downloadfile'),

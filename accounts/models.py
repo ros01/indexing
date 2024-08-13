@@ -66,6 +66,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
     middle_name = models.CharField(max_length=30, blank=True)
+    slug  = models.SlugField(blank=True, null=True, unique=True)
     phone_no = models.CharField(max_length=100, blank=True)
     matric_no = models.CharField(max_length=200, blank=True)
     role = models.CharField (max_length=20, choices = ROLE, blank=True, default='Student')
@@ -113,6 +114,13 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_short_name(self):
         return self.email
+
+
+def post_save_user_receiver(sender, instance, *args, **kwargs):
+    if not instance.slug:
+        instance.slug = create_slug0(instance)
+
+pre_save.connect(post_save_user_receiver, sender=User)
 
 
 class IndexingOfficerProfile(models.Model):

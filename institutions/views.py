@@ -11,7 +11,7 @@ from django.views.generic import (
 )
 from django.db.models import Q
 from django.db import IntegrityError
-from accounts.forms import SignupForm
+from accounts.forms import *
 from django.forms.models import modelformset_factory # model form for querysets
 from .forms import *
 from accounts.tokens import account_activation_token
@@ -356,40 +356,40 @@ class StudentProfileCreateView(LoginRequiredMixin, StaffRequiredMixin, SuccessMe
 			else:
 				for row in list_of_dict:
 					data = row['email']
-					students_list = User.objects.filter(email = data)
+					students_list = User.objects.filter(email=data)
 					try:
 						if students_list.exists():
 							messages.error(request, f'This User: {data} and possibly other students on this list exit already exist')
 							return redirect("institutions:batch_create_student_profiles")
 						else:
-							for data in list_of_dict:
-								data = User.objects.create(email=row['email'], last_name=row['last_name'], first_name=row['first_name'], middle_name=row['middle_name'], phone_no=row['phone_no'], matric_no=row['matric_no'], password = make_password('student@001'),)
+							data = [(
+							User.objects.create(email=row['email'], last_name=row['last_name'], first_name=row['first_name'], middle_name=row['middle_name'], phone_no=row['phone_no'], matric_no=row['matric_no'], password = make_password('student@001'),))
+							for row in list_of_dict]
 
-								objs = [
-						            StudentProfile(
-						            	student = User.objects.get(email=row['email']),
-						            	institution=institution,
-						            	academic_session = academic_session,
-						            )
-						            for row in list_of_dict   	
-						         ]
-								for obj in objs:
-									obj.slug = create_slug3(instance=obj)
-								nmsg = StudentProfile.objects.bulk_create(objs)
-								messages.success(request, "Bulk Create of Students successful!")
-								returnmsg = {"status_code": 200}
-								for obj in objs:
-									user = obj.student
-									reset_password(user, request)
-								return redirect("institutions:batch_create_student_profiles")
+							objs = [
+					            StudentProfile(
+					            	student = User.objects.get(email=row['email']),
+					            	institution=institution,
+					            	academic_session = academic_session,
+					            )
+					            for row in list_of_dict]
+							for obj in objs:
+								obj.slug = create_slug3(instance=obj)
+								user = obj.student
+								reset_password(user, request)
 							
+							nmsg = StudentProfile.objects.bulk_create(objs)
+							messages.success(request, "Bulk Create of Students successful!")
+							returnmsg = {"status_code": 200}
+							return redirect("institutions:batch_create_student_profiles")
 					except Exception as e:
 						messages.error(request, e)
-							
+						return redirect("institutions:batch_create_student_profiles")				
 		except Exception as e:
 			print('Error While Importing Data: ', e)
 			returnmsg = {"status_code": 500}
-		return JsonResponse(returnmsg)
+			return JsonResponse(returnmsg)
+			return redirect("institutions:batch_create_student_profiles")
 		
 
 
@@ -593,14 +593,14 @@ class StudentProfileCreateView0(StaffRequiredMixin, SuccessMessageMixin, CreateV
 
 
 class StudentProfileUpdateView (LoginRequiredMixin, StaffRequiredMixin, SuccessMessageMixin, UpdateView):
-    form_class = SignupForm
+    form_class = UserUpdateForm
     template_name = "institutions/update_student_profile.html"
     # success_message = "Student Profile Update Successful"
 
     success_message = "%(student)s  Student Profile Update Successful"
     def get_object(self, queryset=None):
-    	pk = self.kwargs.get("pk")
-    	user = User.objects.get(id=pk)
+    	slug = self.kwargs.get("slug")
+    	user = User.objects.get(slug=slug)
     	return user
 
     def get_success_message(self, cleaned_data):
@@ -615,12 +615,14 @@ class StudentProfileUpdateView (LoginRequiredMixin, StaffRequiredMixin, SuccessM
 
     def post(self, request, *args, **kwargs):
     	email = request.POST['email']
-    	pk = self.kwargs.get("pk")
-    	obj = get_object_or_404(User, id=pk)
+    	slug = self.kwargs.get("slug")
+    	obj = get_object_or_404(User, slug=slug)
     	# obj = StudentProfile.objects.get(student__email= form.cleaned_data["email"]).student.email
     	form = self.form_class(request.POST or None, instance = obj)
     	if form.is_valid():
-        	student_profile = form.save()
+        	student_profile = form.save(commit=False)
+        	student_profile.set_password("student@001")
+        	student_profile.save()
         	user = student_profile
         	student_profile = StudentProfile.objects.filter(student=user).first()
         	print("User:", user)

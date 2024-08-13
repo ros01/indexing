@@ -394,7 +394,7 @@ class IndexingOfficerUpdateView (LoginRequiredMixin, StaffRequiredMixin, Success
 
             user = form.save(commit=False)
             user.is_active = True  # Deactivate account till it is confirmed
-            user.hospital = True
+            # user.hospital = True
             user.set_password('indexing@001') 
             # user.password = make_password('rrbnhq123%') 
             user.save()

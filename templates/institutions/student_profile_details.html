@@ -109,7 +109,10 @@
 
 <div class="d-flex justify-content-end mr-3 mb-3">   
 
-<a href="{% url 'institutions:student_profile_update' object.student.pk  %}" class="btn btn-outline-primary py-0 mr-2 mt-1 mb-3"><i class="fa fa-toggle-on" aria-hidden="true"></i> Update Student Profile </a>  
+
+<a href="{{request.META.HTTP_REFERER}}" class="btn btn-outline-primary py-0 mr-2 mt-1 mb-3"><i class="fas fa-angle-double-left" aria-hidden="true"></i> Go Back </a>
+
+<a href="{% url 'institutions:student_profile_update' object.student.slug  %}" class="btn btn-outline-primary py-0 mr-2 mt-1 mb-3"><i class="fa fa-toggle-on" aria-hidden="true"></i> Update Student Profile </a>  
 
 
 <a href="{% url 'institutions:student_profiles_list' %}" class="btn btn-outline-primary py-0 mr-3 mt-1 mb-3"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Students List</a>  
