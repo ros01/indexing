@@ -267,7 +267,7 @@ class InstitutionObjectMixin(object):
 def batch_create_student_profiles(request):
 	academic_sessions = AcademicSession.objects.filter(status = 1)
 	academic_session = request.GET.get('academic_session')
-	print("Academic Session S:", academic_session)
+	# print("Academic Session S:", academic_session)
 	form = StudentProfileModelForm(request.POST or None)
 	context = {'academic_sessions': academic_sessions, 'academic_session': academic_session, 'form':form, 'is_htmx': True}
 	# return render(request, 'institutions/pay_institutions_indexing_fee.html', context)
@@ -282,11 +282,11 @@ class StudentProfileCreateView(LoginRequiredMixin, StaffRequiredMixin, SuccessMe
 
 		user = self.request.user
 		institution = InstitutionProfile.objects.filter(name=user.get_indexing_officer_profile.institution).first()
-		print("Institution1:", institution)
+		# print("Institution1:", institution)
 		session = self.request.GET.get('academic_session')
-		print("Form Session:", session)
+		# print("Form Session:", session)
 		academic_session_name = AcademicSession.objects.get(id=session)
-		print("Academic Session1:", academic_session_name)
+		# print("Academic Session1:", academic_session_name)
 		academic_session = academic_session_name.id
 		quota = AdmissionQuota.objects.get_or_none(institution = institution, academic_session = academic_session)
 		admission_quota = quota.admission_quota
@@ -294,7 +294,7 @@ class StudentProfileCreateView(LoginRequiredMixin, StaffRequiredMixin, SuccessMe
 		quota_used = len(students_list)
 		quota_remaining = admission_quota - quota_used
 		context = { 'quota_remaining': quota_remaining, 'quota_used': quota_used, 'admission_quota': admission_quota, 'academic_session': academic_session, 'academic_session_name': academic_session_name, 'form':form}
-		print("A Quota:", quota.admission_quota)
+		# print("A Quota:", quota.admission_quota)
 		if quota.status == 0:
 			messages.error(self.request, "This session is locked for students indexing. Please select an active academic session to proceed or Contact RRBN")
 			return redirect("institutions:batch_create_student_profiles")
@@ -311,17 +311,17 @@ class StudentProfileCreateView(LoginRequiredMixin, StaffRequiredMixin, SuccessMe
 	def post(self, request, *args, **kwargs):
 		user = self.request.user
 		institution = InstitutionProfile.objects.filter(name=user.get_indexing_officer_profile.institution).first()
-		print("Institution:", institution)
+		# print("Institution:", institution)
 		session = request.POST.get('academic_session')
 		academic_session = AcademicSession.objects.get(id=session)
-		print("Academic Session:", academic_session)
+		# print("Academic Session:", academic_session)
 		quota = AdmissionQuota.objects.get_or_none(institution = institution, academic_session = academic_session)
-		print("Quota:", quota)
+		# print("Quota:", quota)
 		if quota is None:
 			admission_quota = 0;
 		else:
 			admission_quota = quota.admission_quota
-		print("Admission Quota:", admission_quota)
+		# print("Admission Quota:", admission_quota)
 		students_qs = institution.studentprofile_set.all()		
 
 		students_list = students_qs.filter(academic_session = academic_session)
@@ -334,24 +334,24 @@ class StudentProfileCreateView(LoginRequiredMixin, StaffRequiredMixin, SuccessMe
 			context = {}
 			if len(list_of_dict) == 0:
 				messages.error(request, "No Data in List. Please populate list and try again")
-				print("Number in List:",  len(list_of_dict))
+				# print("Number in List:",  len(list_of_dict))
 				return redirect("institutions:batch_create_student_profiles")
 			elif email_check:
 				messages.error(request, "No email in list. Please add email and try again")
-				print("Number of emails in List:",  len(data[0]["email"]))
+				# print("Number of emails in List:",  len(data[0]["email"]))
 				return redirect("institutions:batch_create_student_profiles")
 			elif admission_quota == 0:
 				messages.error(request, "No Quota Assigned for Selected Academic Session")
-				print("Number in List:",  len(list_of_dict))
-				print("Number of students registered:", len(students_list))
-				print("Admission Quota:", int(admission_quota))
+				# print("Number in List:",  len(list_of_dict))
+				# print("Number of students registered:", len(students_list))
+				# print("Admission Quota:", int(admission_quota))
 				return redirect("institutions:batch_create_student_profiles")
 
 			elif len(students_list) > admission_quota or len(list_of_dict) > admission_quota or len(list_of_dict) + int(len(students_list)) > admission_quota:
 				messages.error(request, "Admission Quota exceeded!")
-				print("Number in List:",  len(list_of_dict))
-				print("Number of students registered:", len(students_list))
-				print("Admission Quotas:", int(admission_quota))
+				# print("Number in List:",  len(list_of_dict))
+				# print("Number of students registered:", len(students_list))
+				# print("Admission Quotas:", int(admission_quota))
 				return redirect("institutions:batch_create_student_profiles")
 			else:
 				for row in list_of_dict:
