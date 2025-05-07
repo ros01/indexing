@@ -10,12 +10,30 @@
 
 <input type="hidden" name="academic_session" value="{{academic_session}}"/>
 
-<div class="form-group row">
+<!-- <div class="form-group row">
     
     <div class="col-md-6">
     <div class= "form-control-alternative my-0 py-0">
     {{ form.student_indexing|as_crispy_field }}
     </div>
+    </div>
+</div> -->
+
+<div class="form-group">
+    <label><strong>Select Students</strong></label>
+    <div class="container">
+        <div class="row">
+            {% for checkbox in form.student_indexing %}
+                <div class="col-md-3 mb-2">
+                    <div class="form-check">
+                        {{ checkbox.tag }}
+                        <label class="form-check-label" for="{{ checkbox.id_for_label }}">
+                            {{ checkbox.choice_label }}
+                        </label>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
     </div>
 </div>
 

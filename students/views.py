@@ -514,7 +514,91 @@ def show_transfer_form(wizard):
     cleaned_data = wizard.get_cleaned_data_for_step('utme_admission') or {'direct_entry': 'none'}
     return cleaned_data['direct_entry'] == '4'
 
+
 class StudentIndexingWizardView(StaffRequiredMixin, SessionWizardView):
+    # form_list = [IndexingModelForm, UtmeGradeModelForm, GceAlevelsModelForm, DegreeResultModelForm, TransferGradeModelForm] 
+    form_list = [
+         ("start_application", IndexingModelForm),
+         ("utme_admission", UtmeGradeModelForm),
+         ("gce_alevels", GceAlevelsModelForm),
+         ("degree_result", DegreeResultModelForm),
+         ("transfer_admission", TransferGradeModelForm),
+         ("confirmation", forms.Form), 
+         ]
+    template_name = "students/student_indexing_pretty.html"
+    file_storage = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, 'photos'))
+    condition_dict = {
+        'gce_alevels': show_gce_alevels_form,
+        'degree_result': show_degree_result_form,
+        'transfer_admission': show_transfer_form,
+        'confirmation': lambda wizard: True,  # Always show confirmation step
+    }
+
+    # def get_context_data(self, form, **kwargs):
+    #     context = super().get_context_data(form=form, **kwargs)
+        
+    #     # Expose previous step data into the template
+    #     context.update({
+    #         'start_application_data': self.get_cleaned_data_for_step('start_application'),
+    #         'utme_admission_data': self.get_cleaned_data_for_step('utme_admission'),
+    #         'gce_alevels_data': self.get_cleaned_data_for_step('gce_alevels'),
+    #         'degree_result_data': self.get_cleaned_data_for_step('degree_result'),
+    #         'transfer_admission_data': self.get_cleaned_data_for_step('transfer_admission'),
+    #     })
+
+    #     return context
+
+
+    def get_context_data(self, form, **kwargs):
+        context = super().get_context_data(form=form, **kwargs)
+
+        # Dynamically gather all cleaned data for each step
+        step_data = {}
+        for step in self.get_form_list():
+            data = self.get_cleaned_data_for_step(step)
+            if data:
+                step_data[step] = data
+
+        context['step_data'] = step_data
+        return context
+
+    def done(self, form_list, **kwargs):
+        self.student_profile = StudentProfile.objects.get(slug=self.kwargs['slug'])
+
+        indexing_form = form_list[0]
+        utme = form_list[1]
+
+        indexing = indexing_form.save(commit=False)
+        utme_grade = utme.save()
+
+        if utme.cleaned_data['direct_entry'] == '2':
+            gce_alevels = form_list[2].save()
+            indexing.gce_alevels = gce_alevels
+        elif utme.cleaned_data['direct_entry'] == '3':
+            degree_result = form_list[2].save()
+            indexing.degree_result = degree_result
+        elif utme.cleaned_data['direct_entry'] == '4':
+            transfer_admission = form_list[2].save()
+            indexing.transfer_grade = transfer_admission
+
+        indexing.utme_grade = utme_grade
+        indexing.student_profile = self.student_profile
+        indexing.institution = self.student_profile.institution
+        indexing.matric_no = self.student_profile.student.matric_no
+        indexing.academic_session = self.student_profile.academic_session
+        indexing.save()
+
+        url_kwargs = {
+            'islug': indexing.institution.slug,
+            'sslug': indexing.slug,
+        }
+        return HttpResponseRedirect(reverse('students:my_indexing_application_details', kwargs=url_kwargs))
+
+
+
+    
+
+class StudentIndexingWizardView0(StaffRequiredMixin, SessionWizardView):
     # form_list = [IndexingModelForm, UtmeGradeModelForm, GceAlevelsModelForm, DegreeResultModelForm, TransferGradeModelForm] 
     form_list = [("start_application", IndexingModelForm),
          ("utme_admission", UtmeGradeModelForm),
@@ -533,9 +617,6 @@ class StudentIndexingWizardView(StaffRequiredMixin, SessionWizardView):
         indexing = indexing_form.save(commit=False)
         utme = form_list[1]
         utme_grade = utme.save()
-        # gce_alevels = form_list[2]
-        # degree_result = form_list[-2]
-        # transfer_admission = form_list[-1]
 
 
         if utme.cleaned_data['direct_entry'] == '2':
@@ -563,44 +644,6 @@ class StudentIndexingWizardView(StaffRequiredMixin, SessionWizardView):
 
         return HttpResponseRedirect(reverse('students:my_indexing_application_details', kwargs=url_kwargs)) 
 
-
-        # if utme.cleaned_data['direct_entry'] == '2':
-        #     gce_alevels = form_list[2].save()
-        #     indexing.gce_alevels = gce_alevels
-        # if utme.cleaned_data['direct_entry'] == '3':
-        #     degree_result = form_list[-2].save()
-        #     indexing.degree_result = degree_result
-        # if utme.cleaned_data['direct_entry'] == '4':
-        #     transfer_admission = form_list[4].save()
-        #     indexing.transfer_grade = transfer_admission
-       
-        # utme = form_list[1].save()
-        # indexing.utme_grade = utme
-        # indexing.student_profile = self.student_profile
-        # indexing.institution = self.student_profile.institution
-        # indexing.matric_no = self.student_profile.student.matric_no
-        # indexing.save()
-
-            
-        # student_profile.save()
-        # utme = form_list[-1].save(commit=False)
-        # utme.student_profile = utme
-        # guest_form = form_list[0]
-        # if guest_form.cleaned_data.get('is_business_guest'):
-        #     business = form_list[1].save()
-        #     guest = guest_form.save(commit=False)
-        #     guest.business = business
-        #     guest.save()
-        # else:
-        #     guest = guest_form.save()
-
-        # business = form_list[-1].save(commit=False)
-        # booking.guest = guest
-        # booking.save()
-
-        # index = get_object_or_404(StudentIndexing, slug = indexing)
-
-        # print ("index:", index)
 
 
 

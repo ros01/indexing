@@ -2,6 +2,7 @@ from django.urls import path
 from . import views
 from .views import (
     DashboardView,
+    PreviewStudentCSV,
     StudentProfileCreateView,
     StudentProfileDetailView,
     StudentProfileUpdateView,
@@ -36,7 +37,6 @@ from .views import (
            
 )
 
-
 app_name = 'institutions'
 
 urlpatterns = [
@@ -44,7 +44,7 @@ urlpatterns = [
     path('<slug:slug>/institution_detail',  InstitutionDetailView.as_view(), name='institution_detail'),
     path('admission_quota_list',  AdmissionQuotaListView.as_view(), name='admission_quota_list'),
     path('student_indexing_applications_list', views.students_applications_list, name='student_indexing_applications_list'),
-    path('applications_list', views.applications_list, name='applications_list'),
+    # path('applications_list', views.applications_list, name='applications_list'),
     path('student_indexing_verifications_list', views.students_verifications_list, name='student_indexing_verifications_list'),
     path('verifications_list', views.verifications_list, name='verifications_list'),
     path('student_indexing_rejections_list', views.students_rejections_list, name='student_indexing_rejections_list'),
@@ -67,6 +67,7 @@ urlpatterns = [
     path('<slug:slug>/admission_quota_detail',  AdmissionQuotaDetailView.as_view(), name='admission_quota_detail'),
     path('pay_institutions_indexing_fee',  views.pay_institutions_indexing_fee, name='pay_institutions_indexing_fee'),
     path('pay_session_indexing_fee',  InstitutionPaymentCreateView.as_view(), name='pay_session_indexing_fee'),
+    path('preview-student-csv/', PreviewStudentCSV.as_view(), name='preview_student_csv'),
 
     path('batch_create_student_profiles',  views.batch_create_student_profiles, name='batch_create_student_profiles'),
     path('create_student_profile',  StudentProfileCreateView.as_view(), name='create_student_profile'),
@@ -90,9 +91,11 @@ urlpatterns = [
     path('<int:id>/verify_payment/', views.verify_payment, name='verify_payment'),
     path('<int:id>/reject_payment/', views.reject_payment, name='reject_payment'),
     path('pay_institutions_indexing_fee',  views.pay_institutions_indexing_fee, name='pay_institutions_indexing_fee'),
+
     
     path('pay_session_indexing_fee',  InstitutionPaymentCreateView.as_view(), name='pay_session_indexing_fee'),
     path('pay_institution_indexing_fee',  InstitutionPaymentsCreateView.as_view(), name='pay_institution_indexing_fee'),
+    path('students_list_partial',  views.students_list_partial, name='students_list_partial'),
     
     path('generate_payment_invoice', GenerateInvoiceView.as_view(), name='generate_payment_invoice'),
     path('student_indexing_payments_list', IndexingPaymentsListView.as_view(), name='student_indexing_payments_list'),

@@ -1,0 +1,26 @@
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Email</th>
+            <th>Last Name</th>
+            <th>First Name</th>
+            <th>Middle Name</th>
+            <th>Phone</th>
+            <th>Matric No</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for student in students %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ student.email }}</td>
+            <td>{{ student.last_name }}</td>
+            <td>{{ student.first_name }}</td>
+            <td>{{ student.middle_name }}</td>
+            <td>{{ student.phone_no }}</td>
+            <td>{{ student.matric_no }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

@@ -109,7 +109,7 @@ class IndexingOfficerDetailView(LoginRequiredMixin, StaffRequiredMixin, DetailVi
 	template_name = "registration/indexing_officer_details.html"
 
 
-class AdmissionQuotaListView(LoginRequiredMixin, StaffRequiredMixin, ListView):
+class AdmissionQuotaListView0(LoginRequiredMixin, StaffRequiredMixin, ListView):
 	template_name = "registration/admission_quota_list.html"
 	def get_queryset(self):
 		request = self.request
@@ -118,6 +118,40 @@ class AdmissionQuotaListView(LoginRequiredMixin, StaffRequiredMixin, ListView):
 		if query:
 			qs = qs.filter(name__icontains=query)
 		return qs 
+
+class AdmissionQuotaListView(LoginRequiredMixin, StaffRequiredMixin, ListView):
+    template_name = "registration/admission_quota_list.html"
+
+    def get_queryset(self):
+        request = self.request
+        qs = AdmissionQuota.objects.select_related('academic_session').order_by('-academic_session__name')  # Sort by academic_session name DESC
+        query = request.GET.get('q')
+        if query:
+            qs = qs.filter(name__icontains=query)
+        return qs
+
+class AdmissionQuotaListView1(LoginRequiredMixin, StaffRequiredMixin, ListView):
+    template_name = "registration/admission_quota_list.html"
+
+    def get_queryset(self):
+        request = self.request
+        qs = AdmissionQuota.objects.select_related('academic_session')
+
+        # Optional filtering
+        query = request.GET.get('q')
+        if query:
+            qs = qs.filter(name__icontains=query)
+
+        # Turn into list and sort manually using the start year parsed from name
+        def extract_year(obj):
+            try:
+                return int(str(obj.academic_session.name).split('/')[0])
+            except (AttributeError, IndexError, ValueError):
+                return 0  # fallback for sorting
+
+        return sorted(qs, key=extract_year, reverse=True)
+
+
 
 class AdmissionQuotaDetailView(LoginRequiredMixin, StaffRequiredMixin, DetailView):
 	queryset = AdmissionQuota.objects.all()

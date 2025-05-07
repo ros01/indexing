@@ -58,7 +58,8 @@ class IssueIndexing(models.Model):
 
 def pre_save_issue_indexing_receiver(sender, instance, *args, **kwargs):
     if not instance.slug:
-        instance.slug = create_slug4(instance)
+        from indexing_unit.utils import generate_slug
+        instance.slug = generate_slug(instance, "student_profile.student.last_name")
 
 pre_save.connect(pre_save_issue_indexing_receiver, sender=IssueIndexing)  
 

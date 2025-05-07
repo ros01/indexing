@@ -48,7 +48,118 @@
         <link href="{% static 'd_assets/css/icons.css' %}" rel="stylesheet" type="text/css">
         <link href="{% static 'd_assets/css/style.css' %}" rel="stylesheet" type="text/css">
 
+        <style>
+        #spinner, #successMessage {
+        transition: opacity 0.8s ease-in-out;
+        }
+
+        .fade-out {
+        opacity: 0;
+        pointer-events: none;
+        }
+
+        .fade-in {
+        opacity: 1;
+        }
+        </style>
+
+
     </head>
+
+    <!-- <script>
+    document.addEventListener("DOMContentLoaded", function() {
+    const submitBtn = document.getElementById('finalSubmitBtn');
+
+    if (submitBtn) {
+    submitBtn.addEventListener('click', function(event) {
+    event.preventDefault(); 
+
+    $('#successModal').modal('show');
+
+    // Start progress bar animation
+    const progressBar = document.getElementById('progressBar');
+    progressBar.style.width = '0%'; // reset first
+    setTimeout(() => {
+    progressBar.style.width = '100%'; // smoothly expand to full width
+    }, 100); // slight delay for smoother animation
+
+    // Fade out spinner after 1.5s
+    setTimeout(function() {
+    document.getElementById('spinner').classList.add('fade-out');
+
+    setTimeout(function() {
+    document.getElementById('spinner').classList.add('d-none');
+    document.getElementById('successMessage').classList.remove('d-none');
+    document.getElementById('successMessage').classList.add('fade-in');
+    }, 800); 
+    }, 1500); 
+
+    // Submit after 3.5s
+    setTimeout(function() {
+    submitBtn.closest('form').submit();
+    }, 3500); 
+    });
+    }
+    });
+    </script> -->
+
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+    const submitBtn = document.getElementById('finalSubmitBtn');
+
+    if (submitBtn) {
+    submitBtn.addEventListener('click', function(event) {
+    event.preventDefault(); 
+
+    $('#successModal').modal('show');
+
+    setTimeout(function() {
+    document.getElementById('spinner').classList.add('fade-out');
+
+    setTimeout(function() {
+    document.getElementById('spinner').classList.add('d-none');
+    document.getElementById('successMessage').classList.remove('d-none');
+    document.getElementById('successMessage').classList.add('fade-in');
+    }, 800); // after fade-out is complete
+
+    }, 1500); 
+
+    setTimeout(function() {
+    submitBtn.closest('form').submit();
+    }, 3500); 
+    });
+    }
+    });
+    </script>
+
+
+    <!-- <script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const submitBtn = document.getElementById('finalSubmitBtn');
+    
+    if (submitBtn) {
+      submitBtn.addEventListener('click', function(event) {
+        event.preventDefault(); // prevent immediate submit
+        
+        // Show the modal
+        $('#successModal').modal('show');
+
+        // After 1.5 seconds, show success message
+        setTimeout(function() {
+          document.getElementById('spinner').classList.add('d-none');
+          document.getElementById('successMessage').classList.remove('d-none');
+        }, 1500);
+
+        // After 3 seconds, actually submit the form
+        setTimeout(function() {
+          submitBtn.closest('form').submit();
+        }, 3000);
+      });
+    }
+  });
+</script> -->
+
 
 
     <body class="fixed-left">

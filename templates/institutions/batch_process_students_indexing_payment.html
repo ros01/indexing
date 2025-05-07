@@ -1,0 +1,47 @@
+{% extends 'institutions/dashboard_base2.html'%}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block title%}| Welcome {% endblock %}
+
+{% block styles %}
+
+
+{% endblock %}
+
+
+
+{% block content %}
+
+<div class="container mt-5" x-data="{ session: '{{ academic_session|default:"" }}' }">
+    <h3 class="text-primary mb-4">💳 Pay Institution Indexing Fee</h3>
+
+    <!-- Academic Session Dropdown -->
+    <div class="mb-4">
+        <label class="font-weight-bold">Select Academic Session:</label>
+        <select 
+            class="custom-select w-25"
+            x-model="session"
+            hx-get="{% url 'institutions:students_list_partial' %}" 
+            hx-target="#student-list"
+            hx-trigger="change"
+            name="academic_session"
+        >
+            <option value="">-- Select --</option>
+            {% for s in academic_sessions %}
+                <option value="{{ s.id }}" {% if academic_session == s.id|stringformat:"s" %}selected{% endif %}>
+                    {{ s.name }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- HTMX Target: Student List -->
+    <div id="student-list">
+        {% if academic_session %}
+            {% include "partials/students_list_partial.html" %}
+        {% endif %}
+    </div>
+</div>
+
+
+{% endblock %}

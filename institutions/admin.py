@@ -107,7 +107,7 @@ admin.site.register(InstitutionIndexing, InstitutionIndexingAdmin)
 
 class AcademicSessionAdmin(admin.ModelAdmin):
     list_filter = ['updated', 'timestamp']
-    list_display = ['name', 'slug', 'timestamp', 'updated']
+    list_display = ['id', 'name', 'slug', 'timestamp', 'updated']
     readonly_fields = ['updated', 'timestamp']
     search_fields = ['name', 'timestamp', 'slug', 'updated']
     

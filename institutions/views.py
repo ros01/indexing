@@ -61,6 +61,11 @@ from django.core.mail import send_mail
 from django.template.loader import get_template
 from django.template import Context
 from django.contrib.auth import get_user_model
+from django.views.decorators.csrf import csrf_exempt
+
+
+
+
 
 
 User = get_user_model()
@@ -266,15 +271,36 @@ class InstitutionObjectMixin(object):
 @login_required
 def batch_create_student_profiles(request):
 	academic_sessions = AcademicSession.objects.filter(status = 1)
-	academic_session = request.GET.get('academic_session')
+	academic_session = request.GET.get('academic_session') or None
 	# print("Academic Session S:", academic_session)
 	form = StudentProfileModelForm(request.POST or None)
 	context = {'academic_sessions': academic_sessions, 'academic_session': academic_session, 'form':form, 'is_htmx': True}
 	# return render(request, 'institutions/pay_institutions_indexing_fee.html', context)
-	return render(request, 'institutions/bulk_create_students.html', context)
+	# return render(request, 'institutions/bulk_create_students.html', context)
+	return render(request, 'institutions/bulk_upload_students.html', context)
 
+@method_decorator(csrf_exempt, name='dispatch')
+class PreviewStudentCSV(View):
+    def post(self, request, *args, **kwargs):
+        try:
+            file = request.FILES.get('students_list')
+            if not file:
+                return HttpResponse("No file uploaded", status=400)
+            
+            paramFile = io.TextIOWrapper(file.file, encoding='utf-8')
+            reader = csv.DictReader(paramFile)
+            data = list(reader)
 
-class StudentProfileCreateView(LoginRequiredMixin, StaffRequiredMixin, SuccessMessageMixin, CreateView):
+            if not data:
+                return HttpResponse("CSV is empty", status=400)
+
+            html = render_to_string("partials/_students_csv_preview.html", {"students": data})
+            return HttpResponse(html)
+
+        except Exception as e:
+            return HttpResponse(f"Error processing CSV: {str(e)}", status=500)
+
+class StudentProfileCreateView0(LoginRequiredMixin, StaffRequiredMixin, SuccessMessageMixin, CreateView):
 	form = StudentProfileModelForm
 	def get(self, request, *args, **kwargs):
 		form = StudentProfileModelForm()
@@ -391,9 +417,822 @@ class StudentProfileCreateView(LoginRequiredMixin, StaffRequiredMixin, SuccessMe
 			return JsonResponse(returnmsg)
 			return redirect("institutions:batch_create_student_profiles")
 		
+def generate_user_slug(row):
+    base = f"{row['first_name']}-{row['last_name']}-{row['email'].split('@')[0]}"
+    return slugify(base) + "-" + uuid.uuid4().hex[:4] 
 
 
-class StudentProfileCreateView0(StaffRequiredMixin, SuccessMessageMixin, CreateView):
+class StudentProfileCreateView(LoginRequiredMixin, StaffRequiredMixin, SuccessMessageMixin, CreateView):
+    form = StudentProfileModelForm
+    template_name = 'partials/bulk_upload_students.html'
+
+    def get(self, request, *args, **kwargs):
+        form = self.form()
+        session_id = request.GET.get('academic_session')
+        if not session_id:
+            messages.error(request, "Academic session not provided.")
+            return redirect("institutions:batch_create_student_profiles")
+
+        academic_session = get_object_or_404(AcademicSession, id=session_id)
+        user = request.user
+        institution = user.get_indexing_officer_profile.institution
+        quota = AdmissionQuota.objects.get_or_none(institution=institution, academic_session=academic_session)
+
+        if not quota:
+            messages.error(request, "No admission quota set for this session.")
+            return redirect("institutions:batch_create_student_profiles")
+
+        if quota.status == 0:
+            messages.error(request, "This session is locked for indexing. Contact RRBN.")
+            return redirect("institutions:batch_create_student_profiles")
+
+        students_list = StudentProfile.objects.filter(institution=institution, academic_session=academic_session)
+        context = {
+            'form': form,
+            'academic_session': academic_session.id,
+            'academic_session_name': academic_session,
+            'quota_remaining': quota.admission_quota - students_list.count(),
+            'quota_used': students_list.count(),
+            'admission_quota': quota.admission_quota,
+        }
+        return render(request, self.template_name, context)
+
+
+    def post(self, request, *args, **kwargs):
+	    import logging
+	    logger = logging.getLogger(__name__)
+
+	    action = request.POST.get("action_type", "create")
+	    file = request.FILES.get("students_list")
+
+	    if not file:
+	        messages.error(request, "No file uploaded.")
+	        return redirect("institutions:batch_create_student_profiles")
+
+	    try:
+	        decoded_file = io.TextIOWrapper(file.file, encoding='utf-8')
+	        reader = csv.DictReader(decoded_file)
+	        data = list(reader)
+	    except Exception as e:
+	        logger.exception("Failed to decode or read CSV")
+	        messages.error(request, f"Invalid CSV format: {str(e)}")
+	        return redirect("institutions:batch_create_student_profiles")
+
+	    if not data:
+	        messages.error(request, "CSV file is empty.")
+	        return redirect("institutions:batch_create_student_profiles")
+
+	    required_fields = {"email", "last_name", "first_name", "middle_name", "phone_no", "matric_no"}
+	    if not required_fields.issubset(data[0]):
+	        messages.error(request, "CSV headers missing required fields.")
+	        return redirect("institutions:batch_create_student_profiles")
+
+	    session_id = request.POST.get('academic_session')
+	    academic_session = get_object_or_404(AcademicSession, id=session_id)
+	    user = request.user
+	    institution = user.get_indexing_officer_profile.institution
+	    quota = AdmissionQuota.objects.get_or_none(institution=institution, academic_session=academic_session)
+	    admission_quota = quota.admission_quota if quota else 0
+
+	    existing_students_count = StudentProfile.objects.filter(institution=institution, academic_session=academic_session).count()
+	    if len(data) + existing_students_count > admission_quota:
+	        messages.error(request, "Admission quota exceeded.")
+	        return redirect("institutions:batch_create_student_profiles")
+
+	    if action == "preview":
+	        context = {"students": data}
+	        return render(request, "partials/preview_table.html", context)
+
+	    emails = [row['email'] for row in data]
+	    existing_users = User.objects.filter(email__in=emails).values_list('email', flat=True)
+	    duplicate_emails = set(emails) & set(existing_users)
+
+	    if duplicate_emails:
+	        messages.error(request, f"Duplicate emails found: {', '.join(duplicate_emails)}")
+	        return redirect("institutions:batch_create_student_profiles")
+
+	    try:
+	        with transaction.atomic():
+	            # Create Users
+	            new_users = []
+	            for row in data:
+	                user = User(
+	                    email=row['email'],
+	                    first_name=row['first_name'],
+	                    last_name=row['last_name'],
+	                    middle_name=row['middle_name'],
+	                    phone_no=row['phone_no'],
+	                    matric_no=row['matric_no'],
+	                    password=make_password("student@001"),
+	                    slug=slugify(row['email'])  # TEMP fix
+	                )
+	                new_users.append(user)
+
+	            logger.info(f"Creating {len(new_users)} users...")
+	            User.objects.bulk_create(new_users, batch_size=1000)
+
+	            # Verify creation
+	            created_users = list(User.objects.filter(email__in=emails))
+	            user_map = {u.email: u for u in created_users}
+	            logger.info(f"Successfully created {len(created_users)} users.")
+	            new_profiles = [
+				    StudentProfile(
+				        student=user_map[row['email']],
+				        institution=institution,
+				        academic_session=academic_session,
+				        slug=create_slug3_from_user(user_map[row['email']])
+				    )
+				    for row in data
+				]
+
+	            # Create StudentProfiles
+	            # new_profiles = []
+	            # for row in data:
+	            #     user = user_map.get(row['email'])
+	            #     if user:
+	            #         profile = StudentProfile(
+	            #             student=user,
+	            #             institution=institution,
+	            #             academic_session=academic_session,
+	            #             slug=create_slug3(user)
+	            #         )
+	            #         new_profiles.append(profile)
+
+	            StudentProfile.objects.bulk_create(new_profiles, batch_size=1000)
+	            logger.info(f"Successfully created {len(new_profiles)} student profiles.")
+
+	            # Now reset passwords correctly
+	            for user in user_map.values():
+	                reset_password(user, request)
+
+	    except Exception as e:
+	        logger.exception("Error during batch creation.")
+	        messages.error(request, f"An error occurred during upload: {str(e)}")
+	        return redirect("institutions:batch_create_student_profiles")
+
+	    messages.success(request, "Students uploaded successfully.")
+	    return redirect("institutions:batch_create_student_profiles")
+
+
+
+    # def post(self, request, *args, **kwargs):
+	#     action = request.POST.get("action_type", "create")
+	#     file = request.FILES.get("students_list")
+
+	#     if not file:
+	#         messages.error(request, "No file uploaded.")
+	#         return redirect("institutions:batch_create_student_profiles")
+
+	#     try:
+	#         decoded_file = io.TextIOWrapper(file.file, encoding='utf-8')
+	#         reader = csv.DictReader(decoded_file)
+	#         data = list(reader)
+	#     except Exception:
+	#         messages.error(request, "Invalid CSV format.")
+	#         return redirect("institutions:batch_create_student_profiles")
+
+	#     if not data:
+	#         messages.error(request, "CSV file is empty.")
+	#         return redirect("institutions:batch_create_student_profiles")
+
+	#     required_fields = {"email", "last_name", "first_name", "middle_name", "phone_no", "matric_no"}
+	#     if not required_fields.issubset(data[0]):
+	#         messages.error(request, "CSV headers missing required fields.")
+	#         return redirect("institutions:batch_create_student_profiles")
+
+	#     session_id = request.POST.get('academic_session')
+	#     academic_session = get_object_or_404(AcademicSession, id=session_id)
+	#     user = request.user
+	#     institution = user.get_indexing_officer_profile.institution
+	#     quota = AdmissionQuota.objects.get_or_none(institution=institution, academic_session=academic_session)
+	#     admission_quota = quota.admission_quota if quota else 0
+
+	#     existing_students_count = StudentProfile.objects.filter(institution=institution, academic_session=academic_session).count()
+	#     if len(data) + existing_students_count > admission_quota:
+	#         messages.error(request, "Admission quota exceeded.")
+	#         return redirect("institutions:batch_create_student_profiles")
+
+	#     if action == "preview":
+	#         context = {"students": data}
+	#         return render(request, "partials/preview_table.html", context)
+
+	#     emails = [row['email'] for row in data]
+	#     existing_emails = set(User.objects.filter(email__in=emails).values_list('email', flat=True))
+	#     duplicate_emails = set(emails) & existing_emails
+
+	#     if duplicate_emails:
+	#         messages.error(request, f"Duplicate emails found: {', '.join(duplicate_emails)}")
+	#         return redirect("institutions:batch_create_student_profiles")
+
+	#     try:
+	#     	with transaction.atomic():
+	# 		    new_users = []
+	# 		    for row in data:
+	# 		        try:
+	# 		            user = User(
+	# 		                email=row['email'],
+	# 		                first_name=row['first_name'],
+	# 		                last_name=row['last_name'],
+	# 		                middle_name=row['middle_name'],
+	# 		                phone_no=row['phone_no'],
+	# 		                matric_no=row['matric_no'],
+	# 		                password=make_password("student@001"),
+	# 		                slug=slugify(row['email']),  # TEMP: test with simple slug
+	# 		            )
+	# 		            new_users.append(user)
+	# 		        except Exception as e:
+	# 		            print(f"Error building user: {e}")
+
+	# 		    print("Creating", len(new_users), "users...")
+	# 		    User.objects.bulk_create(new_users, batch_size=1000)
+
+	# 		    created_users = User.objects.filter(email__in=[u.email for u in new_users])
+	# 		    print("Created in DB:", created_users.count())
+	# 		    user_map = {u.email: u for u in created_users}
+
+	# 		    new_profiles = []
+	# 		    for row in data:
+	# 		        user = user_map.get(row['email'])
+	# 		        if user:
+	# 		            profile = StudentProfile(
+	# 		                student=user,
+	# 		                institution=institution,
+	# 		                academic_session=academic_session,
+	# 		                slug=create_slug3(user),
+	# 		            )
+	# 		            new_profiles.append(profile)
+
+	# 		    StudentProfile.objects.bulk_create(new_profiles, batch_size=1000)
+	# 		    print("Created", len(new_profiles), "student profiles")
+
+	# 		    for user in user_map.values():
+	# 		        reset_password(user, request)
+
+	    	# with transaction.atomic():
+	    	# 	print("Total rows from CSV:", len(data))
+			# 	print("First row:", data[0])
+
+			#     new_users = []
+			#     for row in data:
+			#         if row['email'] not in existing_emails:
+			#             try:
+			#                 user = User(
+			#                     email=row['email'],
+			#                     first_name=row['first_name'],
+			#                     last_name=row['last_name'],
+			#                     middle_name=row['middle_name'],
+			#                     phone_no=row['phone_no'],
+			#                     matric_no=row['matric_no'],
+			#                     password=make_password("student@001"),
+			#                     slug=generate_user_slug(row),
+			#                 )
+			#                 new_users.append(user)
+			#             except Exception as e:
+			#                 print(f"Skipping user due to error: {e}")
+
+			#     User.objects.bulk_create(new_users, batch_size=1000)
+			#     print("Bulk user creation done.")
+			#     print("Created users in DB:", User.objects.filter(email__in=[u.email for u in new_users]).count())
+
+
+			#     # Re-fetch to get DB instances
+			#     created_users = User.objects.filter(email__in=[u.email for u in new_users])
+			#     user_map = {u.email: u for u in created_users}
+
+			#     print(f"Created {len(user_map)} users")
+
+			#     new_profiles = []
+			#     for row in data:
+			#         user = user_map.get(row['email'])
+			#         if user:
+			#             new_profiles.append(
+			#                 StudentProfile(
+			#                     student=user,
+			#                     institution=institution,
+			#                     academic_session=academic_session,
+			#                     slug=create_slug3(user)
+			#                 )
+			#             )
+
+			#     StudentProfile.objects.bulk_create(new_profiles, batch_size=1000)
+
+			#     for user in user_map.values():
+			#         reset_password(user, request)
+
+	        # with transaction.atomic():
+	        #     new_users_data = [row for row in data if row['email'] not in existing_emails]
+
+	        #     new_users = [
+	        #         User(
+	        #             email=row['email'],
+	        #             first_name=row['first_name'],
+	        #             last_name=row['last_name'],
+	        #             middle_name=row['middle_name'],
+	        #             phone_no=row['phone_no'],
+	        #             matric_no=row['matric_no'],
+	        #             password=make_password("student@001"),
+	        #             slug=generate_user_slug(row),
+	        #         )
+	        #         for row in new_users_data
+	        #     ]
+
+	        #     User.objects.bulk_create(new_users, batch_size=1000)
+
+	        #     # Confirm that users were actually created
+	        #     created_users = User.objects.filter(email__in=[row['email'] for row in new_users_data])
+	        #     user_map = {user.email: user for user in created_users}
+
+	        #     if not created_users:
+	        #         messages.error(request, "No users were created. Check for issues in data or creation logic.")
+	        #         return redirect("institutions:batch_create_student_profiles")
+
+	        #     new_profiles = [
+	        #         StudentProfile(
+	        #             student=user_map[row['email']],
+	        #             institution=institution,
+	        #             academic_session=academic_session,
+	        #             slug=create_slug3(user_map[row['email']])
+	        #         )
+	        #         for row in new_users_data if row['email'] in user_map
+	        #     ]
+
+	        #     StudentProfile.objects.bulk_create(new_profiles, batch_size=1000)
+
+	        #     for profile in new_profiles:
+	        #         reset_password(profile.student, request)
+
+	    # except Exception as e:
+	    #     messages.error(request, f"An error occurred during upload: {str(e)}")
+	    #     return redirect("institutions:batch_create_student_profiles")
+
+	    # messages.success(request, "Students uploaded successfully.")
+	    # return redirect("institutions:batch_create_student_profiles")
+
+
+    # def post(self, request, *args, **kwargs):
+	#     action = request.POST.get("action_type", "create")
+	#     file = request.FILES.get("students_list")
+
+	#     if not file:
+	#         messages.error(request, "No file uploaded.")
+	#         return redirect("institutions:batch_create_student_profiles")
+
+	#     try:
+	#         decoded_file = io.TextIOWrapper(file.file, encoding='utf-8')
+	#         reader = csv.DictReader(decoded_file)
+	#         data = list(reader)
+	#     except Exception:
+	#         messages.error(request, "Invalid CSV format.")
+	#         return redirect("institutions:batch_create_student_profiles")
+
+	#     if not data:
+	#         messages.error(request, "CSV file is empty.")
+	#         return redirect("institutions:batch_create_student_profiles")
+
+	#     required_fields = {"email", "last_name", "first_name", "middle_name", "phone_no", "matric_no"}
+	#     if not required_fields.issubset(data[0]):
+	#         messages.error(request, "CSV headers missing required fields.")
+	#         return redirect("institutions:batch_create_student_profiles")
+
+	#     session_id = request.POST.get('academic_session')
+	#     academic_session = get_object_or_404(AcademicSession, id=session_id)
+	#     user = request.user
+	#     institution = user.get_indexing_officer_profile.institution
+	#     quota = AdmissionQuota.objects.get_or_none(institution=institution, academic_session=academic_session)
+	#     admission_quota = quota.admission_quota if quota else 0
+
+	#     existing_students_count = StudentProfile.objects.filter(
+	#         institution=institution, academic_session=academic_session
+	#     ).count()
+
+	#     if len(data) + existing_students_count > admission_quota:
+	#         messages.error(request, "Admission quota exceeded.")
+	#         return redirect("institutions:batch_create_student_profiles")
+
+	#     if action == "preview":
+	#         # Render preview table
+	#         context = {
+	#             "students": data
+	#         }
+	#         return render(request, "partials/preview_table.html", context)
+
+	#     emails = [row['email'] for row in data]
+	#     existing_users = User.objects.filter(email__in=emails).values_list('email', flat=True)
+	#     duplicate_emails = set(emails) & set(existing_users)
+
+	#     if duplicate_emails:
+	#         messages.error(request, f"Duplicate emails found: {', '.join(duplicate_emails)}")
+	#         return redirect("institutions:batch_create_student_profiles")
+
+	#     try:
+	#         with transaction.atomic():
+	#             # Create users with slugs
+	#             new_users = [
+	#                 User(
+	#                     email=row['email'],
+	#                     first_name=row['first_name'],
+	#                     last_name=row['last_name'],
+	#                     middle_name=row['middle_name'],
+	#                     phone_no=row['phone_no'],
+	#                     matric_no=row['matric_no'],
+	#                     password=make_password("student@001"),
+	#                     slug=generate_user_slug(row),
+	#                 )
+	#                 for row in data
+	#             ]
+	#             User.objects.bulk_create(new_users, batch_size=1000)
+
+	#             created_users = User.objects.filter(email__in=emails)
+	#             user_map = {user.email: user for user in created_users}
+
+	#             new_profiles = [
+	#                 StudentProfile(
+	#                     student=user_map[row['email']],
+	#                     institution=institution,
+	#                     academic_session=academic_session,
+	#                     slug=create_slug3(user_map[row['email']])  # Assuming create_slug3 accepts instance
+	#                 )
+	#                 for row in data
+	#             ]
+	#             StudentProfile.objects.bulk_create(new_profiles, batch_size=1000)
+	#             saved_profiles = StudentProfile.objects.select_related('student').filter(
+	# 			    student__email__in=emails,
+	# 			    institution=institution,
+	# 			    academic_session=academic_session,
+	# 			)
+	# 			# for profile in saved_profiles:
+	# 			#     reset_password(profile.student, request)
+
+
+	#             for profile in saved_profiles:
+	#                 reset_password(profile.student, request)
+
+	#     except Exception as e:
+	#         messages.error(request, f"An error occurred during upload: {str(e)}")
+	#         return redirect("institutions:batch_create_student_profiles")
+
+	#     messages.success(request, "Students uploaded successfully.")
+	#     return redirect("institutions:batch_create_student_profiles")
+
+
+    # def post(self, request, *args, **kwargs):
+    # 	action = request.POST.get("action_type", "create")
+    # 	file = request.FILES.get("students_list")
+    # 	if not file:
+    #         messages.error(request, "No file uploaded.")
+    #         return redirect("institutions:batch_create_student_profiles")
+    #     try:
+    #         decoded_file = io.TextIOWrapper(file.file, encoding='utf-8')
+    #         reader = csv.DictReader(decoded_file)
+    #         data = list(reader)
+    #     except Exception:
+    #         messages.error(request, "Invalid CSV format.")
+    #         return redirect("institutions:batch_create_student_profiles")
+
+    #     if not data:
+    #         messages.error(request, "CSV file is empty.")
+    #         return redirect("institutions:batch_create_student_profiles")
+
+    #     required_fields = {"email", "last_name", "first_name", "middle_name", "phone_no", "matric_no"}
+    #     if not required_fields.issubset(data[0]):
+    #         messages.error(request, "CSV headers missing required fields.")
+    #         return redirect("institutions:batch_create_student_profiles")
+
+    #     session_id = request.POST.get('academic_session')
+    #     academic_session = get_object_or_404(AcademicSession, id=session_id)
+    #     user = request.user
+    #     institution = user.get_indexing_officer_profile.institution
+    #     quota = AdmissionQuota.objects.get_or_none(institution=institution, academic_session=academic_session)
+    #     admission_quota = quota.admission_quota if quota else 0
+
+    #     existing_students_count = StudentProfile.objects.filter(institution=institution, academic_session=academic_session).count()
+    #     if len(data) + existing_students_count > admission_quota:
+    #         messages.error(request, "Admission quota exceeded.")
+    #         return redirect("institutions:batch_create_student_profiles")
+
+    #     if action == "preview":
+	#         # Render preview table (you can style this in 'partials/preview_table.html')
+	#         context = {
+	#             "students": data
+	#         }
+	#         return render(request, "partials/preview_table.html", context)
+
+    #     emails = [row['email'] for row in data]
+    #     existing_users = User.objects.filter(email__in=emails).values_list('email', flat=True)
+    #     duplicate_emails = set(emails) & set(existing_users)
+
+    #     if duplicate_emails:
+    #         messages.error(request, f"Duplicate emails found: {', '.join(duplicate_emails)}")
+    #         return redirect("institutions:batch_create_student_profiles")
+
+    #     try:
+    #         with transaction.atomic():
+    #             # Create users with slugs
+    #             new_users = [
+    #                 User(
+    #                     email=row['email'],
+    #                     first_name=row['first_name'],
+    #                     last_name=row['last_name'],
+    #                     middle_name=row['middle_name'],
+    #                     phone_no=row['phone_no'],
+    #                     matric_no=row['matric_no'],
+    #                     password=make_password("student@001"),
+    #                     slug=generate_user_slug(row),
+    #                 )
+    #                 for row in data
+    #             ]
+    #             User.objects.bulk_create(new_users, batch_size=1000)
+
+    #             # Create student profiles
+    #             created_users = User.objects.filter(email__in=emails)
+    #             user_map = {user.email: user for user in created_users}
+
+    #             new_profiles = [
+    #                 StudentProfile(
+    #                     student=user_map[row['email']],
+    #                     institution=institution,
+    #                     academic_session=academic_session,
+    #                     slug=create_slug3(user_map[row['email']])  # Assuming create_slug3 accepts instance
+    #                 )
+    #                 for row in data
+    #             ]
+    #             StudentProfile.objects.bulk_create(new_profiles, batch_size=1000)
+
+               
+    #             for profile in new_profiles:
+    #                 reset_password(profile.student, request)
+
+    #     except Exception as e:
+    #         messages.error(request, f"An error occurred during upload: {str(e)}")
+    #         return redirect("institutions:batch_create_student_profiles")
+
+    #     messages.success(request, "Students uploaded successfully.")
+    #     return redirect("institutions:batch_create_student_profiles")
+
+
+
+    # def post(self, request, *args, **kwargs):
+	#     action = request.POST.get("action_type", "create")
+	#     file = request.FILES.get("students_list")
+	#     if not file:
+	#         messages.error(request, "No file uploaded.")
+	#         return redirect("institutions:batch_create_student_profiles")
+
+	#     try:
+	#         decoded_file = io.TextIOWrapper(file.file, encoding='utf-8')
+	#         reader = csv.DictReader(decoded_file)
+	#         data = list(reader)
+	#     except Exception:
+	#         messages.error(request, "Invalid CSV format.")
+	#         return redirect("institutions:batch_create_student_profiles")
+
+	#     if not data:
+	#         messages.error(request, "CSV file is empty.")
+	#         return redirect("institutions:batch_create_student_profiles")
+
+	#     required_fields = {"email", "last_name", "first_name", "middle_name", "phone_no", "matric_no"}
+	#     if not required_fields.issubset(data[0]):
+	#         messages.error(request, "CSV headers missing required fields.")
+	#         return redirect("institutions:batch_create_student_profiles")
+
+	#     session_id = request.POST.get("academic_session")
+	#     academic_session = get_object_or_404(AcademicSession, id=session_id)
+	#     user = request.user
+	#     institution = user.get_indexing_officer_profile.institution
+	#     quota = AdmissionQuota.objects.get_or_none(institution=institution, academic_session=academic_session)
+	#     admission_quota = quota.admission_quota if quota else 0
+
+	#     existing_students_count = StudentProfile.objects.filter(institution=institution, academic_session=academic_session).count()
+	#     if len(data) + existing_students_count > admission_quota:
+	#         messages.error(request, "Admission quota exceeded.")
+	#         return redirect("institutions:batch_create_student_profiles")
+
+	#     if action == "preview":
+	#         # Render preview table (you can style this in 'partials/preview_table.html')
+	#         context = {
+	#             "students": data
+	#         }
+	#         return render(request, "partials/preview_table.html", context)
+
+	#     # Create action
+	#     emails = [row['email'] for row in data]
+	#     existing_users = User.objects.filter(email__in=emails).values_list('email', flat=True)
+	#     duplicate_emails = set(emails) & set(existing_users)
+
+	#     if duplicate_emails:
+	#         messages.error(request, f"Duplicate emails found: {', '.join(duplicate_emails)}")
+	#         return redirect("institutions:batch_create_student_profiles")
+
+	#     new_users = [
+	# 	    User(
+	# 	        email=row['email'],
+	# 	        first_name=row['first_name'],
+	# 	        last_name=row['last_name'],
+	# 	        middle_name=row['middle_name'],
+	# 	        phone_no=row['phone_no'],
+	# 	        matric_no=row['matric_no'],
+	# 	        password=make_password("student@001"),
+	# 	        slug=create_slug0_stub(row)  # your custom slug function
+	# 	    )
+	# 	    for row in data
+	# 	]
+
+	#     User.objects.bulk_create(new_users)
+
+	#     user_map = {u.email: u for u in User.objects.filter(email__in=emails)}
+
+	#     new_profiles = [
+	#         StudentProfile(
+	#             student=user_map[row['email']],
+	#             institution=institution,
+	#             academic_session=academic_session,
+	#         )
+	#         for row in data
+	#     ]
+	#     for profile in new_profiles:
+	#         profile.slug = create_slug3(profile)
+
+	#     StudentProfile.objects.bulk_create(new_profiles)
+
+	#     for profile in new_profiles:
+	#         reset_password(profile.student, request)
+
+	#     messages.success(request, "Students uploaded successfully.")
+	#     return redirect("institutions:batch_create_student_profiles")
+
+
+    # def post(self, request, *args, **kwargs):
+	#     action = request.POST.get("action_type", "create")
+	#     file = request.FILES.get("students_list")
+	#     if not file:
+	#         messages.error(request, "No file uploaded.")
+	#         return redirect("institutions:batch_create_student_profiles")
+
+	#     try:
+	#         decoded_file = io.TextIOWrapper(file.file, encoding='utf-8')
+	#         reader = csv.DictReader(decoded_file)
+	#         data = list(reader)
+	#     except Exception:
+	#         messages.error(request, "Invalid CSV format.")
+	#         return redirect("institutions:batch_create_student_profiles")
+
+	#     if not data:
+	#         messages.error(request, "CSV file is empty.")
+	#         return redirect("institutions:batch_create_student_profiles")
+
+	#     required_fields = {"email", "last_name", "first_name", "middle_name", "phone_no", "matric_no"}
+	#     if not required_fields.issubset(data[0]):
+	#         messages.error(request, "CSV headers missing required fields.")
+	#         return redirect("institutions:batch_create_student_profiles")
+
+	#     session_id = request.POST.get("academic_session")
+	#     academic_session = get_object_or_404(AcademicSession, id=session_id)
+	#     user = request.user
+	#     institution = user.get_indexing_officer_profile.institution
+	#     quota = AdmissionQuota.objects.get_or_none(institution=institution, academic_session=academic_session)
+	#     admission_quota = quota.admission_quota if quota else 0
+
+	#     existing_students_count = StudentProfile.objects.filter(institution=institution, academic_session=academic_session).count()
+	#     if len(data) + existing_students_count > admission_quota:
+	#         messages.error(request, "Admission quota exceeded.")
+	#         return redirect("institutions:batch_create_student_profiles")
+
+	#     if action == "preview":
+	#         # Render preview table (you can style this in 'partials/preview_table.html')
+	#         context = {
+	#             "students": data
+	#         }
+	#         return render(request, "partials/preview_table.html", context)
+
+	#     # Create action
+	#     emails = [row['email'] for row in data]
+	#     existing_users = User.objects.filter(email__in=emails).values_list('email', flat=True)
+	#     duplicate_emails = set(emails) & set(existing_users)
+
+	#     if duplicate_emails:
+	#         messages.error(request, f"Duplicate emails found: {', '.join(duplicate_emails)}")
+	#         return redirect("institutions:batch_create_student_profiles")
+
+	#     new_users = [
+	#         User(
+	#             email=row['email'],
+	#             first_name=row['first_name'],
+	#             last_name=row['last_name'],
+	#             middle_name=row['middle_name'],
+	#             phone_no=row['phone_no'],
+	#             matric_no=row['matric_no'],
+	#             password=make_password("student@001"),
+	#         )
+	#         for row in data
+	#     ]
+	#     User.objects.bulk_create(new_users)
+
+	#     user_map = {u.email: u for u in User.objects.filter(email__in=emails)}
+
+	#     new_profiles = [
+	#         StudentProfile(
+	#             student=user_map[row['email']],
+	#             institution=institution,
+	#             academic_session=academic_session,
+	#         )
+	#         for row in data
+	#     ]
+	#     for profile in new_profiles:
+	#         profile.slug = create_slug3(profile)
+
+	#     StudentProfile.objects.bulk_create(new_profiles)
+
+	#     for profile in new_profiles:
+	#         reset_password(profile.student, request)
+
+	#     messages.success(request, "Students uploaded successfully.")
+	#     return redirect("institutions:batch_create_student_profiles")
+
+    # def post(self, request, *args, **kwargs):
+	#     print("FILES:", request.FILES)
+	#     print("POST:", request.POST)
+
+	#     file = request.FILES.get("students_list")
+	#     if not file:
+	#         messages.error(request, "No file uploaded.")
+	#         return redirect("institutions:batch_create_student_profiles")
+
+	#     try:
+	#         decoded_file = io.TextIOWrapper(file.file, encoding='utf-8')
+	#         reader = csv.DictReader(decoded_file)
+	#         data = list(reader)
+	#     except Exception:
+	#         messages.error(request, "Invalid CSV format.")
+	#         return redirect("institutions:batch_create_student_profiles")
+
+	#     if not data:
+	#         messages.error(request, "CSV file is empty.")
+	#         return redirect("institutions:batch_create_student_profiles")
+
+	#     required_fields = {"email", "last_name", "first_name", "middle_name", "phone_no", "matric_no"}
+	#     if not required_fields.issubset(data[0]):
+	#         messages.error(request, "CSV headers missing required fields.")
+	#         return redirect("institutions:batch_create_student_profiles")
+
+	#     session_id = request.POST.get('academic_session')
+	#     academic_session = get_object_or_404(AcademicSession, id=session_id)
+	#     user = request.user
+	#     institution = user.get_indexing_officer_profile.institution
+	#     quota = AdmissionQuota.objects.get_or_none(institution=institution, academic_session=academic_session)
+	#     admission_quota = quota.admission_quota if quota else 0
+
+	#     existing_students_count = StudentProfile.objects.filter(institution=institution, academic_session=academic_session).count()
+	#     if len(data) + existing_students_count > admission_quota:
+	#         messages.error(request, "Admission quota exceeded.")
+	#         return redirect("institutions:batch_create_student_profiles")
+
+	#     emails = [row['email'] for row in data]
+	#     existing_users = User.objects.filter(email__in=emails).values_list('email', flat=True)
+	#     duplicate_emails = set(emails) & set(existing_users)
+
+	#     if duplicate_emails:
+	#         messages.error(request, f"Duplicate emails found: {', '.join(duplicate_emails)}")
+	#         return redirect("institutions:batch_create_student_profiles")
+
+	#     new_users = [
+	#         User(
+	#             email=row['email'],
+	#             first_name=row['first_name'],
+	#             last_name=row['last_name'],
+	#             middle_name=row['middle_name'],
+	#             phone_no=row['phone_no'],
+	#             matric_no=row['matric_no'],
+	#             password=make_password("student@001"),
+	#         )
+	#         for row in data
+	#     ]
+	#     User.objects.bulk_create(new_users)
+
+	#     user_map = {u.email: u for u in User.objects.filter(email__in=emails)}
+
+	#     new_profiles = [
+	#         StudentProfile(
+	#             student=user_map[row['email']],
+	#             institution=institution,
+	#             academic_session=academic_session,
+	#         )
+	#         for row in data
+	#     ]
+
+	#     for profile in new_profiles:
+	#         profile.slug = create_slug3(profile)
+
+	#     StudentProfile.objects.bulk_create(new_profiles)
+
+	#     for profile in new_profiles:
+	#         reset_password(profile.student, request)
+
+	#     messages.success(request, "Students uploaded successfully.")
+	#     return redirect("institutions:batch_create_student_profiles")
+
+
+
+class StudentProfileCreateView1(StaffRequiredMixin, SuccessMessageMixin, CreateView):
 	form = StudentProfileModelForm
 	def get(self, request, *args, **kwargs):
 		form = StudentProfileModelForm()
@@ -1277,24 +2116,84 @@ class IndexingPaymentsDetails(LoginRequiredMixin, StaffRequiredMixin, TemplateVi
         return context
 
 @login_required
-def students_applications_list(request):
+def students_applications_list0(request):
 	academic_sessions = AcademicSession.objects.all()
 	context = {'academic_sessions': academic_sessions}
 	print("User Role:", request.user.role)
 	return render(request, 'institutions/academic_sessions.html', context)
 
-@login_required
-def applications_list(request):
-	academic_session = request.GET.get('academic_session')
-	user = request.user
-	applications = StudentIndexing.objects.filter(academic_session=academic_session, institution=user.get_indexing_officer_profile.institution, verification_status="pending", rejection_status = "pending")
-	context = {'applications': applications}
-	return render(request, 'partials/applications.html', context)
+
+def students_applications_list1(request):
+    academic_sessions = AcademicSession.objects.all()
+
+    selected_session = None
+    applications = []
+
+    if request.GET.get('academic_session'):
+        selected_session = AcademicSession.objects.get(pk=request.GET.get('academic_session'))
+        applications = StudentIndexing.objects.filter(academic_session=selected_session)
+
+    context = {
+        'academic_sessions': academic_sessions,
+        'applications': applications,
+        'selected_session': selected_session,
+    }
+    if request.htmx:
+        return render(request, 'partials/applications_list.html', context)
+    return render(request, 'institutions/applications_list.html', context)
+
+
+def students_applications_list(request):
+    selected_session_id = request.GET.get('academic_session')
+    user = request.user
+
+    # Save selected session to user's session
+    if selected_session_id:
+        request.session['selected_academic_session_id'] = selected_session_id
+    else:
+        # Try to recover from session if not sent
+        selected_session_id = request.session.get('selected_academic_session_id')
+
+    academic_sessions = AcademicSession.objects.all()
+
+    # Check if user has an institution profile
+    try:
+        institution = user.get_indexing_officer_profile.institution
+    except AttributeError:
+        # If not, redirect or show error
+        return redirect('login')  # or some error page
+
+
+    applications = StudentIndexing.objects.filter(
+    	academic_session=selected_session_id, 
+    	institution=institution, 
+    	verification_status="pending", 
+    	rejection_status = "pending"
+    )
+    # if selected_session_id:
+    #     applications = applications.filter(academic_session_id=selected_session_id)
+
+    context = {
+        'academic_sessions': academic_sessions,
+        'applications': applications,
+        'selected_session_id': selected_session_id,
+    }
+    if request.htmx:
+        return render(request, 'partials/applications_list.html', context)
+    return render(request, 'institutions/applications_list.html', context)
+
+# @login_required
+# def applications_list(request):
+# 	academic_session = request.GET.get('academic_session')
+# 	user = request.user
+# 	applications = StudentIndexing.objects.filter(academic_session=academic_session, institution=user.get_indexing_officer_profile.institution, verification_status="pending", rejection_status = "pending")
+# 	context = {'applications': applications}
+# 	return render(request, 'partials/applications_list.html', context)
 
 
 
 @login_required
-def students_verifications_list(request):
+def students_verifications_list0(request):
 	academic_sessions = AcademicSession.objects.all()
 	context = {'academic_sessions': academic_sessions}
 	# print("User Role:", request.user.role)
@@ -1307,6 +2206,48 @@ def verifications_list(request):
 	verifications = StudentIndexing.objects.filter(academic_session=academic_session, institution=user.get_indexing_officer_profile.institution, verification_status="approved").union(StudentIndexing.objects.filter(academic_session=academic_session, institution=user.get_indexing_officer_profile.institution, verification_status="indexed"))
 	context = {'verifications': verifications}
 	return render(request, 'partials/verifications.html', context)
+
+
+def students_verifications_list(request):
+    selected_session_id = request.GET.get('academic_session')
+    user = request.user
+
+    # Save selected session to user's session
+    if selected_session_id:
+        request.session['selected_academic_session_id'] = selected_session_id
+    else:
+        # Try to recover from session if not sent
+        selected_session_id = request.session.get('selected_academic_session_id')
+
+    academic_sessions = AcademicSession.objects.all()
+
+    # Check if user has an institution profile
+    try:
+        institution = user.get_indexing_officer_profile.institution
+    except AttributeError:
+        # If not, redirect or show error
+        return redirect('login')  # or some error page
+
+
+    verifications = StudentIndexing.objects.filter(
+    	academic_session=selected_session_id, 
+    	institution=institution, 
+    	verification_status="approved").union(StudentIndexing.objects.filter(
+    	academic_session=selected_session_id, 
+    	institution=institution, 
+    	verification_status="indexed")
+    	)
+    # if selected_session_id:
+    #     verifications = verifications.filter(academic_session_id=selected_session_id)
+
+    context = {
+        'academic_sessions': academic_sessions,
+        'verifications': verifications,
+        'selected_session_id': selected_session_id,
+    }
+    if request.htmx:
+        return render(request, 'partials/verifications_list.html', context)
+    return render(request, 'institutions/verifications_list.html', context)
 
 
 @login_required
@@ -1365,32 +2306,22 @@ def indexed_list(request):
 def pay_institutions_indexing_fee(request):
 	academic_sessions = AcademicSession.objects.all()
 	academic_session = request.GET.get('academic_session')
-	# print("Academic Session:", academic_session)
 	form = InstitutionIndexingModelForm(request.POST or None, request = request)
-	context = {'academic_sessions': academic_sessions, 'academic_session': academic_session, 'form':form}
+	context = {
+		'academic_sessions': academic_sessions, 
+		'academic_session': academic_session, 
+		'form':form
+	}
 	return render(request, 'institutions/pay_institutions_indexing_fee.html', context)
+	# return render(request, 'institutions/batch_process_students_indexing_payment.html', context)
 
 class InstitutionPaymentCreateView(LoginRequiredMixin, StaffRequiredMixin, SuccessMessageMixin, CreateView):
     model = InstitutionIndexing
     template_name = "partials/institutions_payment_partial.html"
+    # template_name = "partials/students_list_partial.html"
     form_class = InstitutionIndexingModelForm
     # success_message = "%(institution)s Institution Indexing Payment Submission Successful"
     academic_sessions = AcademicSession.objects.all()
-
-
-    # def get(self, request, *args, **kwargs):
-    # 	form = InstitutionPaymentModelForm(request.POST or None, request = request)
-    # 	academic_session = request.GET.get('academic_session')
-    # 	context = {'academic_session': academic_session, 'form':form}
-    # 	template_name = "partials/institutions_payment_partial.html"
-    # 	return render(request, template_name, context)
-
-
-    # def get_success_message(self, cleaned_data):
-    #   return self.success_message % dict(
-    #         cleaned_data,
-    #         institution=self.object.institution.name,
-    #     ) 
 
     def get_context_data(self, **kwargs):
     	context = super().get_context_data(**kwargs)
@@ -1405,23 +2336,17 @@ class InstitutionPaymentCreateView(LoginRequiredMixin, StaffRequiredMixin, Succe
         return kwargs
 
 
-    # def form_valid(self, form):
-    #     payment = form.save(commit=False)
-    #     user = self.request.user
-    #     institution = InstitutionProfile.objects.get(name=user.get_indexing_officer_profile.institution)
-    #     # form.instance.institution = institution
-    #     payment.institution = institution
-    #     payment.save()
-    #     return super(InstitutionPaymentCreateView, self).form_valid(form)
-
-
-
     def post(self, request, *args, **kwargs):
     	user = self.request.user
     	session=request.POST.get('academic_session')
     	student_indexing = request.POST.getlist('student_indexing')
     	print ("List of Students:", student_indexing)
-    	students = StudentIndexing.objects.all()
+    	# students = StudentIndexing.objects.all()
+    	try:
+    		institution = user.get_indexing_officer_profile.institution
+    	except AttributeError:
+	        # If not, redirect or show error
+	        return redirect('login')
 
     	institution_indexing = InstitutionIndexing.objects.create(
             # students_payments=request.POST.get('students_payments'),
@@ -1430,25 +2355,48 @@ class InstitutionPaymentCreateView(LoginRequiredMixin, StaffRequiredMixin, Succe
             payment_amount=request.POST.get('payment_amount'),
             payment_method=request.POST.get('payment_method'),
             payment_receipt=request.FILES.get('payment_receipt'),
-            institution = InstitutionProfile.objects.get(name=user.get_indexing_officer_profile.institution),
+            institution = InstitutionProfile.objects.get(name=institution),
             )
 
-
-    	# students_list = InstitutionPayment.objects.filter(pk__in=student_payments)
-    	# for institution_payment in students_list:
-    	institution_indexing.student_indexing.add(*student_indexing)
-    	print ("Student Payments:", *student_indexing)
+    	students = StudentIndexing.objects.filter(id__in=student_indexing)
 
 
+    	institution_indexing.student_indexing.add(*students)
+    	if not student_indexing:
+		    messages.error(request, "Please select at least one student.")
+		    return redirect("institutions:pay_institutions_indexing_fee")
+
+    	# print ("Student Payments:", *student_indexing)
     	institution = institution_indexing.institution.name
-
-    	print ("institution:", institution)
-
+    	# print ("institution:", institution)
     	messages.success(request, f"{institution}s Institution Indexing Submission Successful") 
     	return redirect(institution_indexing.get_absolute_url())
 
 
-    	
+# def students_list_partial(request):
+#     session_id = request.GET.get('academic_session')
+#     students = StudentIndexing.objects.filter(academic_session_id=session_id) if session_id else []
+#     return render(request, 'partials/students_list_partial.html', {'students': students})   	
+
+
+def students_list_partial(request):
+    academic_session_id = request.GET.get('academic_session')
+    user = request.user
+
+    if not request.user.is_authenticated:
+        return HttpResponseBadRequest("Authentication required")
+
+    if not academic_session_id:
+        return HttpResponseBadRequest("Academic session not provided")
+
+    students = StudentIndexing.objects.filter(
+        academic_session_id=academic_session_id,
+        institution=user.get_indexing_officer_profile.institution,
+        verification_status="pending",
+        rejection_status="pending"
+    )
+
+    return render(request, 'partials/students_list_partial.html', {'students': students})
     	
 def add_film(request):
     name = request.POST.get('name')

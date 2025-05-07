@@ -78,8 +78,19 @@
 
 <div class="form-group row">
     <div class="col-md-5 mt-2 ml-1 pr-1">
+    <!-- <label for="id_students_list">Upload Students List:</label>
+    <input type="file" name="students_list"  class="form-control"> -->
     <label for="id_students_list">Upload Students List:</label>
-    <input type="file" name="students_list"  class="form-control">
+    <input type="file" name="students_list" class="form-control mb-2" accept=".csv" onchange="previewCSV(this)">
+    <small class="text-muted">CSV preview will appear below after selection.</small>
+    </div>
+
+    <!-- Preview Area -->
+    <div id="csvPreview" class="table-responsive mt-3" style="display: none;">
+    <table class="table table-bordered table-striped">
+    <thead id="csvHead"></thead>
+    <tbody id="csvBody"></tbody>
+    </table>
     </div>
 
 </div>
@@ -118,6 +129,52 @@
 </div>
 
 
+<script>
+function previewCSV(input) {
+    const file = input.files[0];
+    if (!file || !file.name.endsWith('.csv')) {
+        alert("Please upload a valid CSV file.");
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        const text = e.target.result;
+        const rows = text.trim().split('\n').map(row => row.split(','));
+
+        if (rows.length === 0) return;
+
+        const head = document.getElementById('csvHead');
+        const body = document.getElementById('csvBody');
+        head.innerHTML = '';
+        body.innerHTML = '';
+
+        // Render table header
+        const headerRow = document.createElement('tr');
+        rows[0].forEach(cell => {
+            const th = document.createElement('th');
+            th.textContent = cell.trim();
+            headerRow.appendChild(th);
+        });
+        head.appendChild(headerRow);
+
+        // Render first 5 rows of data
+        rows.slice(1, 6).forEach(row => {
+            const tr = document.createElement('tr');
+            row.forEach(cell => {
+                const td = document.createElement('td');
+                td.textContent = cell.trim();
+                tr.appendChild(td);
+            });
+            body.appendChild(tr);
+        });
+
+        document.getElementById('csvPreview').style.display = 'block';
+    };
+
+    reader.readAsText(file);
+}
+</script>
 
 
 

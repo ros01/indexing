@@ -163,7 +163,8 @@ class InstitutionIndexingModelForm(forms.ModelForm):
        self.fields['student_indexing'].label = "Select Students for Institution Indexing Payment"
   
     
-
+    def label_from_instance(self, obj):
+        return f"{obj.student_profile.student.get_full_name()} - {obj.student_profile.student.matric_no}"
 
 
 class IndexingPaymentForm(forms.ModelForm):

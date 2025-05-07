@@ -1,0 +1,148 @@
+{% extends 'students/dashboard_base1.html'%}
+{% load static %}
+{% load widget_tweaks %}
+{% load crispy_forms_tags %}
+{% load i18n %}
+
+{% block head %}
+{{ wizard.form.media }}
+{% endblock %}
+
+{% block content %}
+<!-- <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet"> -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
+
+<div class="row ml-3 mb-4 pb-4">
+<div class="col-lg-12 col-xl-10">
+<div class="card m-b-30">
+
+    <div class="card-header profile-tabs pb-0">
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link active" href="#about" data-toggle="tab" aria-expanded="false">
+                    <i class="ti-user mr-2"></i>Indexing Profile Application
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="card-body">
+        {% include 'partials/_alerts.html' %}
+        <div class="tab-content">
+            <div class="tab-pane active" id="about">
+                <div class="row justify-content-center">
+                    <div class="col-md-12 profile-detail">
+                        <h5 class="mb-3">
+                            <i class="fa fa-graduation-cap text-primary"></i> Apply for Student Indexing
+                        </h5>
+                    </div>
+                </div>
+
+                <p>Step {{ wizard.steps.step1 }} of {{ wizard.steps.count }}</p>
+
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ wizard.management_form }}
+
+                    {% if wizard.steps.current == "confirmation" %}
+                        <!-- CONFIRMATION PAGE -->
+                        <h3 class="mb-4 text-primary">Confirm Your Application Details</h3>
+
+                        <div class="accordion" id="confirmationAccordion">
+                            {% for step_name, step_fields in step_data.items %}
+                                <div class="card mb-3">
+                                    <div class="card-header" id="heading-{{ step_name }}">
+                                        <h5 class="mb-0 d-flex justify-content-between align-items-center">
+                                            <button class="btn btn-link collapsed text-left" type="button" data-toggle="collapse" data-target="#collapse-{{ step_name }}" aria-expanded="false" aria-controls="collapse-{{ step_name }}">
+                                                {{ step_name|title|cut:"_" }}
+                                            </button>
+                                            <button name="wizard_goto_step" value="{{ step_name }}" class="btn btn-sm btn-outline-primary"><i class="fas fa-edit"></i>Edit</button>
+                                        </h5>
+                                    </div>
+                                    <div id="collapse-{{ step_name }}" class="collapse" aria-labelledby="heading-{{ step_name }}" data-parent="#confirmationAccordion">
+                                        <div class="card-body">
+                                            {% for field, value in step_fields.items %}
+                                                <p><strong>{{ field|title|cut:"_" }}:</strong> {{ value }}</p>
+                                            {% empty %}
+                                                <p class="text-muted">No data entered for this step.</p>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="mt-4">
+
+                        <input type="submit" 
+                        id="finalSubmitBtn"
+                        class="btn btn-outline-primary btn-lg"
+                        value="Submit Application">
+                        <!-- <button type="submit" class="btn btn-success btn-block">
+                            ✅ Confirm and Submit Application
+                        </button> -->
+                        </div>
+
+                    {% else %}
+                        <!-- NORMAL FORM STEPS -->
+                        {% if wizard.form.forms %}
+                            {{ wizard.form.management_form }}
+                            {% for form in wizard.form.forms %}
+                                {{ form|crispy }}
+                            {% endfor %}
+                        {% else %}
+                            {{ wizard.form|crispy }}
+                        {% endif %}
+
+                        <div class="d-flex justify-content-between mt-4">
+                            {% if wizard.steps.prev %}
+                                <button name="wizard_goto_step" type="submit" value="{{ wizard.steps.first }}" class="btn btn-outline-secondary">
+                                    « First Step
+                                </button>
+                                <button name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}" class="btn btn-outline-primary">
+                                    « Prev
+                                </button>
+                            {% endif %}
+                            <button type="submit" class="btn btn-primary">
+                                {% if wizard.steps.last == wizard.steps.current %}
+                                    Finish
+                                {% else %}
+                                    Next »
+                                {% endif %}
+                            </button>
+                        </div>
+                    {% endif %}
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+</div>
+</div>
+
+<!-- Success Modal -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-center p-4">
+        <!-- <div id="progressContainer" style="height: 4px; width: 100%; background-color: #e9ecef; overflow: hidden;">
+        <div id="progressBar" style="height: 100%; width: 0%; background-color: #28a745; transition: width 3s ease;"></div>
+        </div> -->
+
+      <div id="spinner" class="mb-3">
+        <div class="spinner-border text-success" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </div>
+      <div id="successMessage" class="d-none">
+        <i class="fas fa-check-circle fa-5x text-success mb-3"></i>
+        <h4 class="text-success">Application Submitted Successfully!</h4>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

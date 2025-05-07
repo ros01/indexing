@@ -1,0 +1,139 @@
+{% extends 'institutions/dashboard_base2.html'%}
+{% load static %}
+{% load widget_tweaks %}
+{% load crispy_forms_tags %}
+{% block title%}| Welcome {% endblock %}
+
+{% block styles %}
+
+<!-- <style>
+.with-icon {
+  position: relative;
+  padding-left: 1.8rem; /* add left space for icon */
+}
+
+.with-icon::before {
+  content: "\f144"; /* FontAwesome play-circle unicode */
+  font-family: "Font Awesome 5 Free"; 
+  font-weight: 900;
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+</style> -->
+
+
+
+{% endblock %}
+
+
+
+{% block content %}
+
+<div class="col-md-11 ml-3 mb-3">
+    <div class="col-md-12 col-xl-9">
+        <div class="card m-b-30">
+            <div class="card-header profile-tabs pb-0">
+                <ul class="nav nav-tabs">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#profile" data-toggle="tab" aria-expanded="false">
+                            <i class="ti-user mr-2"></i> Student Profiles Creation
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="card-body">
+                <div class="tab-content">
+                    <div class="tab-pane active" id="profile">
+                        <div class="row justify-content-center">
+                            {% include 'partials/_alerts.html' %} 
+                            <div class="col-md-12 profile-detail">
+
+                                <h5 class="mb-3">
+                                    <i class="fa fa-graduation-cap text-primary"></i> Create Student Profiles
+                                </h5>
+
+                                <div class="alert alert-primary mt-1 mb-3 py-2" role="alert">
+                                    <h4 class="alert-heading font-18">
+                                        <span class="text-danger">Important!</span> Download the CSV template below. Open it with MS Excel and fill in the student details. Keep the file format as <code>.csv</code> when saving. Select and Upload saved file to bulk create students. Maximum Batch Size = 1000
+                                    </h4>
+                                </div>
+
+                                <div class="d-flex justify-content-end mb-3">   
+                                    <a href="{% url 'institutions:downloadfile' %}" class="btn btn-outline-success py-0 mt-1 mb-3">
+                                        <i class="fas fa-arrow-circle-down"></i> Download CSV
+                                    </a>
+                                </div>
+
+                                <p class="lead text-primary">Batch create student profiles from CSV file.</p>
+
+                                <!-- Academic Session Selector -->
+                                <select class="custom-select mb-4 col-md-5" 
+                                        name="academic_session" 
+                                        hx-get="{% url 'institutions:create_student_profile' %}"
+                                        hx-trigger="change"
+                                        hx-target="body">
+                                    <option selected>Select Academic Session</option>
+                                    {% for academic_session in academic_sessions %}
+                                        <option value="{{ academic_session.pk }}" {% if academic_session.pk == selected_session_id %}selected{% endif %}>
+                                            {{ academic_session.name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+
+                                <!-- File Upload Form -->
+                                <form action="{% url 'institutions:create_student_profile' %}" 
+                                      class="form-horizontal form-material" 
+                                      method="post" 
+                                      enctype="multipart/form-data">
+                                    {% csrf_token %}
+
+                                    <input type="hidden" name="academic_session" value="{{ selected_session_id }}"/>
+
+                                    <div class="form-group row">
+                                        <div class="col-md-5 mt-2 ml-1 pr-1">
+                                            <label for="id_students_list">Upload Students List:</label>
+                                            <input type="file" name="students_list" class="form-control">
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex justify-content-end mb-3">
+                                        <a href="{% url 'institutions:student_profiles_list' %}" class="btn btn-outline-primary px-2 mr-3 mt-1">
+                                            <i class="fas fa-angle-double-left"></i> Go to Students List
+                                        </a>
+
+                                        <!-- input type="submit" 
+                                               class="btn btn-outline-primary btn-sm px-2 mt-1" 
+                                               value="Batch Create Student Profiles" 
+                                               onclick="return confirm('Are you sure you want to submit this list?')"> -->
+
+                                        <button 
+                                        type="submit" 
+                                        class="btn btn-outline-primary btn-sm px-2 mt-1" 
+                                        onclick="return confirm('Are you sure you want to submit this list?')"
+                                        >
+                                        <i class="fa fa-play-circle" aria-hidden="true"></i> Batch Create Student Profiles
+                                        </button>
+
+                                        <!-- <input 
+                                        type="submit" 
+                                        class="btn btn-outline-primary btn-sm px-2 mt-1 with-icon" 
+                                        value="Batch Create Student Profiles" 
+                                        onclick="return confirm('Are you sure you want to submit this list?')"> -->
+
+
+                                    </div>
+                                </form>
+
+                            </div>
+                        </div>
+                    </div> <!-- end tab-pane -->
+                </div> <!-- end tab-content -->
+            </div> <!-- end card-body -->
+        </div>
+    </div>
+</div>
+
+{% endblock %}

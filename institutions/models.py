@@ -6,6 +6,7 @@ from django.template import Context
 from django.template.loader import get_template
 from django.db.models.signals import pre_save, post_save, m2m_changed
 from django.dispatch import receiver
+
 from django.urls import reverse
 from django.utils.text import slugify
 from .choices import *
@@ -16,15 +17,31 @@ from indexing_unit.utils import *
 from multiselectfield import MultiSelectField
 
 
+
 class AcademicSession(models.Model):
     name = models.CharField(max_length=120, unique=True)
     slug = models.SlugField(blank=True)
     status = models.IntegerField(default=1)
+    # start_year = models.PositiveIntegerField(default=0)
+    # start_year = models.PositiveIntegerField(null=True, blank=True)  # ← now safely added
     updated = models.DateTimeField(auto_now=True)
     timestamp = models.DateTimeField(auto_now_add=True)
 
+    # class Meta:
+    #     ordering = ['-start_year']
+
     def __str__(self): 
         return self.name
+
+
+    # def save(self, *args, **kwargs):
+    #     # Attempt to auto-populate start_year from name
+    #     if not self.start_year and '/' in self.name:
+    #         try:
+    #             self.start_year = int(self.name.split('/')[0])
+    #         except (ValueError, IndexError):
+    #             self.start_year = 0  # fallback
+    #     super().save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse("indexing_unit:academic_session_detail", kwargs={"slug": self.slug})
@@ -132,7 +149,8 @@ class AdmissionQuota(models.Model):
     timestamp       = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-       unique_together = ('institution', 'academic_session',)
+        ordering = ['-academic_session']
+        unique_together = ('institution', 'academic_session',)
 
    
     def __str__(self):
@@ -379,7 +397,10 @@ class StudentIndexing(models.Model):
     timestamp       = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return  str(self.student_profile)
+        return f"{self.student_profile.student.get_full_name} ({self.student_profile.student.matric_no})"
+
+    # def __str__(self):
+    #     return  str(self.student_profile)
 
     class Meta:
         unique_together = ('student_profile', 'matric_no')
@@ -500,7 +521,8 @@ class StudentIndexing(models.Model):
         
 def pre_save_student_indexing_receiver(sender, instance, *args, **kwargs):
     if not instance.slug:
-        instance.slug = create_slug4(instance)
+        from indexing_unit.utils import generate_slug
+        instance.slug = generate_slug(instance, "student_profile.student.last_name")
 
     if instance.gce_alevels:
         instance.admission_type = 'DE'
@@ -512,8 +534,6 @@ def pre_save_student_indexing_receiver(sender, instance, *args, **kwargs):
         instance.admission_type = 'UTME'
 
 pre_save.connect(pre_save_student_indexing_receiver, sender=StudentIndexing)
-
-
 
 
 
@@ -612,7 +632,9 @@ class InstitutionIndexing(models.Model):
 
 def pre_save_institution_indexing_receiver(sender, instance, *args, **kwargs):
     if not instance.slug:
-        instance.slug = create_slug7(instance)
+        from indexing_unit.utils import generate_slug
+        instance.slug = generate_slug(instance, "institution.name")
+
 
 pre_save.connect(pre_save_institution_indexing_receiver, sender=InstitutionIndexing)
 
@@ -622,6 +644,8 @@ def post_save_institution_indexing_receiver(sender, instance,  *args, **kwargs):
         student.save()
 
 m2m_changed.connect(post_save_institution_indexing_receiver, sender=InstitutionIndexing.student_indexing.through)
+
+
 
 
 # @receiver(post_save, sender=InstitutionPayment)

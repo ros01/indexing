@@ -174,10 +174,42 @@ class AdmissionQuotaListView(LoginRequiredMixin, StaffRequiredMixin, ListView):
 			qs = qs.filter(name__icontains=query)
 		return qs 
 
+class AdmissionQuotaCreateView0(LoginRequiredMixin, StaffRequiredMixin, CreateView):
+    model = AdmissionQuota
+    template_name = "indexing_unit/assign_admission_quota.html"
+    form_class = AdmissionQuotaForm
+
+    success_message = "%(institution)s Admision Quota Creation Successful"
+
+    def get_success_message(self, cleaned_data):
+      return self.success_message % dict(
+            cleaned_data,
+            institution=self.object.institution.name,
+        )
+
+
 class AdmissionQuotaCreateView(LoginRequiredMixin, StaffRequiredMixin, CreateView):
     model = AdmissionQuota
     template_name = "indexing_unit/assign_admission_quota.html"
     form_class = AdmissionQuotaForm
+
+    success_message = "%(institution)s Admission Quota Creation Successful"
+
+    def get_success_url(self):
+        return self.object.get_absolute_url()  # Make sure this is defined in your model
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(
+            self.request,
+            self.get_success_message(form.cleaned_data)
+        )
+        return response
+
+    def get_success_message(self, cleaned_data):
+        return self.success_message % {
+            'institution': self.object.institution.name
+        }
 
 
 class AdmissionQuotaDetailView(LoginRequiredMixin, StaffRequiredMixin, DetailView):
@@ -288,50 +320,88 @@ class IndexingOfficerCreateView2(CreateView):
 	template_name1 = 'indexing_unit/indexing_officer_details.html'
 
 
-
 class IndexingOfficerCreateView(LoginRequiredMixin, StaffRequiredMixin, SuccessMessageMixin, CreateView):
-	model = User
-	user_form = UserUpdateForm
-	form = IndexingOfficerProfileForm
-	template_name = 'indexing_unit/create_indexing_officer.html'
-	template_name1 = 'indexing_unit/indexing_officer_details.html'
+    model = User
+    form_class = IndexingOfficerProfileForm
+    user_form_class = UserUpdateForm  # Consider renaming this to a creation-specific form
+    template_name = 'indexing_unit/create_indexing_officer.html'
+    success_message = "%(indexing_officer)s Indexing Officer Profile was created successfully"
 
-	success_message = "%(last_name)s Indexing Officer Profile was created successfully"
 
-	def get_success_message(self, cleaned_data):
-		return self.success_message % dict(
+    def get_success_message(self, cleaned_data):
+        return self.success_message % dict(
             cleaned_data,
-            last_name=self.object.last_name,
+            indexing_officer=self.object.get_full_name(),
         )
 
-	def get(self, request, *args, **kwargs):
-		user_form = self.user_form()
-		form  = self.form()
-		return render(request, self.template_name, {'user_form':user_form, 'form':form})
+    def get(self, request, *args, **kwargs):
+        user_form = self.user_form_class()
+        form = self.form_class()
+        return render(request, self.template_name, {'user_form': user_form, 'form': form})
 
-	def post(self, request, *args, **kwargs):
-		user_form = self.user_form(request.POST)
-		form  = self.form (request.POST)
+    def post(self, request, *args, **kwargs):
+        user_form = self.user_form_class(request.POST)
+        form = self.form_class(request.POST)
+
+        if user_form.is_valid() and form.is_valid():
+            user = user_form.save(commit=False)
+            user.is_active = True
+            user.set_password('indexing@001')  # You can make this more secure later
+            user.save()
+
+            indexing_officer_profile = form.save(commit=False)
+            indexing_officer = IndexingOfficerProfile.objects.create(
+                indexing_officer=user,
+                institution=indexing_officer_profile.institution,
+            )
+
+            reset_password(user, request)
+            messages.success(request, 'Indexing Officer Profile Creation Successful.')
+            return redirect(indexing_officer.get_absolute_url())
+        return render(request, self.template_name, {'user_form': user_form, 'form': form})
+
+# class IndexingOfficerCreateView(LoginRequiredMixin, StaffRequiredMixin, SuccessMessageMixin, CreateView):
+# 	model = User
+# 	user_form = UserUpdateForm
+# 	form = IndexingOfficerProfileForm
+# 	template_name = 'indexing_unit/create_indexing_officer.html'
+# 	template_name1 = 'indexing_unit/indexing_officer_details.html'
+
+# 	success_message = "%(indexing_officer)s Indexing Officer Profile was created successfully"
+#     def get_success_message(self, cleaned_data):
+#         return self.success_message % dict(
+#             cleaned_data,
+#             indexing_officer=self.object.get_full_name,
+#         )
+
+#     def get(self, request, *args, **kwargs):
+# 		user_form = self.user_form()
+# 		form  = self.form()
+# 		return render(request, self.template_name, {'user_form':user_form, 'form':form})
+
+# 	def post(self, request, *args, **kwargs):
+# 		user_form = self.user_form(request.POST)
+# 		form  = self.form (request.POST)
 		
-		if user_form.is_valid() and form.is_valid():
-			user = user_form.save(commit=False)
-			user.is_active = True
-			user.set_password('indexing@001') 
-			user.save()
-			indexing_officer = form.save(commit=False)
-			IndexingOfficerProfile.objects.create(
-                indexing_officer = user,
-                institution = indexing_officer.institution,
-                )
-			indexing_officer = IndexingOfficerProfile.objects.filter(indexing_officer=user).first()
-			user = user
-			reset_password(user, request)
-			return redirect(indexing_officer.get_absolute_url())
+# 		if user_form.is_valid() and form.is_valid():
+# 			user = user_form.save(commit=False)
+# 			user.is_active = True
+# 			user.set_password('indexing@001') 
+# 			user.save()
+# 			indexing_officer = form.save(commit=False)
+# 			IndexingOfficerProfile.objects.create(
+#                 indexing_officer = user,
+#                 institution = indexing_officer.institution,
+#                 )
+# 			indexing_officer = IndexingOfficerProfile.objects.filter(indexing_officer=user).first()
+# 			user = user
+# 			reset_password(user, request)
+# 			return redirect(indexing_officer.get_absolute_url())
 
-	   	# 	return redirect('index')  	
+# 	   	# 	return redirect('index')  	
 	   	
-		print(request.POST)
-		return render(request, self.template_name, {'user_form':user_form, 'form':form})
+# 		print(request.POST)
+# 		return render(request, self.template_name, {'user_form':user_form, 'form':form})
     
 
 
@@ -401,6 +471,7 @@ class IndexingOfficerUpdateView (LoginRequiredMixin, StaffRequiredMixin, Success
             indexing_officer = IndexingOfficerProfile.objects.filter(indexing_officer=user).first()
             user = user
             reset_password(user, request)
+            messages.success(request, 'Indexing Officer Profile Update Successful.')
             return redirect(indexing_officer.get_absolute_url())        
             
         else:
@@ -644,7 +715,7 @@ class InstitutionSearchView(LoginRequiredMixin, ListView):
 		return context
 
 
-class InstitutionsIndexedStudentsList(LoginRequiredMixin, ListView):
+class InstitutionsIndexedStudentsList0(LoginRequiredMixin, ListView):
 	template_name = "indexing_unit/indexed_students_list.html"
 	def get_queryset(self):
 		institutions = InstitutionProfile.objects.all()
@@ -665,6 +736,31 @@ class InstitutionsIndexedStudentsList(LoginRequiredMixin, ListView):
 		context['form'] = InstitutionPaymentForm(self.request.GET or None)	
 		context['indexing'] = filter_set
 		return context
+
+class InstitutionsIndexedStudentsList(LoginRequiredMixin, ListView):
+    template_name = "indexing_unit/indexed_students_list.html"
+    context_object_name = "indexing"  # Optional: cleaner access in templates
+    paginate_by = 25  # Optional: if you want to paginate
+
+    def get_queryset(self):
+        institutions = InstitutionProfile.objects.all()
+        qs = IssueIndexing.objects.filter(institution__in=institutions)
+
+        academic_session = self.request.GET.get("academic_session")
+        institution = self.request.GET.get("institution")
+
+        if academic_session:
+            qs = qs.filter(academic_session=academic_session)
+        if institution:
+            qs = qs.filter(institution=institution)
+
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = InstitutionPaymentForm(self.request.GET or None)
+        return context
+
 
 
 class InstitutionsIndexedStudentsListView(LoginRequiredMixin, ListView):

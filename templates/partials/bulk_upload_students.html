@@ -1,0 +1,193 @@
+{% extends 'institutions/dashboard_base2.html'%}
+{% load static %}
+{% load crispy_forms_tags %}
+
+
+{% block content %}
+<meta name="csrf-token" content="{{ csrf_token }}">
+
+<div class="col-md-11 ml-3 mb-3">
+<div class="col-md-12 col-xl-9">
+<div class="card m-b-30">
+<div class="card-header profile-tabs pb-0">
+<ul class="nav nav-tabs">
+<li class="nav-item">
+<a class="nav-link active" href="#profile" data-toggle="tab" aria-expanded="false"><i class="ti-user mr-2"></i>Student Profiles Creation</a>
+</li>
+
+
+<li class="nav-item">
+
+</li>
+</ul>
+</div>
+<div class="card-body">
+<div class="">
+<div class="tab-content">
+<div class="tab-pane active" id="profile">
+<div class="row justify-content-center">
+{% include 'partials/_alerts.html' %} 
+<div class="col-md-12  profile-detail">
+<div class="">
+<h5 class="mb-3"> <i class="fa fa-graduation-cap text-primary"></i> Create Student Profiles</h5>
+</div>
+
+<div class="col-md-12 alert alert-primary mt-1 mb-3 py-2" role="alert">
+<h4 class="alert-heading font-18"><span class="text-danger">Important! </span>Download csv template from link below. Open downloaded file with MS-Excel and fill in all the students details. Maintain fileformat of .csv when saving data. Select and Upload saved file to bulk create students. Maximum Batch Size = 1000</h4>
+</div>
+
+
+
+<div class="d-flex justify-content-end mb-3">   
+<a href="{% url 'institutions:downloadfile' %}" class="btn btn-outline-success py-0 mt-1 mb-3"><i class="fas fa-arrow-circle-down" aria-hidden="true"></i> Download CSV</a>  
+</div>
+
+
+</div>
+<div>
+<p class="lead text-primary ">Batch create student profiles from csv file.
+</p>
+
+</div>
+
+<div class="form-group row">
+<div class="col-md-5 alert alert-primary mt-1 mb-3 py-2 pr-0 pl-2" role="alert">
+<h4 class="alert-heading font-18"><span class="text-danger">Selected Academic Session: </span><em>{{academic_session_name}}</em></h4>
+<h4 class="alert-heading font-18"><span class="text-danger">Assigned Quota: </span><em>{{admission_quota}}</em></h4>
+<h4 class="alert-heading font-18"><span class="text-danger">Quota Used: </span><em>{{quota_used}}</em></h4>
+<h4 class="alert-heading font-18"><span class="text-danger">Quota Remaining: </span><em>{{quota_remaining}}</em></h4>
+</div>
+</div>
+
+
+<div class="">
+
+<form 
+  id="uploadForm" 
+  action="{% url 'institutions:create_student_profile' %}" 
+  method="post" 
+  enctype="multipart/form-data"
+>
+  {% csrf_token %}
+  <input type="hidden" name="academic_session" value="{{ academic_session }}">
+  <input type="hidden" name="action_type" id="action_type" value="create">
+
+  <div class="form-group row">
+    <div class="col-md-5 mt-2 ml-1 pr-1">
+      <label for="students_list">Upload Students List:</label>
+      <input type="file" name="students_list" id="students_list" class="form-control" accept=".csv">
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-end mb-3">
+    <!-- Preview Button (uses HTMX only for preview) -->
+    <button 
+      type="button"
+      class="btn btn-outline-primary py-0 mt-1 mb-3 mr-3"
+      hx-post="{% url 'institutions:preview_student_csv' %}"
+      hx-target="#csvPreview"
+      hx-encoding="multipart/form-data"
+      hx-include="#uploadForm"
+      onclick="document.getElementById('action_type').value='preview';"
+    >
+      <i class="fas fa-eye" aria-hidden="true"></i> Preview
+    </button>
+  </div>
+
+  <!-- HTMX Target -->
+  <div id="csvPreview" class="mt-3"></div>
+
+  <div class="d-flex justify-content-end mb-3">
+    <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-outline-primary pr-3 mr-3 mt-2">
+      <i class="fas fa-angle-double-left" aria-hidden="true"></i> Go Back
+    </a>
+
+    <!-- Create button triggers full POST -->
+    <!-- <button 
+      type="submit" 
+      class="btn btn-outline-primary btn-sm px-4 mt-2 float-right"
+      onclick="document.getElementById('action_type').value='create';"
+    >
+      Batch Create Student Profiles
+    </button> -->
+
+    <!-- <button 
+    type="submit" 
+    class="btn btn-outline-primary btn-sm px-4 mt-2 float-right"
+    onclick="document.getElementById('action_type').value='create'; return confirm('Are you sure you want to create these students?');"
+    >
+    Batch Create Student Profiles
+    </button> -->
+
+    <button 
+    type="submit" 
+    class="btn btn-outline-primary btn-sm px-4 mt-2 float-right"
+    onclick="document.getElementById('action_type').value='create'; return confirm('Are you sure you want to create these students?');"
+    > <i class="fa fa-play-circle" aria-hidden="true"></i>
+    Batch Create Student Profiles 
+    </button>
+
+  </div>
+</form>
+
+
+
+</div>
+
+
+
+
+
+
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+    <div class="row">
+        <div class="col-lg-12 col-sm-12">
+            <div class="card">
+       
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+document.getElementById("uploadForm").addEventListener("submit", function(e) {
+  const fileInput = document.getElementById("students_list");
+  if (!fileInput.files.length) {
+    e.preventDefault();
+    alert("Please choose a file before submitting.");
+    return;
+  }
+  console.log("Form is being submitted with file:", fileInput.files[0].name);
+});
+</script>
+
+
+<script>
+document.getElementById("uploadForm").addEventListener("submit", function(e) {
+  console.log("Submitting form...");
+});
+</script>
+
+
+<script>
+document.body.addEventListener('htmx:beforeRequest', function(evt) {
+  document.querySelector('#csvPreview').innerHTML = '<div class="text-center text-muted">Loading preview...</div>';
+});
+</script>
+
+<script>
+document.body.addEventListener('htmx:configRequest', (event) => {
+  const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+  event.detail.headers['X-CSRFToken'] = token;
+});
+</script>
+
+
+{% endblock %}

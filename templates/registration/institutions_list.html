@@ -5,7 +5,7 @@
 
 {% block content %}
 
-<div class="row mx-2">
+<!-- <div class="row mx-2">
 <div class="col-md-12 mt-4 mx-1">
 <div class="row">
 <div class="col-md-12">
@@ -44,8 +44,56 @@
             </table>
         </div>
     </div>
-</div> <!-- end col -->
-</div> <!-- end row -->
+</div>
+</div> 
 </div>
 </div>
-{% endblock content %}
+ -->
+<div class="row mx-2">
+  <div class="col-md-12 mt-4 mx-1">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
+            {% include 'partials/_alerts.html' %}
+
+            <h4 class="mt-0 header-title">List of Institutions with Valid Accreditations for Radiography and MIPT Practice</h4>
+            <p class="text-muted font-14">
+              Download the printable version of the list in any of the available formats below.
+            </p>
+
+            <table id="datatable-buttons" class="table table-striped table-bordered dt-responsive nowrap" style="width: 100%;">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Address</th>
+                  <th>Phone</th>
+                  <th>Email</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for object in object_list %}
+                <tr>
+                  <td>{{ object.name }}</td>
+                  <td>{{ object.address }}</td>
+                  <td>{{ object.phone_no }}</td>
+                  <td>{{ object.email }}</td>
+                  <td>
+                    <a href="{{ object.get_reg_absolute_url }}" class="btn btn-sm btn-outline-primary">
+                      <i class="fas fa-search mr-1"></i> View Details
+                    </a>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock content %} 

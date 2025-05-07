@@ -1,8 +1,10 @@
 import random
 import string
 
+from .models import *
 from django.contrib.humanize.templatetags.humanize import intcomma
 from django.utils.text import slugify
+import uuid
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
@@ -24,6 +26,34 @@ def unique_string_generator(size=5, chars=string.ascii_lowercase + string.digits
     return "".join(random.choice(chars) for _ in range(size))
 
 
+def generate_slug(instance, field_path, new_slug=None):
+    """
+    Generic slug generator.
+    - instance: model instance
+    - field_path: field or nested fields separated by '.' (dot notation)
+    - new_slug: optional manually provided slug
+    """
+    if new_slug:
+        slug = new_slug
+    else:
+        # Resolve the field_path, e.g., "student.last_name"
+        value = instance
+        for attr in field_path.split('.'):
+            value = getattr(value, attr)
+        slug = slugify(value)
+
+    Klass = instance.__class__
+    qs = Klass.objects.filter(slug=slug).order_by('-id')
+    
+    if qs.exists():
+        from indexing_unit.utils import unique_string_generator  # import inside to avoid circular import
+        string_unique = unique_string_generator()
+        newly_created_slug = f"{slug}-{string_unique}"
+        return generate_slug(instance, field_path, new_slug=newly_created_slug)
+
+    return slug
+
+
 def create_slug0(instance, new_slug=None):
     if not new_slug:
         slug = slugify(instance.last_name)
@@ -36,6 +66,11 @@ def create_slug0(instance, new_slug=None):
         newly_created_slug = slug + "-{id_}".format(id_=string_unique)
         return create_slug(instance, new_slug=newly_created_slug)
     return slug
+
+def create_slug0_stub(data):
+    base = f"{data['first_name']}-{data['last_name']}"
+    slug = slugify(base)
+    return f"{slug}-{uuid.uuid4().hex[:6]}"
 
 
 def create_slug(instance, new_slug=None):
@@ -65,6 +100,17 @@ def create_slug2(instance, new_slug=None):
         string_unique = unique_string_generator()
         newly_created_slug = slug + "-{id_}".format(id_=string_unique)
         return create_slug(instance, new_slug=newly_created_slug)
+    return slug
+
+
+# utils.py
+def create_slug3_from_user(user):
+    slug = slugify(user.last_name)
+    Klass = StudentProfile
+    qs = Klass.objects.filter(slug=slug).order_by('-id')
+    if qs.exists():
+        string_unique = unique_string_generator()
+        slug = f"{slug}-{string_unique}"
     return slug
 
 

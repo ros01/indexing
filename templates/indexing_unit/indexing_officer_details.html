@@ -15,17 +15,16 @@
 <li class="nav-item">
 <a class="nav-link active" href="#about" data-toggle="tab" aria-expanded="false"><i class="ti-user mr-2"></i>Indexing Officer Profile Details</a>
 </li>
-</ul>
+</ul> 
 </div>
 <div class="card-body mb-0 pb-0">
-{% include 'partials/_alerts.html' %} 
-
 <div class="">
 <div class="tab-content">
 <div class="tab-pane active" id="about">
 <div class="row justify-content-center">
 
 <div class="col-md-12  profile-detail">
+{% include 'partials/_alerts.html' %}
 
 <div class="">
 <h5 class="mb-1"> <i class="fa fa-graduation-cap text-primary"></i> Personal Details</h5>
@@ -37,7 +36,7 @@
 <ul class="list-unstyled">                        
 <li>Name: <span class="text-dark font-weight-bold ms-sm-2">{{object.indexing_officer.first_name}} {{object.indexing_officer.last_name}}</span></li>
 <li>Address: <span class="text-dark font-weight-bold ms-sm-2">{{object.institution.address}}</span></li>
-<li>Phone No: <span class="text-dark font-weight-bold ms-sm-2">{{object.institution.phone_no}}</span></li>
+<li>Phone No: <span class="text-dark font-weight-bold ms-sm-2">{{object.indexing_officer.phone_no}}</span></li>
 <li>Email: <span class="text-dark font-weight-bold ms-sm-2">{{object.indexing_officer.email}}</span></li>
 </ul>
 </div>

@@ -294,6 +294,9 @@ EXAMINATION_BODY = (
         ('WAEC', 'WAEC'),
         ('NECO', 'NECO'),
         ('NABTEB', 'NABTEB'),
+        ('WAEC & NECO', 'WAEC & NECO'),
+        ('WAEC & NABTEB', 'WAEC & NABTEB'),
+        ('NECO & NABTEB', 'NECO & NABTEB'),
         )
 
 ADMISSION_TYPE = (
