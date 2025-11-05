@@ -187,10 +187,18 @@ class AdmissionQuotaDetailView(LoginRequiredMixin, StaffRequiredMixin, DetailVie
 	template_name = "institutions/admission_quota_details.html"
 
 	def get_object(self):
-		user = self.request.user
-		obj1 = AdmissionQuota.objects.filter(institution = user.get_indexing_officer_profile.institution)
-		obj = obj1.first()
-		return obj
+	    user = self.request.user
+	    slug = self.kwargs.get("slug")  # from URL
+	    return AdmissionQuota.objects.get(
+	        institution=user.get_indexing_officer_profile.institution,
+	        slug=slug
+	    )
+
+	# def get_object(self):
+	# 	user = self.request.user
+	# 	obj1 = AdmissionQuota.objects.filter(institution = user.get_indexing_officer_profile.institution)
+	# 	obj = obj1.first()
+	# 	return obj
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
@@ -1769,7 +1777,7 @@ class StudentProfileDetailView(LoginRequiredMixin, StaffRequiredMixin, DetailVie
 
 
 @login_required
-def student_profiles_list(request):
+def student_profiles_list7(request):
 	academic_sessions = AcademicSession.objects.all()
 	context = {'academic_sessions': academic_sessions}
 	return render(request, 'institutions/academic_session_students_list.html', context)
@@ -1787,6 +1795,45 @@ def student_list(request):
 	    'students_list':students_list,
 	    }
 	return render(request, 'partials/students_list.html', context)
+
+@login_required
+def student_profiles_list(request):
+    selected_session_id = request.GET.get('academic_session')
+    user = request.user
+
+    # Save selected session to user's session
+    if selected_session_id:
+        request.session['selected_academic_session_id'] = selected_session_id
+    else:
+        # Try to recover from session if not sent
+        selected_session_id = request.session.get('selected_academic_session_id')
+
+    academic_sessions = AcademicSession.objects.all()
+
+    # Check if user has an institution profile
+    try:
+        institution = user.get_indexing_officer_profile.institution
+    except AttributeError:
+        # If not, redirect or show error
+        return redirect('login')  # or some error page
+
+
+    students_list = StudentProfile.objects.filter(
+        academic_session=selected_session_id, 
+        institution=institution 
+    )
+    # if selected_session_id:
+    #     applications = applications.filter(academic_session_id=selected_session_id)
+
+    context = {
+        'academic_sessions': academic_sessions,
+        'students_list': students_list,
+        'selected_session_id': selected_session_id,
+    }
+    if request.htmx:
+        return render(request, 'partials/students_profile_list.html', context)
+    return render(request, 'institutions/students_profile_list.html', context)
+
 
 
 class StudentProfilesListView(LoginRequiredMixin, StaffRequiredMixin, ListView):
@@ -2123,6 +2170,7 @@ def students_applications_list0(request):
 	return render(request, 'institutions/academic_sessions.html', context)
 
 
+@login_required
 def students_applications_list1(request):
     academic_sessions = AcademicSession.objects.all()
 
@@ -2143,6 +2191,7 @@ def students_applications_list1(request):
     return render(request, 'institutions/applications_list.html', context)
 
 
+@login_required
 def students_applications_list(request):
     selected_session_id = request.GET.get('academic_session')
     user = request.user
@@ -2270,7 +2319,7 @@ def rejections_list(request):
 
 
 @login_required
-def institutions_payments_list(request):
+def institutions_payments_list7(request):
 	academic_sessions = AcademicSession.objects.all()
 	context = {'academic_sessions': academic_sessions}
 	return render(request, 'institutions/academic_session_payments.html', context)
@@ -2285,7 +2334,45 @@ def payments_list(request):
 
 
 @login_required
-def indexed_students_list(request):
+def institutions_payments_list(request):
+    selected_session_id = request.GET.get('academic_session')
+    user = request.user
+
+    # Save selected session to user's session
+    if selected_session_id:
+        request.session['selected_academic_session_id'] = selected_session_id
+    else:
+        # Try to recover from session if not sent
+        selected_session_id = request.session.get('selected_academic_session_id')
+
+    academic_sessions = AcademicSession.objects.all()
+
+    # Check if user has an institution profile
+    try:
+        institution = user.get_indexing_officer_profile.institution
+    except AttributeError:
+        # If not, redirect or show error
+        return redirect('login')  # or some error page
+
+
+    submissions = InstitutionIndexing.objects.filter(
+    	academic_session=selected_session_id, 
+    	institution=institution 
+    )
+    # if selected_session_id:
+    #     applications = applications.filter(academic_session_id=selected_session_id)
+
+    context = {
+        'academic_sessions': academic_sessions,
+        'submissions': submissions,
+        'selected_session_id': selected_session_id,
+    }
+    if request.htmx:
+        return render(request, 'partials/submissions_list.html', context)
+    return render(request, 'institutions/submissions_list.html', context)
+
+@login_required
+def indexed_students_list7(request):
 	academic_sessions = AcademicSession.objects.all()
 	context = {'academic_sessions': academic_sessions}
 	return render(request, 'institutions/academic_session_indexing_list.html', context)
@@ -2301,6 +2388,46 @@ def indexed_list(request):
 	    'indexing_list':indexing_list,
 	    }
 	return render(request, 'partials/indexed_students_list.html', context)
+
+
+@login_required
+def indexed_students_list(request):
+    selected_session_id = request.GET.get('academic_session')
+    user = request.user
+
+    # Save selected session to user's session
+    if selected_session_id:
+        request.session['selected_academic_session_id'] = selected_session_id
+    else:
+        # Try to recover from session if not sent
+        selected_session_id = request.session.get('selected_academic_session_id')
+
+    academic_sessions = AcademicSession.objects.all()
+
+    # Check if user has an institution profile
+    try:
+        institution = user.get_indexing_officer_profile.institution
+    except AttributeError:
+        # If not, redirect or show error
+        return redirect('login')  # or some error page
+
+
+    indexing_list = IssueIndexing.objects.filter(
+        academic_session=selected_session_id, 
+        institution=institution 
+    )
+    # if selected_session_id:
+    #     applications = applications.filter(academic_session_id=selected_session_id)
+
+    context = {
+        'academic_sessions': academic_sessions,
+        'indexing_list': indexing_list,
+        'selected_session_id': selected_session_id,
+    }
+    if request.htmx:
+        return render(request, 'partials/indexed_students_sessions_list.html', context)
+    return render(request, 'institutions/indexed_students_sessions_list.html', context)
+
 
 @login_required
 def pay_institutions_indexing_fee(request):
