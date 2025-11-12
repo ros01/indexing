@@ -16,7 +16,7 @@ from institutions.models import *
 class IssueIndexing(models.Model):    
     student_profile = models.ForeignKey(StudentProfile,  null=True, blank=True, on_delete=models.CASCADE)
     matric_no = models.CharField(max_length=200, unique=True)
-    institution = models.ForeignKey(InstitutionProfile, related_name = "issue_indexing", on_delete=models.DO_NOTHING)
+    institution = models.ForeignKey(InstitutionProfile, related_name = "issue_indexing", on_delete=models.CASCADE)
     slug  = models.SlugField(blank=True)
     # academic_session = models.CharField(max_length=200, choices = ACADEMIC_SESSION,  null=True, blank=True)
     academic_session = models.ForeignKey(AcademicSession,  on_delete=models.CASCADE)

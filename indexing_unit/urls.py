@@ -11,9 +11,11 @@ from .views import (
     AcademicSessionUpdateView,
     IndexingOfficerCreateView,
     IndexingOfficerDetailView,
+    IndexingOfficerDeleteView,
     IndexingOfficerUpdateView,
     IndexingOfficerListView,
     InstitutionDetailView,
+    InstitutionDeleteView,
     InstitutionListView,
     InstitutionSearchView,
     AdmissionQuotaCreateView,
@@ -50,10 +52,17 @@ from .views import (
 
 app_name = 'indexing_unit'
 
+# urls.py
+from .views import IndexingOfficerDeleteView
+
+app_name = 'indexing_unit'
+
+
 urlpatterns = [
 	path('dashboard', DashboardView.as_view(), name='dashboard'),
     path('institutions_list', InstitutionListView.as_view(), name='institutions_list'),
     path('institutions_search_results', InstitutionSearchView.as_view(), name='institutions_search_results'),
+    path('indexing_officers_list', IndexingOfficerListView.as_view(), name='indexing_officers_list'),
     # path('institutions_list', views.institutions_list, name='institutions_list'),
     path('universities_list', views.universities_list, name='universities_list'),
     # path('university_list', views.university_list, name='university_list'),
@@ -71,10 +80,11 @@ urlpatterns = [
     path('create_institution',  InstitutionCreateView.as_view(), name='create_institution'),
     path('<slug:slug>/update_institution',  InstitutionUpdateView.as_view(), name='update_institution'),
     path('create_indexing_officer',  IndexingOfficerCreateView.as_view(), name='create_indexing_officer'),
-    path('indexing_officers_list', IndexingOfficerListView.as_view(), name='indexing_officers_list'),
     path('<slug:slug>/institution_detail',  InstitutionDetailView.as_view(), name='institution_detail'),
+    path('<slug:slug>/delete_institution/', InstitutionDeleteView.as_view(), name='delete_institution'),
     path('<slug:slug>/academic_session_detail',  AcademicSessionDetailView.as_view(), name='academic_session_detail'),
     path('<slug:slug>/indexing_officer_detail',  IndexingOfficerDetailView.as_view(), name='indexing_officer_detail'),
+    path('<slug:slug>/delete_indexing_officer', IndexingOfficerDeleteView.as_view(), name='delete_indexing_officer'),
     path('<int:pk>/indexing_officer_update',  IndexingOfficerUpdateView.as_view(), name='indexing_officer_update'),
     path('<slug:slug>/activate_user/', views.activate_user, name='activate_user'),
     path('<slug:slug>/deactivate_user/', views.deactivate_user, name='deactivate_user'),

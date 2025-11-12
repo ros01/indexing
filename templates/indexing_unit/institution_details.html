@@ -116,6 +116,56 @@
 
 <div class="d-flex justify-content-end">   
 
+<!-- <a href="{% url 'indexing_unit:delete_institution' object.slug %}" 
+   class="btn btn-outline-danger py-0 mr-4 mt-1 mb-3">
+   <i class="fa fa-trash" aria-hidden="true"></i> Delete Institution
+</a> -->
+<button 
+  class="btn btn-outline-danger py-0 mr-4 mt-1 mb-3"
+  onclick="confirmDelete('{{ object.slug }}', '{{ object.name }}')">
+  <i class="fa fa-trash" aria-hidden="true"></i> Delete Institution
+</button>
+
+<script>
+function confirmDelete(slug, name) {
+  Swal.fire({
+    title: 'Are you sure?',
+    text: `Delete institution "${name}"? This action cannot be undone and will delete all indexing officers, students and users associated with this institution.`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Yes, delete it!'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      fetch(`/indexing_unit/${slug}/delete_institution/`, {
+        method: 'DELETE',
+        headers: {
+          'X-CSRFToken': '{{ csrf_token }}',
+          'Accept': 'application/json'
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          Swal.fire('Deleted!', `${name} was deleted successfully.`, 'success');
+          setTimeout(() => {
+            window.location.href = data.redirect_url;
+          }, 1500);
+        } else {
+          Swal.fire('Error', data.error || 'Unable to delete institution.', 'error');
+        }
+      })
+      .catch(() => Swal.fire('Error', 'Something went wrong.', 'error'));
+    }
+  });
+}
+</script>
+
+
+
+
+
 <a href="{% url 'indexing_unit:update_institution' object.slug  %}" class="btn btn-outline-primary py-0 mr-4 mt-1 mb-3"><i class="fa fa-toggle-on" aria-hidden="true"></i> Update Institution</a>  
 
 

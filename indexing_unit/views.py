@@ -39,6 +39,9 @@ from django.utils.decorators import method_decorator
 from django.contrib import messages 
 from django.contrib.messages.views import SuccessMessageMixin
 from indexing_unit.utils import *
+from django.http import JsonResponse, HttpResponse
+from django.template.loader import render_to_string
+
 
 
 
@@ -423,6 +426,25 @@ class IndexingOfficerDetailView(LoginRequiredMixin, StaffRequiredMixin, DetailVi
 # qs = User.objects.filter(role='Indexing Officer')
 
 
+class IndexingOfficerDeleteView(LoginRequiredMixin, StaffRequiredMixin, DeleteView):
+    model = IndexingOfficerProfile
+    success_url = reverse_lazy("indexing_unit:indexing_officers_list")  # or wherever you want to redirect
+
+    @transaction.atomic
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        user = self.object.indexing_officer
+
+        # Delete both profile and associated user safely
+        if user:
+            user.delete()
+        self.object.delete()
+
+        return JsonResponse({
+            "success": True,
+            "redirect_url": str(self.success_url)
+        }, status=200)
+
 
 class IndexingOfficerUpdateView (LoginRequiredMixin, StaffRequiredMixin, SuccessMessageMixin, UpdateView):
     form_class = UserUpdateForm
@@ -479,11 +501,6 @@ class IndexingOfficerUpdateView (LoginRequiredMixin, StaffRequiredMixin, Success
             indexing_officer = IndexingOfficerProfile.objects.filter(indexing_officer=user).first() 
             return redirect(indexing_officer.get_absolute_url())
         return super(IndexingOfficerUpdateView, self).form_valid(form)
-
-
-
-    
-
  
     def get_success_url(self):
         # obj = self.get_object()
@@ -559,19 +576,6 @@ class CollegesListView(LoginRequiredMixin, StaffRequiredMixin, ListView):
 # 		return qs  #.filter(title__icontains='vid') 
 
  
-class IndexingOfficerListView(LoginRequiredMixin, StaffRequiredMixin, ListView):
-	template_name = "indexing_unit/indexing_officers_list.html"
-	def get_queryset(self):
-		request = self.request
-		# qs = User.objects.filter(role='Indexing Officer')
-		qs = IndexingOfficerProfile.objects.all()
-		query = request.GET.get('q')
-		if query:
-			qs = qs.filter(name__icontains=query)
-		return qs  #.filter(title__icontains='vid')
-
-
-
 
 
 
@@ -625,6 +629,90 @@ class InstitutionDetailView(LoginRequiredMixin, StaffRequiredMixin, SuccessMessa
     #     )
 
  
+
+
+class InstitutionDeleteViewOld(LoginRequiredMixin, StaffRequiredMixin, SuccessMessageMixin, DeleteView):
+    model = InstitutionProfile
+    template_name = "indexing_unit/institution_confirm_delete.html"
+    success_url = reverse_lazy('indexing_unit:institutions_list')
+    success_message = "Institution profile was deleted successfully."
+
+    def delete(self, request, *args, **kwargs):
+        """Override delete to add success message before redirect."""
+        messages.success(self.request, self.success_message)
+        return super().delete(request, *args, **kwargs)
+
+
+
+
+class InstitutionDeleteViewLast(LoginRequiredMixin, StaffRequiredMixin, DeleteView):
+    model = InstitutionProfile
+    success_url = reverse_lazy('indexing_unit:institutions_list')
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.delete()
+        return JsonResponse({
+            "success": True,
+            "redirect_url": str(self.success_url)
+        }, status=200)
+
+
+
+
+class InstitutionDeleteView(LoginRequiredMixin, StaffRequiredMixin, DeleteView):
+    model = InstitutionProfile
+    success_url = reverse_lazy('indexing_unit:institutions_list')
+
+    @transaction.atomic
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+
+        indexing_officers = self.object.indexingofficerprofile_set.all()
+        users_to_delete = User.objects.filter(
+            id__in=indexing_officers.values_list('indexing_officer_id', flat=True)
+        )
+
+        users_to_delete.delete()
+        self.object.delete()
+
+        return JsonResponse({
+            "success": True,
+            "redirect_url": str(self.success_url)
+        }, status=200)
+
+
+
+# class InstitutionDeleteView(LoginRequiredMixin, StaffRequiredMixin, DeleteView):
+#     model = InstitutionProfile
+#     success_url = reverse_lazy('indexing_unit:institutions_list')
+
+#     def delete(self, request, *args, **kwargs):
+#         self.object = self.get_object()
+#         self.object.delete()
+#         return JsonResponse({
+#             "success": True,
+#             "redirect_url": str(self.success_url)
+#         })
+
+
+    # def delete(self, request, *args, **kwargs):
+    #     self.object = self.get_object()
+    #     self.object.delete()
+
+    #     # For HTMX requests, return JSON
+    #     if request.headers.get('HX-Request'):
+    #         messages.success(request, f"{self.object.name} was deleted successfully.")
+    #         return JsonResponse({
+    #             "success": True,
+    #             "redirect_url": str(self.success_url)
+    #         })
+
+    #     # Normal fallback (in case someone accesses via a normal link)
+    #     messages.success(request, "Institution deleted successfully.")
+    #     return super().delete(request, *args, **kwargs)
+
+
 
 
 class IndexingApplicationsListView(LoginRequiredMixin, StaffRequiredMixin, ListView):
@@ -713,6 +801,93 @@ class InstitutionSearchView(LoginRequiredMixin, ListView):
 		context['form'] = SelectInstitutionForm()	
 		context['institution'] = filter_set
 		return context
+
+class IndexingOfficerListView(LoginRequiredMixin, StaffRequiredMixin, ListView):
+    template_name = "indexing_unit/indexing_officers_list.html"
+    context_object_name = "officers"
+
+    def get_queryset(self):
+        qs = IndexingOfficerProfile.objects.select_related('institution', 'indexing_officer')
+        institution_type = self.request.GET.get('institution_type')
+
+        if institution_type in ["University", "College of Health"]:
+            qs = qs.filter(institution__institution_type=institution_type)
+
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        form = SelectInstitutionForm()
+
+        institution_type = self.request.GET.get('institution_type')
+        if institution_type:
+            form.fields['institution_type'].initial = institution_type
+
+        context['form'] = form
+        context['institution_type'] = institution_type
+        return context
+        
+class IndexingOfficerListViewXXX(LoginRequiredMixin, StaffRequiredMixin, ListView):
+    """
+    Displays Indexing Officers dynamically filtered by institution type (HTMX-enabled).
+    """
+    template_name = "indexing_unit/indexing_officers_list.html"
+    context_object_name = "officers"
+
+    def get_queryset(self):
+        qs = IndexingOfficerProfile.objects.select_related("institution", "indexing_officer")
+        institution_type = self.request.GET.get("institution_type")
+
+        if institution_type and institution_type != "All":
+            qs = qs.filter(institution__institution_type=institution_type)
+
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["institution_type"] = self.request.GET.get("institution_type", "All")
+        return context
+
+
+
+class IndexingOfficerListViewOld(LoginRequiredMixin, StaffRequiredMixin, ListView):
+    template_name = "indexing_unit/indexing_officers_list.html"
+    def get_queryset(self):
+        request = self.request
+        # qs = User.objects.filter(role='Indexing Officer')
+        qs = IndexingOfficerProfile.objects.all()
+        query = request.GET.get('q')
+        if query:
+            qs = qs.filter(name__icontains=query)
+        return qs  #.filter(title__icontains='vid')
+
+
+class IndexingOfficerListView000(LoginRequiredMixin, StaffRequiredMixin, ListView):
+    template_name = "indexing_unit/indexing_officers_list.html"
+    context_object_name = "officers"
+
+    def get_queryset(self):
+        qs = IndexingOfficerProfile.objects.select_related('institution', 'indexing_officer')
+        institution_type = self.request.GET.get('institution_type')
+        if institution_type:
+            qs = qs.filter(institution__institution_type=institution_type)
+        return qs
+
+    def get(self, request, *args, **kwargs):
+        self.object_list = self.get_queryset()
+        context = self.get_context_data()
+
+        # If request is from HTMX, return only the table fragment
+        if request.headers.get('HX-Request'):
+            html = render_to_string(
+                "partials/_indexing_officers_table.html",
+                context,
+                request=request
+            )
+            return HttpResponse(html)
+
+        return self.render_to_response(context)
+
 
 
 class InstitutionsIndexedStudentsList0(LoginRequiredMixin, ListView):

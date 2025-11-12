@@ -192,7 +192,9 @@ class StudentProfileManager(models.Manager):
 
 class StudentProfile(models.Model):
     student = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.CASCADE)
-    institution = models.ForeignKey(InstitutionProfile,  on_delete=models.DO_NOTHING)
+    # institution = models.ForeignKey(InstitutionProfile,  on_delete=models.DO_NOTHING)
+    institution = models.ForeignKey(InstitutionProfile, on_delete=models.CASCADE)
+
     # admission_type = models.CharField(max_length=100, choices = EXAMINATION_BODY, blank=True)
     slug  = models.SlugField(blank=True)
     # academic_session = models.CharField(max_length=200, null=True, blank=True)
@@ -376,7 +378,8 @@ INDEXING_STATUS = (
     )
 class StudentIndexing(models.Model):    
     student_profile = models.ForeignKey(StudentProfile,  null=True, blank=True, on_delete=models.CASCADE)
-    institution = models.ForeignKey(InstitutionProfile,  on_delete=models.DO_NOTHING)
+    institution = models.ForeignKey(InstitutionProfile, on_delete=models.CASCADE)
+    # institution = models.ForeignKey(InstitutionProfile,  on_delete=models.DO_NOTHING)
     slug  = models.SlugField(blank=True)
     matric_no = models.CharField(max_length=200)
     # academic_session = models.CharField(max_length=200, choices = ACADEMIC_SESSION)
@@ -539,7 +542,8 @@ pre_save.connect(pre_save_student_indexing_receiver, sender=StudentIndexing)
 
 
 class IndexingPayment(models.Model):
-    institution = models.ForeignKey(InstitutionProfile, on_delete=models.DO_NOTHING)
+    # institution = models.ForeignKey(InstitutionProfile, on_delete=models.DO_NOTHING)
+    institution = models.ForeignKey(InstitutionProfile, on_delete=models.CASCADE)
     student_profile = models.ForeignKey(StudentProfile,  null=True, blank=True, on_delete=models.CASCADE)
     student_indexing = models.ForeignKey(StudentIndexing,  null=True, blank=True, on_delete=models.CASCADE)
     # institution_payment = models.ForeignKey("InstitutionPayment", null=True, blank=True, on_delete=models.DO_NOTHING)
@@ -590,7 +594,8 @@ pre_save.connect(pre_save_student_indexing_payment_receiver, sender=IndexingPaym
 
 
 class InstitutionIndexing(models.Model):
-    institution = models.ForeignKey(InstitutionProfile, on_delete=models.DO_NOTHING)
+    institution = models.ForeignKey(InstitutionProfile, on_delete=models.CASCADE)
+    # institution = models.ForeignKey(InstitutionProfile, on_delete=models.DO_NOTHING)
     # student_profile = models.ForeignKey(StudentProfile,  null=True, blank=True, on_delete=models.DO_NOTHING)
     # student_indexing = models.ForeignKey(StudentIndexing,  null=True, blank=True, on_delete=models.DO_NOTHING)
     student_indexing = models.ManyToManyField(StudentIndexing)

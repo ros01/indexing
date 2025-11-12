@@ -406,8 +406,8 @@
 <script src="{% static 'd_assets/plugins/datatables/buttons.print.min.js' %}"></script>
 <script src="{% static 'd_assets/plugins/datatables/buttons.colVis.min.js' %}"></script>
 <!-- Responsive examples -->
-<script src="{% static 'd_assets/plugins/datatables/dataTables.responsive.min.js' %}"></script>
-<script src="{% static 'd_assets/plugins/datatables/responsive.bootstrap4.min.js' %}"></script>
+<!-- <script src="{% static 'd_assets/plugins/datatables/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'd_assets/plugins/datatables/responsive.bootstrap4.min.js' %}"></script> -->
 
 <!-- Datatable init js -->
 <script src="{% static 'd_assets/pages/datatables.init.js' %}"></script>  
@@ -415,6 +415,9 @@
 
 <!-- App js -->
 <script src="{% static 'd_assets/js/app.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> 
+<script src="https://unpkg.com/htmx.org@1.9.10"></script>
+
 <!-- <script src="{% static 'js/jquery.js' %}"></script> -->
 <!-- <script>
 $(document).ready(function(){
@@ -422,6 +425,70 @@ $(document).ready(function(){
 
 });
 </script> -->
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+function confirmIndexingOfficerDelete(button) {
+    const deleteUrl = button.getAttribute("data-url");
+
+    Swal.fire({
+        title: 'Delete Indexing Officer?',
+        text: "This will permanently delete this Indexing Officer and their associated user account.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch(deleteUrl, {
+                method: "DELETE",
+                headers: {
+                    "X-CSRFToken": getCookie('csrftoken'),
+                    "HX-Request": "true"
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Deleted!',
+                        text: 'Indexing Officer and user deleted successfully.',
+                        icon: 'success',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+
+                    setTimeout(() => {
+                        window.location.href = data.redirect_url;
+                    }, 1500);
+                } else {
+                    Swal.fire('Error', 'Could not delete indexing officer.', 'error');
+                }
+            })
+            .catch(() => {
+                Swal.fire('Error', 'An error occurred during deletion.', 'error');
+            });
+        }
+    });
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let cookie of cookies) {
+            cookie = cookie.trim();
+            if (cookie.startsWith(name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+
        
 </body>
 </html>
